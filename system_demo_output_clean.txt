@@ -1,0 +1,190 @@
+OpenAI client initialized
+Anthropic client initialized
+DeepSeek client available
+Attempting AWS initialization with region: us-east-1
+AWS DynamoDB connection successful
+Initializing DynamoDB tables...
+AWS Knowledge Base initialized successfully
+COMPLETE HUMOR GENERATION SYSTEM DEMO
+- Multiple LLM agents (GPT-4, Claude, DeepSeek) with personas
+- Context-aware persona selection and demographics
+- Evaluation agents with personas
+- User feedback learning and AWS knowledge base
+- Group context support
+- FOR LOOP generation with multiple models
+- Cloud-ready architecture
+
+============================================================
+Initializing Complete Humor Generation System...
+System initialized!
+Available LLMs: ['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku', 'deepseek-chat', 'deepseek-coder']
+Available Personas: 12 personas loaded
+
+============================================================
+DEMONSTRATING COMPLETE WORKFLOW
+============================================================
+
+Processing user: john_lawyer
+  Context: What's the best legal excuse for being late? _____
+  Audience: colleagues
+  Recommended personas: ['millennial_memer', 'dad_humor_enthusiast', 'office_worker']
+  Generation time: 3.36s
+  Generated 3 options
+  Best result: "Accidentally joining a cult meeting instead of the morning Zoom call."
+  By: Dark Humor Connoisseur using gpt-4
+  Score: 8.0/10
+  LLMs used: gpt-4
+
+Processing user: mary_parent
+  Context: What did I pack for my kid's lunch? _____
+  Audience: family
+  Recommended personas: ['millennial_memer', 'dad_humor_enthusiast', 'office_worker']
+  Generation time: 2.53s
+  Generated 3 options
+  Best result: "Grandma's dentures."
+  By: Dark Humor Connoisseur using gpt-4
+  Score: 7.0/10
+  LLMs used: gpt-4
+
+Processing user: alex_gamer
+  Context: What's my secret gaming strategy? _____
+  Audience: friends
+  Recommended personas: ['millennial_memer', 'dad_humor_enthusiast', 'office_worker']
+  Generation time: 2.27s
+  Generated 3 options
+  Best result: "Unplugging the router when I'm about to lose."
+  By: Office_worker using gpt-4
+  Score: 8.0/10
+  LLMs used: gpt-4
+
+SIMULATING USER FEEDBACK
+----------------------------------------
+
+john_lawyer feedback:
+  Dark Humor Connoisseur: 5/10
+WARNING: AWS Bedrock access denied - embeddings disabled (this warning shown once)
+Stored preferences for user john_lawyer
+  Corporate Humor Specialist: 5/10
+Stored preferences for user john_lawyer
+  Millennial Memer: 5/10
+Stored preferences for user john_lawyer
+  Feedback stored for john_lawyer
+
+mary_parent feedback:
+  Dark Humor Connoisseur: 5/10
+Stored preferences for user mary_parent
+  Corporate Humor Specialist: 5/10
+Stored preferences for user mary_parent
+  Millennial Memer: 5/10
+Stored preferences for user mary_parent
+  Feedback stored for mary_parent
+
+alex_gamer feedback:
+  Dark Humor Connoisseur: 5/10
+Stored preferences for user alex_gamer
+  Corporate Humor Specialist: 5/10
+Stored preferences for user alex_gamer
+  Millennial Memer: 5/10
+Stored preferences for user alex_gamer
+  Feedback stored for alex_gamer
+
+DEMONSTRATING LEARNING & ADAPTATION
+----------------------------------------
+Generating humor for john_lawyer again (after feedback):
+Updated persona recommendations: ['millennial_memer', 'dad_humor_enthusiast', 'office_worker']
+
+
+
+Adapted result: "The 'I'm Not Responsible for the Coffee Pot' disclaimer."
+Selected persona: Dark Humor Connoisseur
+Score: 7.0/10
+System successfully adapted to user preferences!
+
+DEMONSTRATING GROUP MODE
+----------------------------------------
+Group: office_friends
+Members: john_lawyer, mary_parent, alex_gamer
+Stored group context for office_friends
+Common humor styles: []
+Group preferences: {'member_count': 3, 'common_personas': [], 'style_preferences': {}}
+
+Group humor options:
+  1. "Avengers-style intervention for Tony Stark's caffeine addiction." (by Marvel Universe Expert, score: 7.0)
+  2. "Competitive interpretive dances about our various food allergies." (by Dark Humor Connoisseur, score: 7.0)
+  3. "Attempting to simultaneously break the world record for largest macarena dance and the diversity barrier." (by Pun and Wordplay Expert, score: 7.0)
+
+ANALYTICS & INSIGHTS
+----------------------------------------
+
+john_lawyer:
+  Liked personas: []
+  Disliked personas: []
+  Total interactions: 6
+  Last updated: 2025-06-28 18:57
+  Average feedback score: 5.0/10
+
+mary_parent:
+  Liked personas: []
+  Disliked personas: []
+  Total interactions: 6
+  Last updated: 2025-06-28 18:57
+  Average feedback score: 5.0/10
+
+alex_gamer:
+  Liked personas: []
+  Disliked personas: []
+  Total interactions: 6
+  Last updated: 2025-06-28 18:57
+  Average feedback score: 5.0/10
+
+FOR LOOP GENERATION DEMO
+----------------------------------------
+
+Loop 1: What's in my browser history? _____
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+ERROR: Error with deepseek-chat: Client error '401 Unauthorized' for url 'https://api.deepseek.com/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+  Generated 3 responses in 0.97s
+    1. ""Unsuccessful avocado toast recipes and 1,001 ways to pay off student loans"" (via gpt-4)
+Stored preferences for user demo_user
+    2. ""What's in my browser history? A deep dive into the dark world of cat memes and failed attempts at adulting."" (via gpt-3.5-turbo)
+Stored preferences for user demo_user
+    3. "What's in my browser history? A questionable search history that would make my FBI agent blush." (via gpt-3.5-turbo)
+Stored preferences for user demo_user
+
+Loop 2: What did I Google at 3 AM? _____
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+ERROR: Error with deepseek-chat: Client error '401 Unauthorized' for url 'https://api.deepseek.com/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+  Generated 3 responses in 1.22s
+    1. ""How to professionally quit a job you haven't even started yet"" (via gpt-4)
+Stored preferences for user demo_user
+    2. ""Regrettable life decisions."" (via gpt-3.5-turbo)
+Stored preferences for user demo_user
+    3. ""What did I Google at 3 AM? 'How to break up with my microwave because it's too clingy.'"" (via gpt-3.5-turbo)
+Stored preferences for user demo_user
+
+Loop 3: What's my biggest work mistake? _____
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+ERROR: Error with deepseek-chat: Client error '401 Unauthorized' for url 'https://api.deepseek.com/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+  Generated 3 responses in 0.98s
+    1. "Accidentally starting a union during my lunch break." (via gpt-4)
+Stored preferences for user demo_user
+    2. "Accidentally hitting "reply all" on an email meant for just your work BFF and accidentally exposing your true feelings about your boss." (via gpt-3.5-turbo)
+Stored preferences for user demo_user
+    3. "Accidentally hitting "reply all" on an email meant for your boss, admitting you binge-watched Netflix at work." (via gpt-3.5-turbo)
+Stored preferences for user demo_user
+
+Loop 4: What's my secret talent? _____
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+ERROR: Error with deepseek-chat: Client error '401 Unauthorized' for url 'https://api.deepseek.com/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+  Generated 3 responses in 0.90s
+    1. ""Surviving on avocado toast and crippling student debt."" (via gpt-4)
+Stored preferences for user demo_user
+    2. ""Taking naps so long, they qualify as hibernation."" (via gpt-3.5-turbo)
+Stored preferences for user demo_user
+    3. "What's my secret talent? Pretending to adult successfully." (via gpt-3.5-turbo)
+Stored preferences for user demo_user
+

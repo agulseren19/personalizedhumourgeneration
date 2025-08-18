@@ -1,0 +1,388 @@
+{
+  "timestamp": "2025-06-15 16:16:49",
+  "dataset_info": {
+    "total_data_points": 30,
+    "total_rounds": 30,
+    "win_rate": 0.2,
+    "avg_completion_time": 38.5,
+    "unique_black_cards": 10,
+    "unique_white_cards": 18,
+    "most_common_black_cards": [
+      [
+        "What's the next Happy Meal toy?",
+        5
+      ],
+      [
+        "What's that smell?",
+        5
+      ],
+      [
+        "What's a girl's best friend?",
+        5
+      ],
+      [
+        "War! What is it good for?",
+        5
+      ],
+      [
+        "What gives me uncontrollable gas?",
+        5
+      ]
+    ],
+    "most_common_white_cards": [
+      [
+        "The inevitable heat death of the universe",
+        4
+      ],
+      [
+        "Being rich",
+        3
+      ],
+      [
+        "Genuine human connection",
+        2
+      ],
+      [
+        "A disappointing birthday party",
+        2
+      ],
+      [
+        "Stranger danger",
+        2
+      ]
+    ],
+    "top_winning_white_cards": [
+      [
+        "Powerful thighs",
+        2
+      ],
+      [
+        "Genuine human connection",
+        1
+      ],
+      [
+        "A really cool hat",
+        1
+      ],
+      [
+        "Going inside at some point because of the mosquitoes",
+        1
+      ],
+      [
+        "Letting this loser eat me out",
+        1
+      ]
+    ]
+  },
+  "baseline_results": {
+    "dataset_analysis": {
+      "total_data_points": 30,
+      "total_rounds": 30,
+      "win_rate": 0.2,
+      "avg_completion_time": 38.5,
+      "unique_black_cards": 10,
+      "unique_white_cards": 18,
+      "most_common_black_cards": [
+        [
+          "What's the next Happy Meal toy?",
+          5
+        ],
+        [
+          "What's that smell?",
+          5
+        ],
+        [
+          "What's a girl's best friend?",
+          5
+        ],
+        [
+          "War! What is it good for?",
+          5
+        ],
+        [
+          "What gives me uncontrollable gas?",
+          5
+        ]
+      ],
+      "most_common_white_cards": [
+        [
+          "The inevitable heat death of the universe",
+          4
+        ],
+        [
+          "Being rich",
+          3
+        ],
+        [
+          "Genuine human connection",
+          2
+        ],
+        [
+          "A disappointing birthday party",
+          2
+        ],
+        [
+          "Stranger danger",
+          2
+        ]
+      ],
+      "top_winning_white_cards": [
+        [
+          "Powerful thighs",
+          2
+        ],
+        [
+          "Genuine human connection",
+          1
+        ],
+        [
+          "A really cool hat",
+          1
+        ],
+        [
+          "Going inside at some point because of the mosquitoes",
+          1
+        ],
+        [
+          "Letting this loser eat me out",
+          1
+        ]
+      ]
+    },
+    "baseline_humor_scores": [
+      {
+        "black_card": "Life for American Indians was forever changed when the White Man introduced them to _____.",
+        "white_card": "Powerful thighs",
+        "humor_score": 0.5
+      },
+      {
+        "black_card": "What's the next Happy Meal toy?",
+        "white_card": "Genuine human connection",
+        "humor_score": 0.3
+      },
+      {
+        "black_card": "What's the next Happy Meal toy?",
+        "white_card": "Powerful thighs",
+        "humor_score": 0.3
+      },
+      {
+        "black_card": "What's the next Happy Meal toy?",
+        "white_card": "Genuine human connection",
+        "humor_score": 0.3
+      },
+      {
+        "black_card": "I never truly understood _____ until I encountered _____.",
+        "white_card": "Powerful thighs",
+        "humor_score": 0.3
+      },
+      {
+        "black_card": "I never truly understood _____ until I encountered _____.",
+        "white_card": "Genuine human connection",
+        "humor_score": 0.3
+      },
+      {
+        "black_card": "What's that smell?",
+        "white_card": "Powerful thighs",
+        "humor_score": 0.3
+      },
+      {
+        "black_card": "What's that smell?",
+        "white_card": "Genuine human connection",
+        "humor_score": 0.3
+      },
+      {
+        "black_card": "Life for American Indians was forever changed when the White Man introduced them to _____.",
+        "white_card": "Genuine human connection",
+        "humor_score": 0.3
+      },
+      {
+        "black_card": "Life for American Indians was forever changed when the White Man introduced them to _____.",
+        "white_card": "A really cool hat",
+        "humor_score": 0.2
+      },
+      {
+        "black_card": "I never truly understood _____ until I encountered _____.",
+        "white_card": "A really cool hat",
+        "humor_score": 0.0
+      },
+      {
+        "black_card": "What's that smell?",
+        "white_card": "A really cool hat",
+        "humor_score": 0.0
+      }
+    ],
+    "analysis_type": "simplified_mock_analysis"
+  },
+  "mock_crewai_results": [
+    {
+      "black_card": "What's the next Happy Meal toy?",
+      "white_card": "Being rich",
+      "humor_score": 0.61,
+      "method": "mock_crewai",
+      "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: Being rich. Response maintained - already well-crafted."
+    },
+    {
+      "black_card": "What's the next Happy Meal toy?",
+      "white_card": "A disappointing barbecue",
+      "humor_score": 0.61,
+      "method": "mock_crewai",
+      "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: A disappointing barbecue. Response maintained - already well-crafted."
+    },
+    {
+      "black_card": "What's the next Happy Meal toy?",
+      "white_card": "The Heart of Darkness!",
+      "humor_score": 0.56,
+      "method": "mock_crewai",
+      "humor_analysis": "Limited comedic impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: The Heart of Darkness!. Improved from 'The Heart of Darkness' for better impact."
+    },
+    {
+      "black_card": "I never truly understood _____ until I encountered _____.",
+      "white_card": "Being rich",
+      "humor_score": 0.61,
+      "method": "mock_crewai",
+      "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: Being rich. Response maintained - already well-crafted."
+    },
+    {
+      "black_card": "I never truly understood _____ until I encountered _____.",
+      "white_card": "A disappointing barbecue",
+      "humor_score": 0.61,
+      "method": "mock_crewai",
+      "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: A disappointing barbecue. Response maintained - already well-crafted."
+    },
+    {
+      "black_card": "I never truly understood _____ until I encountered _____.",
+      "white_card": "The Heart of Darkness!",
+      "humor_score": 0.56,
+      "method": "mock_crewai",
+      "humor_analysis": "Limited comedic impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: The Heart of Darkness!. Improved from 'The Heart of Darkness' for better impact."
+    },
+    {
+      "black_card": "What's that smell?",
+      "white_card": "Being rich",
+      "humor_score": 0.61,
+      "method": "mock_crewai",
+      "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: Being rich. Response maintained - already well-crafted."
+    },
+    {
+      "black_card": "What's that smell?",
+      "white_card": "A disappointing barbecue",
+      "humor_score": 0.61,
+      "method": "mock_crewai",
+      "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: A disappointing barbecue. Response maintained - already well-crafted."
+    },
+    {
+      "black_card": "What's that smell?",
+      "white_card": "The Heart of Darkness!",
+      "humor_score": 0.56,
+      "method": "mock_crewai",
+      "humor_analysis": "Limited comedic impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: The Heart of Darkness!. Improved from 'The Heart of Darkness' for better impact."
+    },
+    {
+      "black_card": "Life for American Indians was forever changed when the White Man introduced them to _____.",
+      "white_card": "Being rich",
+      "humor_score": 0.61,
+      "method": "mock_crewai",
+      "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: Being rich. Response maintained - already well-crafted."
+    },
+    {
+      "black_card": "Life for American Indians was forever changed when the White Man introduced them to _____.",
+      "white_card": "A disappointing barbecue",
+      "humor_score": 0.61,
+      "method": "mock_crewai",
+      "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: A disappointing barbecue. Response maintained - already well-crafted."
+    },
+    {
+      "black_card": "Life for American Indians was forever changed when the White Man introduced them to _____.",
+      "white_card": "The Heart of Darkness!",
+      "humor_score": 0.56,
+      "method": "mock_crewai",
+      "humor_analysis": "Limited comedic impact.",
+      "context_analysis": "Excellent contextual fit. Grammar flows well.",
+      "editor_notes": "Refined: The Heart of Darkness!. Improved from 'The Heart of Darkness' for better impact."
+    }
+  ],
+  "comparison_analysis": {
+    "method_comparison": {
+      "baseline": {
+        "count": 12,
+        "average": 0.25833333333333336,
+        "max": 0.5,
+        "min": 0.0,
+        "method": "Baseline Prompt-Only"
+      },
+      "mock_crewai": {
+        "count": 12,
+        "average": 0.5933333333333334,
+        "max": 0.61,
+        "min": 0.56,
+        "method": "Mock CrewAI Multi-Agent"
+      }
+    },
+    "score_analysis": {
+      "baseline_avg": 0.25833333333333336,
+      "crewai_avg": 0.5933333333333334,
+      "absolute_improvement": 0.335,
+      "percentage_improvement": 129.6774193548387,
+      "winner": "Mock CrewAI"
+    },
+    "top_combinations": {
+      "baseline_best": {
+        "black_card": "Life for American Indians was forever changed when the White Man introduced them to _____.",
+        "white_card": "Powerful thighs",
+        "humor_score": 0.5
+      },
+      "crewai_best": {
+        "black_card": "What's the next Happy Meal toy?",
+        "white_card": "Being rich",
+        "humor_score": 0.61,
+        "method": "mock_crewai",
+        "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+        "context_analysis": "Excellent contextual fit. Grammar flows well.",
+        "editor_notes": "Refined: Being rich. Response maintained - already well-crafted."
+      },
+      "overall_best": {
+        "black_card": "What's the next Happy Meal toy?",
+        "white_card": "Being rich",
+        "humor_score": 0.61,
+        "method": "mock_crewai",
+        "humor_analysis": "Moderate humor appeal. Brevity enhances impact.",
+        "context_analysis": "Excellent contextual fit. Grammar flows well.",
+        "editor_notes": "Refined: Being rich. Response maintained - already well-crafted."
+      }
+    },
+    "insights": [
+      "Mock CrewAI shows significant improvement (>20%) over baseline approach",
+      "Mock CrewAI achieves higher peak humor scores",
+      "Mock CrewAI achieves good humor scores (>0.5 average)"
+    ],
+    "recommendations": [
+      "Consider investing in multi-agent approaches for humor generation",
+      "The collaborative agent approach shows promise for CAH-style humor",
+      "Focus on refining high-scoring generation strategies",
+      "Both approaches could benefit from larger training datasets",
+      "Consider hybrid approaches combining baseline efficiency with agent creativity"
+    ]
+  }
+}

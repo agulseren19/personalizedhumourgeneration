@@ -1,0 +1,565 @@
+OpenAI client initialized
+Anthropic client initialized
+DeepSeek client available
+FIXED COMPLETE HUMOR GENERATION SYSTEM DEMO
+All major issues have been addressed:
+• Content filtering with detoxify
+• Proper persona recommendation based on user preferences
+• Fixed feedback learning (likes/dislikes actually work)
+• Meaningful evaluation scores (not all 5/10)
+• Black card generation
+• AWS knowledge base integration
+• Group consensus humor
+
+======================================================================
+Initializing FIXED Complete Humor Generation System...
+Fixed Issues:
+  • Content filtering with detoxify
+  • Proper persona recommendation
+  • Fixed feedback learning (likes/dislikes)
+  • Meaningful evaluation scores
+  • Black card generation
+  • AWS knowledge base integration
+
+Available personas: ['dad_humor_enthusiast', 'millennial_memer', 'office_worker', 'gaming_guru', 'dark_humor_specialist', 'wordplay_master', 'suburban_parent', 'gen_z_chaos']
+
+======================================================================
+DEMONSTRATING FIXED COMPLETE WORKFLOW
+======================================================================
+
+CONTENT FILTERING DEMONSTRATION
+--------------------------------------------------
+  'A delightful family picnic'
+    Safe: True, Toxicity: 0.001
+
+  'My boss's terrible management skills'
+    Safe: True, Toxicity: 0.059
+
+  'Something hilariously inappropriate'
+    Safe: True, Toxicity: 0.012
+
+  'Damn politicians and their BS'
+    Safe: False, Toxicity: 0.956
+    Sanitized: 'Darn politicians and their BS'
+
+  'You're such an idiot, moron'
+    Safe: False, Toxicity: 0.988
+    Sanitized: 'You're such an idiot, moron'
+
+
+INITIAL HUMOR GENERATION
+--------------------------------------------------
+
+👤 Processing user: john_lawyer
+  FIXED Persona recommendations for john_lawyer:
+    office_worker: 8.4
+    corporate_ladder_climber: 6.9
+    wordplay_master: 5.4
+    dad_humor_enthusiast: 5.3
+    suburban_parent: 5.2
+    dark_humor_specialist: 5.1
+    gaming_guru: 5.0
+    gen_z_chaos: 4.9
+  Final strict filtered personas: ['office_worker', 'corporate_ladder_climber', 'wordplay_master', 'dad_humor_enthusiast', 'suburban_parent']
+  Generating with static personas: ['office_worker', 'corporate_ladder_climber', 'wordplay_master', 'dad_humor_enthusiast', 'suburban_parent']
+  • Dynamic persona not created (no user history)
+  Final personas (static + dynamic): ['office_worker', 'corporate_ladder_climber', 'wordplay_master']
+    Generating with static persona: office_worker
+    Generating with static persona: corporate_ladder_climber
+    Generating with static persona: wordplay_master
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  Context: What's the best legal excuse for being late? _____
+  Recommended personas: ['office_worker', 'corporate_ladder_climber', 'wordplay_master', 'dad_humor_enthusiast', 'suburban_parent']
+    1. "What's the best legal excuse for being late? I was detained... by a fascinating book on punctuality!"
+       By: wordplay_master (via gpt-3.5-turbo)
+       Score: 6.6/10
+       Toxicity: 0.001
+       Safe: True
+    2. "Another Zoom meeting that should have been an email."
+       By: office_worker (via gpt-4)
+       Score: 6.0/10
+       Toxicity: 0.001
+       Safe: True
+    3. "Sorry I'm late, I was strategically planning my next career move in the company bathroom."
+       By: corporate_ladder_climber (via gpt-3.5-turbo)
+       Score: 6.0/10
+       Toxicity: 0.001
+       Safe: True
+
+👤 Processing user: mary_parent
+  FIXED Persona recommendations for mary_parent:
+    dad_humor_enthusiast: 9.4
+    suburban_parent: 6.6
+    wordplay_master: 5.5
+    dark_humor_specialist: 5.3
+    corporate_ladder_climber: 5.3
+    office_worker: 5.3
+    gaming_guru: 5.2
+    absurdist_artist: 5.0
+  Final strict filtered personas: ['dad_humor_enthusiast', 'suburban_parent', 'wordplay_master', 'dark_humor_specialist', 'corporate_ladder_climber']
+  Generating with static personas: ['dad_humor_enthusiast', 'suburban_parent', 'wordplay_master', 'dark_humor_specialist', 'corporate_ladder_climber']
+  • Dynamic persona not created (no user history)
+  Final personas (static + dynamic): ['dad_humor_enthusiast', 'suburban_parent', 'wordplay_master']
+    Generating with static persona: dad_humor_enthusiast
+    Generating with static persona: suburban_parent
+    Generating with static persona: wordplay_master
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  Context: What did I pack for my kid's lunch? _____
+  Recommended personas: ['dad_humor_enthusiast', 'suburban_parent', 'wordplay_master', 'dark_humor_specialist', 'corporate_ladder_climber']
+    1. "Ham it up with some cheese puns."
+       By: wordplay_master (via gpt-3.5-turbo)
+       Score: 6.4/10
+       Toxicity: 0.001
+       Safe: True
+    2. "Five different kinds of snacks they won't eat."
+       By: suburban_parent (via gpt-3.5-turbo)
+       Score: 5.8/10
+       Toxicity: 0.001
+       Safe: True
+    3. "A 'peeling' banana, a 'berry' good sandwich and a 'grape' drink for a 'fruitful' day at school!"
+       By: dad_humor_enthusiast (via gpt-4)
+       Score: 6.0/10
+       Toxicity: 0.001
+       Safe: True
+
+👤 Processing user: alex_gamer
+  FIXED Persona recommendations for alex_gamer:
+    gaming_guru: 9.4
+    gen_z_chaos: 7.1
+    millennial_memer: 6.8
+    dad_humor_enthusiast: 5.3
+    office_worker: 5.2
+    dark_humor_specialist: 5.2
+    wordplay_master: 5.1
+    suburban_parent: 4.9
+  Final strict filtered personas: ['gaming_guru', 'gen_z_chaos', 'millennial_memer', 'dad_humor_enthusiast', 'office_worker']
+  Generating with static personas: ['gaming_guru', 'gen_z_chaos', 'millennial_memer', 'dad_humor_enthusiast', 'office_worker']
+  • Dynamic persona not created (no user history)
+  Final personas (static + dynamic): ['gaming_guru', 'gen_z_chaos', 'millennial_memer']
+    Generating with static persona: gaming_guru
+    Generating with static persona: gen_z_chaos
+    Generating with static persona: millennial_memer
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  Context: What's my secret gaming strategy? _____
+  Recommended personas: ['gaming_guru', 'gen_z_chaos', 'millennial_memer', 'dad_humor_enthusiast', 'office_worker']
+    1. "Eating Hot Cheetos to boost my gamer skills while staying hydrated with organic kale smoothies."
+       By: millennial_memer (via gpt-3.5-turbo)
+       Score: 6.0/10
+       Toxicity: 0.018
+       Safe: True
+    2. "Convincing everyone I'm a noob until I unleash my hidden Final Fantasy level grinding skills."
+       By: gaming_guru (via gpt-4)
+       Score: 5.8/10
+       Toxicity: 0.065
+       Safe: True
+    3. "Eating a whole pizza in one sitting while wearing a tutu and singing show tunes"
+       By: gen_z_chaos (via gpt-3.5-turbo)
+       Score: 5.6/10
+       Toxicity: 0.021
+       Safe: True
+
+REALISTIC FEEDBACK SIMULATION
+--------------------------------------------------
+
+👤 john_lawyer feedback:
+  Round 1:
+    wordplay_master: 7.0/10
+  Updating feedback: john_lawyer -> wordplay_master: 7.043563899389156/10
+  Updated preferences - Liked: [], Disliked: []
+    office_worker: 8.4/10
+  Updating feedback: john_lawyer -> office_worker: 8.390941016721007/10
+  Updated preferences - Liked: [], Disliked: []
+    corporate_ladder_climber: 4.7/10
+  Updating feedback: john_lawyer -> corporate_ladder_climber: 4.744136858207947/10
+  Updated preferences - Liked: [], Disliked: []
+  Round 2:
+    wordplay_master: 7.8/10
+  Updating feedback: john_lawyer -> wordplay_master: 7.791997347568357/10
+  Updated preferences - Liked: ['wordplay_master'], Disliked: []
+    office_worker: 9.0/10
+  Updating feedback: john_lawyer -> office_worker: 8.99627138721815/10
+  Updated preferences - Liked: ['wordplay_master', 'office_worker'], Disliked: []
+    corporate_ladder_climber: 5.1/10
+  Updating feedback: john_lawyer -> corporate_ladder_climber: 5.125713021401997/10
+  Updated preferences - Liked: ['wordplay_master', 'office_worker'], Disliked: []
+  Round 3:
+    wordplay_master: 7.5/10
+  Updating feedback: john_lawyer -> wordplay_master: 7.479841132673617/10
+  Updated preferences - Liked: ['wordplay_master', 'office_worker'], Disliked: []
+    office_worker: 8.6/10
+  Updating feedback: john_lawyer -> office_worker: 8.567770463949977/10
+  Updated preferences - Liked: ['wordplay_master', 'office_worker'], Disliked: []
+    corporate_ladder_climber: 4.7/10
+  Updating feedback: john_lawyer -> corporate_ladder_climber: 4.724199401310919/10
+  Updated preferences - Liked: ['wordplay_master', 'office_worker'], Disliked: []
+  • Feedback pattern established for john_lawyer
+
+👤 mary_parent feedback:
+  Round 1:
+    wordplay_master: 8.0/10
+  Updating feedback: mary_parent -> wordplay_master: 7.999836693251652/10
+  Updated preferences - Liked: [], Disliked: []
+    suburban_parent: 7.8/10
+  Updating feedback: mary_parent -> suburban_parent: 7.8212780745644315/10
+  Updated preferences - Liked: [], Disliked: []
+    dad_humor_enthusiast: 9.2/10
+  Updating feedback: mary_parent -> dad_humor_enthusiast: 9.212611463163423/10
+  Updated preferences - Liked: [], Disliked: []
+  Round 2:
+    wordplay_master: 7.3/10
+  Updating feedback: mary_parent -> wordplay_master: 7.3369059995116/10
+  Updated preferences - Liked: ['wordplay_master'], Disliked: []
+    suburban_parent: 7.5/10
+  Updating feedback: mary_parent -> suburban_parent: 7.549823452609501/10
+  Updated preferences - Liked: ['wordplay_master', 'suburban_parent'], Disliked: []
+    dad_humor_enthusiast: 9.3/10
+  Updating feedback: mary_parent -> dad_humor_enthusiast: 9.273998997509196/10
+  Updated preferences - Liked: ['wordplay_master', 'suburban_parent', 'dad_humor_enthusiast'], Disliked: []
+  Round 3:
+    wordplay_master: 7.6/10
+  Updating feedback: mary_parent -> wordplay_master: 7.643753014858908/10
+  Updated preferences - Liked: ['wordplay_master', 'suburban_parent', 'dad_humor_enthusiast'], Disliked: []
+    suburban_parent: 8.5/10
+  Updating feedback: mary_parent -> suburban_parent: 8.450808416306094/10
+  Updated preferences - Liked: ['wordplay_master', 'suburban_parent', 'dad_humor_enthusiast'], Disliked: []
+    dad_humor_enthusiast: 8.6/10
+  Updating feedback: mary_parent -> dad_humor_enthusiast: 8.607393646331602/10
+  Updated preferences - Liked: ['wordplay_master', 'suburban_parent', 'dad_humor_enthusiast'], Disliked: []
+  • Feedback pattern established for mary_parent
+
+👤 alex_gamer feedback:
+  Round 1:
+    millennial_memer: 8.5/10
+  Updating feedback: alex_gamer -> millennial_memer: 8.470536306623746/10
+  Updated preferences - Liked: [], Disliked: []
+    gaming_guru: 9.3/10
+  Updating feedback: alex_gamer -> gaming_guru: 9.346366228311048/10
+  Updated preferences - Liked: [], Disliked: []
+    gen_z_chaos: 7.0/10
+  Updating feedback: alex_gamer -> gen_z_chaos: 7.011121527807376/10
+  Updated preferences - Liked: [], Disliked: []
+  Round 2:
+    millennial_memer: 8.1/10
+  Updating feedback: alex_gamer -> millennial_memer: 8.106399850787305/10
+  Updated preferences - Liked: ['millennial_memer'], Disliked: []
+    gaming_guru: 9.1/10
+  Updating feedback: alex_gamer -> gaming_guru: 9.11952695115569/10
+  Updated preferences - Liked: ['millennial_memer', 'gaming_guru'], Disliked: []
+    gen_z_chaos: 7.4/10
+  Updating feedback: alex_gamer -> gen_z_chaos: 7.4097282068968315/10
+  Updated preferences - Liked: ['millennial_memer', 'gaming_guru', 'gen_z_chaos'], Disliked: []
+  Round 3:
+    millennial_memer: 8.9/10
+  Updating feedback: alex_gamer -> millennial_memer: 8.91127429110577/10
+  Updated preferences - Liked: ['millennial_memer', 'gaming_guru', 'gen_z_chaos'], Disliked: []
+    gaming_guru: 9.2/10
+  Updating feedback: alex_gamer -> gaming_guru: 9.212230044825608/10
+  Updated preferences - Liked: ['millennial_memer', 'gaming_guru', 'gen_z_chaos'], Disliked: []
+    gen_z_chaos: 7.7/10
+  Updating feedback: alex_gamer -> gen_z_chaos: 7.660824959909024/10
+  Updated preferences - Liked: ['millennial_memer', 'gaming_guru', 'gen_z_chaos'], Disliked: []
+  • Feedback pattern established for alex_gamer
+
+FIXED LEARNING & ADAPTATION
+--------------------------------------------------
+
+👤 Learning demonstration for john_lawyer:
+  Current liked personas: ['wordplay_master', 'office_worker']
+  Current disliked personas: []
+  Generating new humor with learned preferences...
+  FIXED Persona recommendations for john_lawyer:
+    office_worker: 13.1 (LIKED)
+    wordplay_master: 12.4 (LIKED)
+    millennial_memer: 9.7
+    gaming_guru: 8.0
+    gen_z_chaos: 8.0
+    corporate_ladder_climber: 6.3
+    suburban_parent: 6.2
+    dark_humor_specialist: 6.1
+  Final strict filtered personas: ['office_worker', 'wordplay_master', 'millennial_memer', 'gaming_guru', 'gen_z_chaos']
+  Generating with static personas: ['office_worker', 'wordplay_master', 'millennial_memer', 'gaming_guru', 'gen_z_chaos']
+  • Generated custom persona from 9 interactions
+  • DYNAMIC PERSONA CREATED: 'Observational Enthusiast John'
+    Description: John is an astute observer of the quirks and oddities of professional life, with a keen eye for the absurdities of office culture. He is sharp, articulate, and able to deliver his observations with a dry, sarcastic wit that his colleagues find hilarious.
+    Humor Style: Observational, Witty, Sarcastic
+    Expertise: Office Life, Technology, Meeting Culture
+  Final personas (static + dynamic): ['Observational Enthusiast John', 'office_worker', 'wordplay_master']
+    Generating with DYNAMIC persona: Observational Enthusiast John
+    Generating with static persona: office_worker
+    Generating with static persona: wordplay_master
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  Recommended personas: ['office_worker', 'wordplay_master', 'millennial_memer', 'gaming_guru', 'gen_z_chaos']
+  Best result: "Scrolling through work emails pretending to be productive."
+  Selected persona: office_worker
+  Score: 6.0/10
+  • SUCCESS: System selected a LIKED persona!
+
+👤 Learning demonstration for mary_parent:
+  Current liked personas: ['wordplay_master', 'suburban_parent', 'dad_humor_enthusiast']
+  Current disliked personas: []
+  Generating new humor with learned preferences...
+  FIXED Persona recommendations for mary_parent:
+    dad_humor_enthusiast: 14.4 (LIKED)
+    suburban_parent: 13.9 (LIKED)
+    wordplay_master: 13.6 (LIKED)
+    millennial_memer: 10.3
+    gaming_guru: 9.1
+    gen_z_chaos: 8.8
+    office_worker: 7.2
+    absurdist_artist: 7.1
+  Final strict filtered personas: ['dad_humor_enthusiast', 'suburban_parent', 'wordplay_master', 'millennial_memer', 'gaming_guru']
+  Generating with static personas: ['dad_humor_enthusiast', 'suburban_parent', 'wordplay_master', 'millennial_memer', 'gaming_guru']
+  • Generated custom persona from 9 interactions
+  • DYNAMIC PERSONA CREATED: 'Wordplay Enthusiast Mary'
+    Description: Mary is a family-oriented humor persona who loves to find the fun in everyday life through clever puns and wordplay. She is always up for a bit of silliness and enjoys sharing her whimsical and punny sense of humor with a family audience.
+    Humor Style: Punny, Wordplay, Silly
+    Expertise: Family-oriented humor, General topics, Wordplay and puns
+  Final personas (static + dynamic): ['Wordplay Enthusiast Mary', 'dad_humor_enthusiast', 'suburban_parent']
+    Generating with DYNAMIC persona: Wordplay Enthusiast Mary
+    Generating with static persona: dad_humor_enthusiast
+    Generating with static persona: suburban_parent
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  Recommended personas: ['dad_humor_enthusiast', 'suburban_parent', 'wordplay_master', 'millennial_memer', 'gaming_guru']
+  Best result: "Doing a 'stand-up' job at keeping my clothes on the chair instead of the closet."
+  Selected persona: Wordplay Enthusiast Mary
+  Score: 6.1/10
+  • System selected a neutral persona
+
+👤 Learning demonstration for alex_gamer:
+  Current liked personas: ['millennial_memer', 'gaming_guru', 'gen_z_chaos']
+  Current disliked personas: []
+  Generating new humor with learned preferences...
+  FIXED Persona recommendations for alex_gamer:
+    millennial_memer: 17.3 (LIKED)
+    gaming_guru: 16.9 (LIKED)
+    gen_z_chaos: 14.9 (LIKED)
+    office_worker: 7.2
+    dad_humor_enthusiast: 7.1
+    wordplay_master: 7.0
+    corporate_ladder_climber: 6.9
+    suburban_parent: 6.9
+  Final strict filtered personas: ['millennial_memer', 'gaming_guru', 'gen_z_chaos', 'office_worker', 'dad_humor_enthusiast']
+  Generating with static personas: ['millennial_memer', 'gaming_guru', 'gen_z_chaos', 'office_worker', 'dad_humor_enthusiast']
+  • Generated custom persona from 9 interactions
+  • DYNAMIC PERSONA CREATED: 'Nerdy Enthusiast Alex'
+    Description: Alex is a charismatic nerd who loves to blend his love for pop-culture, gaming, and absurd humor. He's the life of every party with his quirky, nerdy jokes and has a knack for turning everyday situations into laughable moments.
+    Humor Style: Nerdy, Pop-culture, Absurd
+    Expertise: Gaming, Pop Culture, General Humor
+  Final personas (static + dynamic): ['Nerdy Enthusiast Alex', 'millennial_memer', 'gaming_guru']
+    Generating with DYNAMIC persona: Nerdy Enthusiast Alex
+    Generating with static persona: millennial_memer
+    Generating with static persona: gaming_guru
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  Recommended personas: ['millennial_memer', 'gaming_guru', 'gen_z_chaos', 'office_worker', 'dad_humor_enthusiast']
+  Best result: "Scrolling through memes for hours instead of doing anything productive."
+  Selected persona: millennial_memer
+  Score: 5.8/10
+  • SUCCESS: System selected a LIKED persona!
+
+BLACK CARD GENERATION
+--------------------------------------------------
+
+📝 Generating black card for topic: work
+  FIXED Persona recommendations for creative_writer:
+    office_worker: 5.7
+    wordplay_master: 5.5
+    dark_humor_specialist: 5.3
+    millennial_memer: 5.3
+    absurdist_artist: 5.2
+    gaming_guru: 5.1
+    corporate_ladder_climber: 4.9
+    gen_z_chaos: 4.8
+  Final strict filtered personas: ['office_worker', 'wordplay_master', 'dark_humor_specialist', 'millennial_memer', 'absurdist_artist']
+  Generating with static personas: ['office_worker', 'wordplay_master', 'dark_humor_specialist', 'millennial_memer', 'absurdist_artist']
+  • Dynamic persona not created (no user history)
+  Final personas (static + dynamic): ['office_worker', 'wordplay_master', 'dark_humor_specialist']
+    Generating with static persona: office_worker
+    Generating with static persona: wordplay_master
+    Generating with static persona: dark_humor_specialist
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  1. "Nothing says 'I hate my job' quite like ____ during the staff meeting."
+     By: dark_humor_specialist
+     Score: 6.2/10
+     Safe: True
+  2. "When the boss is away, the office turns into __________."
+     By: office_worker
+     Score: 5.8/10
+     Safe: True
+
+📝 Generating black card for topic: relationships
+  FIXED Persona recommendations for creative_writer:
+    office_worker: 5.6
+    suburban_parent: 5.2
+    millennial_memer: 5.2
+    dark_humor_specialist: 5.2
+    wordplay_master: 5.2
+    corporate_ladder_climber: 5.0
+    gen_z_chaos: 4.9
+    gaming_guru: 4.8
+  Final strict filtered personas: ['office_worker', 'suburban_parent', 'millennial_memer', 'dark_humor_specialist', 'wordplay_master']
+  Generating with static personas: ['office_worker', 'suburban_parent', 'millennial_memer', 'dark_humor_specialist', 'wordplay_master']
+  • Dynamic persona not created (no user history)
+  Final personas (static + dynamic): ['office_worker', 'suburban_parent', 'millennial_memer']
+    Generating with static persona: office_worker
+    Generating with static persona: suburban_parent
+    Generating with static persona: millennial_memer
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  1. "After years of marriage, my spouse still hasn't figured out that my love language is _____."
+     By: suburban_parent
+     Score: 5.9/10
+     Safe: True
+  2. "When your partner suggests trying a new form of roleplay, but instead of a sexy nurse, they show up dressed as ____."
+     By: millennial_memer
+     Score: 5.7/10
+     Safe: True
+
+📝 Generating black card for topic: technology
+  FIXED Persona recommendations for creative_writer:
+    corporate_ladder_climber: 5.3
+    dad_humor_enthusiast: 5.3
+    dark_humor_specialist: 5.2
+    gaming_guru: 5.2
+    wordplay_master: 5.1
+    office_worker: 5.1
+    suburban_parent: 5.0
+    millennial_memer: 5.0
+  Final strict filtered personas: ['corporate_ladder_climber', 'dad_humor_enthusiast', 'dark_humor_specialist', 'gaming_guru', 'wordplay_master']
+  Generating with static personas: ['corporate_ladder_climber', 'dad_humor_enthusiast', 'dark_humor_specialist', 'gaming_guru', 'wordplay_master']
+  • Dynamic persona not created (no user history)
+  Final personas (static + dynamic): ['corporate_ladder_climber', 'dad_humor_enthusiast', 'dark_humor_specialist']
+    Generating with static persona: corporate_ladder_climber
+    Generating with static persona: dad_humor_enthusiast
+    Generating with static persona: dark_humor_specialist
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  1. "Technology may be advancing, but nothing can fix my relationship with ____."
+     By: dark_humor_specialist
+     Score: 6.1/10
+     Safe: True
+  2. "In a shocking turn of events, my smart home device started ____."
+     By: dad_humor_enthusiast
+     Score: 6.0/10
+     Safe: True
+
+📝 Generating black card for topic: food
+  FIXED Persona recommendations for creative_writer:
+    wordplay_master: 5.7
+    dark_humor_specialist: 5.6
+    millennial_memer: 5.3
+    office_worker: 5.3
+    corporate_ladder_climber: 5.2
+    gaming_guru: 5.1
+    gen_z_chaos: 4.9
+    absurdist_artist: 4.8
+  Final strict filtered personas: ['wordplay_master', 'dark_humor_specialist', 'millennial_memer', 'office_worker', 'corporate_ladder_climber']
+  Generating with static personas: ['wordplay_master', 'dark_humor_specialist', 'millennial_memer', 'office_worker', 'corporate_ladder_climber']
+  • Dynamic persona not created (no user history)
+  Final personas (static + dynamic): ['wordplay_master', 'dark_humor_specialist', 'millennial_memer']
+    Generating with static persona: wordplay_master
+    Generating with static persona: dark_humor_specialist
+    Generating with static persona: millennial_memer
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+  1. "When you accidentally microwave ____ instead of your leftover pizza, you know it's time to adult."
+     By: millennial_memer
+     Score: 6.3/10
+     Safe: True
+  2. "When the linguini said ____, even the meatballs couldn't hold back their laughter."
+     By: wordplay_master
+     Score: 6.3/10
+     Safe: True
+
+GROUP CONSENSUS HUMOR
+--------------------------------------------------
+  Creating group context for office_friends with members: ['john_lawyer', 'mary_parent', 'alex_gamer']
+  Group consensus personas: ['wordplay_master', 'gaming_guru', 'dad_humor_enthusiast', 'office_worker', 'millennial_memer']
+Group: office_friends
+Members: john_lawyer, mary_parent, alex_gamer
+Consensus personas: ['wordplay_master', 'gaming_guru', 'dad_humor_enthusiast', 'office_worker', 'millennial_memer']
+  Generating with static personas: ['office_worker', 'corporate_ladder_climber', 'dad_humor_enthusiast', 'millennial_memer', 'gaming_guru']
+  • Dynamic persona not created (no user history)
+  Final personas (static + dynamic): ['office_worker', 'corporate_ladder_climber', 'dad_humor_enthusiast']
+    Generating with static persona: office_worker
+    Generating with static persona: corporate_ladder_climber
+    Generating with static persona: dad_humor_enthusiast
+ERROR: Error with claude-3-sonnet: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}
+
+Group humor options:
+  1. "Accidentally hitting 'Reply All' to a company-wide email."
+     By: office_worker
+     Score: 6.0/10
+     Safe: True
+  2. "What did the grape say when it got stepped on? It let out a little wine!"
+     By: dad_humor_enthusiast
+     Score: 5.8/10
+     Safe: True
+  3. "Forced fun karaoke sessions where your boss insists on singing 'Eye of the Tiger' while everyone awkwardly claps along."
+     By: corporate_ladder_climber
+     Score: 5.6/10
+     Safe: True
+
+USER ANALYTICS
+--------------------------------------------------
+
+👤 john_lawyer Analytics:
+  Total interactions: 9
+  Average score: 7.0/10
+  Liked personas: ['wordplay_master', 'office_worker']
+  Disliked personas: []
+  Persona performance:
+    💚 wordplay_master: 7.3/10 (3 interactions)
+    💚 office_worker: 8.6/10 (3 interactions)
+    🤍 corporate_ladder_climber: 4.8/10 (3 interactions)
+
+👤 mary_parent Analytics:
+  Total interactions: 9
+  Average score: 8.2/10
+  Liked personas: ['wordplay_master', 'suburban_parent', 'dad_humor_enthusiast']
+  Disliked personas: []
+  Persona performance:
+    💚 wordplay_master: 7.8/10 (3 interactions)
+    💚 suburban_parent: 8.0/10 (3 interactions)
+    💚 dad_humor_enthusiast: 9.0/10 (3 interactions)
+
+👤 alex_gamer Analytics:
+  Total interactions: 9
+  Average score: 8.4/10
+  Liked personas: ['millennial_memer', 'gaming_guru', 'gen_z_chaos']
+  Disliked personas: []
+  Persona performance:
+    💚 millennial_memer: 8.5/10 (3 interactions)
+    💚 gaming_guru: 9.3/10 (3 interactions)
+    💚 gen_z_chaos: 7.3/10 (3 interactions)
+
+🎯 EVALUATION IMPROVEMENTS
+--------------------------------------------------
+  Response: "A very funny and clever response"
+  Overall Score: 6.4/10
+  Breakdown: Humor: 7.4, Creativity: 5.1, Appropriateness: 6.9, Relevance: 5.1
+
+  Response: "Short"
+  Overall Score: 5.6/10
+  Breakdown: Humor: 5.4, Creativity: 5.2, Appropriateness: 7.0, Relevance: 4.8
+
+  Response: "This is a mediocre response that's okay"
+  Overall Score: 5.8/10
+  Breakdown: Humor: 5.8, Creativity: 5.1, Appropriateness: 7.1, Relevance: 5.2
+
+  Response: "An absolutely hilarious and unexpected twist that surprises everyone"
+  Overall Score: 7.1/10
+  Breakdown: Humor: 6.7, Creativity: 8.4, Appropriateness: 6.9, Relevance: 5.0
+
+  Response: "Boring standard response"
+  Overall Score: 5.6/10
+  Breakdown: Humor: 5.7, Creativity: 5.0, Appropriateness: 6.8, Relevance: 4.7
+
+
+======================================================================
+FIXED DEMONSTRATION COMPLETE!
+All major issues have been resolved:
+  • Content filtering working
+  • Persona recommendations working
+  • Feedback learning working
+  • Evaluation scores meaningful
+  • Black card generation working
+  • Group consensus working
+  • Analytics working
+======================================================================

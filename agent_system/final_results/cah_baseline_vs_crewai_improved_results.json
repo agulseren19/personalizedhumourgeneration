@@ -1,0 +1,63 @@
+{
+  "model_used": "gpt-3.5-turbo",
+  "has_real_llm": true,
+  "num_tests": 3,
+  "version": "improved_crewai",
+  "test_cards": [
+    "What's the next Happy Meal toy? _____.",
+    "What's a girl's best friend? _____.",
+    "What helps Obama unwind? _____."
+  ],
+  "baseline_results": [
+    {
+      "white_card": "A live hamster.",
+      "score": 0.8,
+      "generation_time": 0.7408335208892822,
+      "approach": "baseline"
+    },
+    {
+      "white_card": "A lifetime supply of tacos.",
+      "score": 0.8,
+      "generation_time": 0.39454126358032227,
+      "approach": "baseline"
+    },
+    {
+      "white_card": "Michelle's playlist of smooth jazz and Enya covers.",
+      "score": 0.8,
+      "generation_time": 0.389237642288208,
+      "approach": "baseline"
+    }
+  ],
+  "crewai_results": [
+    {
+      "white_card": "I now can give a great answer",
+      "score": 0.7,
+      "generation_time": 5.39496111869812,
+      "approach": "crewai",
+      "reasoning": "I now can give a great answer"
+    },
+    {
+      "white_card": "Regrettable late-night decisions.",
+      "score": 0.8,
+      "generation_time": 7.877980709075928,
+      "approach": "crewai",
+      "reasoning": "REFINED WHITE CARD: Regrettable late-night decisions. \nIMPROVEMENTS: Condensed the concept while retaining the humor of making regrettable decisions. Offers a broader range of scenarios beyond just drunk-texting."
+    },
+    {
+      "white_card": "Sour cream surprise.",
+      "score": 0.7,
+      "generation_time": 5.389703989028931,
+      "approach": "crewai",
+      "reasoning": "REFINED WHITE CARD: Sour cream surprise.\nIMPROVEMENTS: Condensed and punchier with unexpected twist."
+    }
+  ],
+  "summary": {
+    "avg_baseline_score": 0.8000000000000002,
+    "avg_crewai_score": 0.7333333333333334,
+    "overall_improvement_percent": -8.333333333333345,
+    "avg_baseline_time": 0.5082041422526041,
+    "avg_crewai_time": 6.220881938934326,
+    "time_overhead_percent": 1124.0911519060821
+  },
+  "timestamp": 1750023406.1135478
+}

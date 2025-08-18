@@ -1,0 +1,59 @@
+================================================================================
+CARDS AGAINST HUMANITY - HUMOR GENERATION ANALYSIS
+================================================================================
+Analysis Date: 2025-06-15 16:16:49
+
+DATASET INFORMATION
+----------------------------------------
+Total data points: 30
+Unique black cards: 10
+Unique white cards: 18
+Win rate: 0.200
+
+METHOD COMPARISON
+----------------------------------------
+BASELINE APPROACH:
+  Method: Baseline Prompt-Only
+  Combinations: 12
+  Average Score: 0.258
+  Best Score: 0.500
+
+MOCK CREWAI APPROACH:
+  Method: Mock CrewAI Multi-Agent
+  Combinations: 12
+  Average Score: 0.593
+  Best Score: 0.610
+
+PERFORMANCE ANALYSIS
+----------------------------------------
+Performance Improvement: +129.7%
+Absolute Improvement: +0.335
+Better Method: Mock CrewAI
+
+TOP COMBINATIONS
+----------------------------------------
+BEST BASELINE COMBINATION:
+  Black: Life for American Indians was forever changed when the White Man introduced them to _____.
+  White: Powerful thighs
+  Score: 0.500
+
+BEST MOCK CREWAI COMBINATION:
+  Black: What's the next Happy Meal toy?
+  White: Being rich
+  Score: 0.610
+
+KEY INSIGHTS
+----------------------------------------
+1. Mock CrewAI shows significant improvement (>20%) over baseline approach
+2. Mock CrewAI achieves higher peak humor scores
+3. Mock CrewAI achieves good humor scores (>0.5 average)
+
+RECOMMENDATIONS
+----------------------------------------
+1. Consider investing in multi-agent approaches for humor generation
+2. The collaborative agent approach shows promise for CAH-style humor
+3. Focus on refining high-scoring generation strategies
+4. Both approaches could benefit from larger training datasets
+5. Consider hybrid approaches combining baseline efficiency with agent creativity
+
+================================================================================

@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: cah-backend
+    env: python
+    buildCommand: pip install -r agent_system/requirements.txt
+    startCommand: cd agent_system && python api/cah_crewai_api.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: "https://cah-frontend.onrender.com,http://localhost:3000"
+    healthCheckPath: /
+    autoDeploy: true
+
+  - type: web
+    name: cah-frontend
+    env: static
+    buildCommand: cd nextjs-boilerplate-main && npm install && npm run build
+    staticPublishPath: nextjs-boilerplate-main/.next
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://cah-backend.onrender.com
+    autoDeploy: true 
