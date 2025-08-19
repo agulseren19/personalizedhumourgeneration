@@ -136,11 +136,9 @@ export interface GameState {
 }
 
 export interface CreateGameRequest {
-  settings?: {
-    max_score?: number;
-    max_players?: number;
-    round_timer?: number;
-  };
+  max_score: number;
+  max_players: number;
+  round_timer: number;
 }
 
 export interface GenerateHumorRequest {

@@ -5,8 +5,8 @@ python-multipart==0.0.6
 python-dotenv==1.0.0
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
-detoxify==0.5.2
-anthropic==0.7.8
+detoxify==0.5.2  # Keep but use smaller model
+# anthropic==0.7.8
 openai==1.7.1
 httpx==0.25.2
 pydantic>=2.5.0
@@ -14,11 +14,12 @@ pydantic>=2.5.0
 aiofiles==23.2.1
 pydantic-settings==2.0.3
 crewai==0.1.32
-boto3==1.34.0
+# boto3==1.34.0
 PyJWT==2.8.0
 bcrypt==4.1.2
 email-validator==2.1.0
 psycopg2-binary==2.9.9
 google-auth==2.23.4
 google-auth-oauthlib==1.1.0
-requests==2.31.0 
+requests==2.31.0
+numpy>=1.21.0 

@@ -401,11 +401,9 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       const token = localStorage.getItem('cah_token');
       
       const result = await cahApi.createGame({
-        settings: {
-          max_score: 5,
-          max_players: 6,
-          round_timer: 300
-        }
+        max_score: 5,
+        max_players: 6,
+        round_timer: 300
       });
       
 
@@ -489,8 +487,9 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
         return;
       }
       
-      
-      const ws = new WebSocket(`ws://localhost:8000/ws/${gameId}/${userId}`);
+      // Use Render backend URL for WebSocket
+      const wsUrl = process.env.NEXT_PUBLIC_API_URL?.replace('https://', 'wss://').replace('http://', 'ws://') || 'ws://localhost:8000';
+      const ws = new WebSocket(`${wsUrl}/ws/${gameId}/${userId}`);
       
       // Set up periodic game state refresh for multiplayer games
       const refreshInterval = setInterval(() => {

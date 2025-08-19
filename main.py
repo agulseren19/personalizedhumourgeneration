@@ -1,11 +1,69 @@
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
-import os
-import random
-from dotenv import load_dotenv
-from detoxify import Detoxify
+#!/usr/bin/env python3
+"""
+Main CAH System Entry Point
+"""
+
+import asyncio
+import json
+import re
+from typing import Dict, List, Optional
+from datetime import datetime
+
+# from detoxify import Detoxify  # REMOVED - causes memory issues on Render
+
+def simple_content_filter(text: str) -> Dict[str, float]:
+    """Simple regex-based content filter (replaces detoxify)"""
+    # Basic toxicity patterns
+    patterns = {
+        'toxicity': [
+            r"\b(hate|despise|loathe)\s+(all|every)\s+\w+",
+            r"\b(kill|murder|die)\s+(all|every)\s+\w+",
+            r"\b\w+\s+(are|is)\s+(evil|scum|trash|garbage)"
+        ],
+        'profanity': [
+            r"\bf[*]?u[*]?c[*]?k\w*",
+            r"\bs[*]?h[*]?i[*]?t\w*", 
+            r"\bd[*]?a[*]?m[*]?n\w*",
+            r"\bb[*]?i[*]?t[*]?c[*]?h\w*"
+        ]
+    }
+    
+    scores = {}
+    for category, pattern_list in patterns.items():
+        score = 0.0
+        for pattern in pattern_list:
+            matches = len(re.findall(pattern, text, re.IGNORECASE))
+            if matches > 0:
+                score = min(1.0, matches * 0.3)
+        scores[category] = score
+    
+    # Add other categories with 0 scores
+    scores.update({
+        'severe_toxicity': 0.0,
+        'obscene': 0.0,
+        'threat': 0.0,
+        'insult': 0.0,
+        'identity_attack': 0.0
+    })
+    
+    return scores
+
+def check_content_safety(text: str) -> Dict[str, float]:
+    """Check if content is safe using simple regex patterns (replaces detoxify)"""
+    try:
+        results = simple_content_filter(text)
+        return results
+    except Exception as e:
+        print(f"Content filter error: {e}")
+        # Fallback: return safe scores
+        return {
+            'toxicity': 0.0,
+            'severe_toxicity': 0.0,
+            'obscene': 0.0,
+            'threat': 0.0,
+            'insult': 0.0,
+            'identity_attack': 0.0
+        }
 
 # Import AI generation modules
 from generation.card_generator import (
@@ -58,12 +116,6 @@ class GenerateCardsResponse(BaseModel):
     blackCards: List[BlackCard]
     whiteCards: List[WhiteCard]
 
-# Content safety check dependency
-def check_content_safety(text: str, threshold: float = 0.5) -> Dict[str, float]:
-    """Check if content is safe using Detoxify"""
-    results = Detoxify('original').predict(text)
-    return results
-
 # Routes
 @app.get("/")
 async def root():
@@ -93,7 +145,7 @@ async def generate_cards(request: GenerateCardsRequest):
             # Filter black cards
             filtered_black_cards = []
             for card in black_cards:
-                results = check_content_safety(card.text, threshold)
+                results = check_content_safety(card.text)
                 # Check if any toxicity score is above threshold
                 if not any(score > threshold for score in results.values()):
                     filtered_black_cards.append(card)
@@ -101,7 +153,7 @@ async def generate_cards(request: GenerateCardsRequest):
             # Filter white cards
             filtered_white_cards = []
             for card in white_cards:
-                results = check_content_safety(card.text, threshold)
+                results = check_content_safety(card.text)
                 if not any(score > threshold for score in results.values()):
                     filtered_white_cards.append(card)
             
