@@ -20,6 +20,37 @@ except ImportError:
     DETOXIFY_AVAILABLE = False
     print("⚠️  Detoxify not available, using regex fallback")
 
+# Data classes for humor generation
+@dataclass
+class HumorRequest:
+    context: str
+    audience: str
+    topic: str
+    user_id: Optional[str] = None
+    humor_type: Optional[str] = None
+    card_type: str = "white"  # "white" or "black"
+
+@dataclass
+class GenerationResult:
+    text: str
+    persona_name: str
+    model_used: str
+    generation_time: float
+    toxicity_score: float
+    is_safe: bool
+    confidence_score: float
+
+@dataclass
+class EvaluationResult:
+    humor_score: float
+    creativity_score: float
+    appropriateness_score: float
+    context_relevance_score: float
+    overall_score: float
+    reasoning: str
+    evaluator_name: str
+    model_used: str
+
 class ToxicityCategory(Enum):
     """Categories of toxicity to detect"""
     TOXICITY = "TOXICITY"
