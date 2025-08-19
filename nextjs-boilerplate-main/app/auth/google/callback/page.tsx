@@ -88,7 +88,7 @@ export default function GoogleCallback() {
 
         <div className="text-gray-400 text-sm">
           <p>This window will close automatically.</p>
-          <p>If it doesn't close, you can close it manually.</p>
+          <p>If it doesn&apos;t close, you can close it manually.</p>
         </div>
       </div>
     </div>

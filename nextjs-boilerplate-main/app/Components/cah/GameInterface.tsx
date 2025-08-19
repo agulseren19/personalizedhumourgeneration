@@ -1256,7 +1256,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
             />
             {cardType === 'white' && (
               <p className="text-xs text-gray-400 mt-1">
-                💡 Enter a black card with _____ for the blank, or use "Try Sample" for examples
+                💡 Enter a black card with _____ for the blank, or use &quot;Try Sample&quot; for examples
               </p>
             )}
           </div>
