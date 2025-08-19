@@ -32,6 +32,27 @@ except ImportError:
             """Fallback persona recommendation"""
             return ["General Comedian", "Witty Observer", "Sarcastic Commentator"]
 
+# Import AWS knowledge base
+try:
+    from ..knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base
+except ImportError:
+    try:
+        from knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base
+    except ImportError:
+        print("⚠️  Could not import improved_aws_knowledge_base, using fallback")
+        # Create a mock knowledge base
+        class MockKnowledgeBase:
+            async def get_persona_recommendations(self, user_id: str, context: str, audience: str) -> List[str]:
+                return ["General Comedian", "Witty Observer"]
+            
+            async def get_user_preference(self, user_id: str) -> Dict[str, Any]:
+                return {"humor_style": "general", "audience": "friends"}
+            
+            async def get_user_interaction_history(self, user_id: str) -> List[Dict[str, Any]]:
+                return []
+        
+        improved_aws_knowledge_base = MockKnowledgeBase()
+
 # Data classes for humor generation
 @dataclass
 class HumorRequest:
