@@ -11,7 +11,7 @@ const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, b
 
   const [dotSize, setDotSize] = useState(defaultDotSize);
   const [gridSpacing, setGridSpacing] = useState(defaultGridSpacing);
-  const [dots, setDots] = useState([]);
+  const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
 
   useEffect(() => {
     const updateForMobile = () => {
