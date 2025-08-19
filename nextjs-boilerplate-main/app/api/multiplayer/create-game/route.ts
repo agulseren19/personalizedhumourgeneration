@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
     // Forward the request to the backend
-    const backendResponse = await fetch('http://localhost:8000/multiplayer/create-game', {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const backendResponse = await fetch(`${backendUrl}/multiplayer/create-game`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

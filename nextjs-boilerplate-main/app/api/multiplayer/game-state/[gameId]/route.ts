@@ -17,7 +17,8 @@ export async function GET(
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
     // Forward the request to the backend
-    const backendResponse = await fetch(`http://localhost:8000/multiplayer/game-state/${params.gameId}`, {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const backendResponse = await fetch(`${backendUrl}/multiplayer/game-state/${params.gameId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`

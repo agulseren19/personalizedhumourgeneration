@@ -74,7 +74,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     
     try {
       // Redirect to backend Google OAuth endpoint
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const googleAuthUrl = `${backendUrl}/auth/google/login`;
       
       // Open Google OAuth in a popup window
@@ -86,7 +86,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       
       // Listen for messages from the popup
       const messageListener = (event: MessageEvent) => {
-        if (event.origin !== backendUrl) return;
+        // Allow messages from the backend domain
+        if (!event.origin || !backendUrl.startsWith(event.origin)) return;
         
         if (event.data.type === 'GOOGLE_OAUTH_SUCCESS') {
           const { user, access_token } = event.data;
