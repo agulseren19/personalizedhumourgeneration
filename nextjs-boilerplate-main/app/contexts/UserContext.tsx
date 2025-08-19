@@ -299,7 +299,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
       });
 
       if (response.ok) {
-        const updatedUser = { ...user, preferences: { ...user.preferences, ...preferences } };
+        const updatedUser = { 
+          ...user, 
+          preferences: { 
+            ...user.preferences, 
+            ...preferences,
+            // Ensure required properties have default values if undefined
+            favorite_personas: preferences.favorite_personas || user.preferences?.favorite_personas || [],
+            humor_style: preferences.humor_style || user.preferences?.humor_style || '',
+            audience_preference: preferences.audience_preference || user.preferences?.audience_preference || ''
+          } 
+        };
         setUser(updatedUser);
       }
     } catch (error) {
