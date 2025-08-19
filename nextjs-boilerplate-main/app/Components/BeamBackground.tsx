@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 
-const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, beamWidth = 200 }) => {
+const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, beamWidth = 200 }: { containerHeight: number; containerWidth: number; lineWidth?: number; beamWidth?: number }) => {
   const defaultDotSize = 30; // Default size of the dots
   const defaultGridSpacing = 400; // Default grid spacing
   const linePadding = 10; // Padding around the dots for the lines
