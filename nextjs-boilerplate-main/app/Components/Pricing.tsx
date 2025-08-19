@@ -37,14 +37,14 @@ const starIcon = (
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: (i) => ({
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: { duration: 0.5, delay: i * 0.3 },
   }),
 };
 
-const pricingVariants = (direction) => ({
+const pricingVariants = (direction: 'left' | 'right') => ({
   hidden: { opacity: 0, x: direction === 'left' ? -100 : 100 },
   visible: {
     opacity: 1,
@@ -65,11 +65,11 @@ const PricingSection = () => {
   const leftBoxRef = useRef(null);
   const rightBoxRef = useRef(null);
 
-  const isTitleInView = useInView(titleRef, { once: true, threshold: 0.3 });
-  const isSubtitleInView = useInView(subtitleRef, { once: true, threshold: 0.4 });
-  const isSwitchInView = useInView(switchRef, { once: true, threshold: 0.5 });
-  const isLeftBoxInView = useInView(leftBoxRef, { once: true, threshold: 0.6 });
-  const isRightBoxInView = useInView(rightBoxRef, { once: true, threshold: 0.6 });
+  const isTitleInView = useInView(titleRef, { once: true });
+  const isSubtitleInView = useInView(subtitleRef, { once: true });
+  const isSwitchInView = useInView(switchRef, { once: true });
+  const isLeftBoxInView = useInView(leftBoxRef, { once: true });
+  const isRightBoxInView = useInView(rightBoxRef, { once: true });
 
   return (
     <div className="flex items-center justify-center min-h-screen">
