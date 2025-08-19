@@ -40,7 +40,7 @@ const BentoBox = () => {
     if (!isMobile) {
       setCursorText(text);
       setIsCursorVisible(true);
-      if (videoRef.current) {
+      if (videoRef && videoRef.current) {
         videoRef.current.play();
       }
     }
@@ -49,7 +49,7 @@ const BentoBox = () => {
   const handleMouseLeave = (videoRef) => {
     if (!isMobile) {
       setIsCursorVisible(false);
-      if (videoRef.current) {
+      if (videoRef && videoRef.current) {
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
       }
