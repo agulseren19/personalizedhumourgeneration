@@ -36,7 +36,7 @@ const BentoBox = () => {
     };
   }, []);
 
-  const handleMouseEnter = (text, videoRef) => {
+  const handleMouseEnter = (text: string, videoRef: HTMLVideoElement | null) => {
     if (!isMobile) {
       setCursorText(text);
       setIsCursorVisible(true);
