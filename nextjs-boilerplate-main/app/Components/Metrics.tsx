@@ -14,7 +14,7 @@ const metrics = [
   { value: '5k', subtitle: 'Support tickets resolved by our dedicated team.', tooltip: 'Efficient support', change: { direction: 'decrease', percentage: 3 } },
 ];
 
-const Counter = ({ from, to, isK, start }) => {
+const Counter = ({ from, to, isK, start }: { from: number; to: number; isK: boolean; start: boolean }) => {
   const [count, setCount] = useState(from);
   const spring = useSpring(from, { stiffness: 30, damping: 15 });
 
@@ -30,13 +30,10 @@ const Counter = ({ from, to, isK, start }) => {
 
 const Metrics = () => {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
-  const [hoveredMetric, setHoveredMetric] = useState(null);
+  const [hoveredMetric, setHoveredMetric] = useState<number | null>(null);
   const [tooltipX, setTooltipX] = useState(0);
 
-
-
-
-  const handleMouseMove = (event) => {
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
 
@@ -64,11 +61,9 @@ const Metrics = () => {
     visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 60, damping: 15, duration: 0.5 } } // Adjust duration for smoothness
   };
 
-
-
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
-    visible: i => ({
+    visible: (i: number) => ({
       opacity: 1,
       y: 0,
       transition: { duration: 0.5, delay: i * 0.3 }
@@ -86,7 +81,6 @@ const Metrics = () => {
       }
     }
   };
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-72">
