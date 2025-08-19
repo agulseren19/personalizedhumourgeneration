@@ -15,25 +15,70 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 import time
-
-# Import our CrewAI humor system
 import sys
 import os
 
-# Add the parent directory (CAH) to Python path so we can import agent_system
+# Fix import paths for Render deployment
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(os.path.dirname(current_dir))
-sys.path.insert(0, parent_dir)
+agent_system_dir = os.path.dirname(current_dir)
+project_root = os.path.dirname(agent_system_dir)
 
-from agent_system.agents.improved_humor_agents import (
-    ImprovedHumorOrchestrator, 
-    HumorRequest
-)
-from agent_system.agents.improved_humor_agents import ContentFilter
-from agent_system.knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base
-from agent_system.personas.enhanced_persona_templates import get_all_personas
-from agent_system.personas.dynamic_persona_generator import dynamic_persona_generator
-from agent_system.agents.bws_evaluation import bws_evaluator, BWS_Item, BWS_Comparison
+# Add paths to Python path
+sys.path.insert(0, project_root)
+sys.path.insert(0, agent_system_dir)
+
+# Try to import required modules with better error handling
+try:
+    from agent_system.agents.improved_humor_agents import (
+        ImprovedHumorOrchestrator, 
+        HumorRequest
+    )
+    from agent_system.agents.improved_humor_agents import ContentFilter
+    print("✅ Core humor agents imported successfully")
+except ImportError as e:
+    print(f"❌ Core humor agents import failed: {e}")
+    # Create fallback classes
+    class ImprovedHumorOrchestrator:
+        def __init__(self):
+            pass
+        async def generate_humor(self, *args, **kwargs):
+            return {"error": "Humor system not available"}
+    
+    class ContentFilter:
+        def __init__(self):
+            pass
+        def filter_content(self, *args, **kwargs):
+            return True
+
+try:
+    from agent_system.knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base
+    print("✅ AWS knowledge base imported successfully")
+except ImportError as e:
+    print(f"❌ AWS knowledge base import failed: {e}")
+    improved_aws_knowledge_base = None
+
+try:
+    from agent_system.personas.enhanced_persona_templates import get_all_personas
+    print("✅ Persona templates imported successfully")
+except ImportError as e:
+    print(f"❌ Persona templates import failed: {e}")
+    get_all_personas = lambda: []
+
+try:
+    from agent_system.personas.dynamic_persona_generator import dynamic_persona_generator
+    print("✅ Dynamic persona generator imported successfully")
+except ImportError as e:
+    print(f"❌ Dynamic persona generator import failed: {e}")
+    dynamic_persona_generator = None
+
+try:
+    from agent_system.agents.bws_evaluation import bws_evaluator, BWS_Item, BWS_Comparison
+    print("✅ BWS evaluation imported successfully")
+except ImportError as e:
+    print(f"❌ BWS evaluation import failed: {e}")
+    bws_evaluator = None
+    BWS_Item = None
+    BWS_Comparison = None
 
 # Import multiplayer game functionality
 try:
@@ -169,10 +214,15 @@ if multiplayer_router:
 else:
     print("⚠️  Multiplayer routes not available")
 
-# Add CORS middleware for frontend
+# Add CORS middleware for frontend and Render deployment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # Next.js dev servers
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://localhost:3001",  # Next.js dev servers
+        "https://cah-frontend.onrender.com",  # Render frontend
+        "*"  # Allow all origins for now (can be restricted later)
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
