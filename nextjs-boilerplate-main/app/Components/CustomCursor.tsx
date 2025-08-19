@@ -9,7 +9,7 @@ const CustomCursor = ({ isVisible, text }: { isVisible: boolean; text: string })
   const [position, setPosition] = useState({ x: -100, y: -100 });
 
   useEffect(() => {
-    const mouseMove = (e) => {
+    const mouseMove = (e: MouseEvent) => {
       setPosition({ x: e.clientX, y: e.clientY });
     };
 
