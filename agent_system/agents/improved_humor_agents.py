@@ -15,18 +15,49 @@ import random
 # Content filtering
 from detoxify import Detoxify
 
+# Import persona recommendation function
+try:
+    from ..personas.enhanced_persona_templates import recommend_personas_for_context
+except ImportError:
+    try:
+        from personas.enhanced_persona_templates import recommend_personas_for_context
+    except ImportError:
+        print("⚠️  Could not import recommend_personas_for_context, using fallback")
+        def recommend_personas_for_context(context: str, audience: str, topic: str) -> List[str]:
+            """Fallback persona recommendation"""
+            return ["General Comedian", "Witty Observer", "Sarcastic Commentator"]
+
+# Import AWS knowledge base
+try:
+    from ..knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base
+except ImportError:
+    try:
+        from knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base
+    except ImportError:
+        print("⚠️  Could not import improved_aws_knowledge_base, using fallback")
+        # Create a mock knowledge base
+        class MockKnowledgeBase:
+            async def get_persona_recommendations(self, user_id: str, context: str, audience: str) -> List[str]:
+                return ["General Comedian", "Witty Observer"]
+            
+            async def get_user_preference(self, user_id: str) -> Dict[str, Any]:
+                return {"humor_style": "general", "audience": "friends", "liked_personas": [], "disliked_personas": []}
+            
+            async def get_user_interaction_history(self, user_id: str) -> List[Dict[str, Any]]:
+                return []
+        
+        improved_aws_knowledge_base = MockKnowledgeBase()
+
 try:
     from ..llm_clients.multi_llm_manager import multi_llm_manager, LLMRequest, LLMProvider
-    from ..personas.enhanced_persona_templates import get_all_personas, recommend_personas_for_context
+    from ..personas.enhanced_persona_templates import get_all_personas
     from ..personas.dynamic_persona_generator import dynamic_persona_generator
-    from ..knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base, UserPreference
     from ..config.settings import settings
 except ImportError:
     # Fallback to absolute imports when running directly
     from llm_clients.multi_llm_manager import multi_llm_manager, LLMRequest, LLMProvider
-    from personas.enhanced_persona_templates import get_all_personas, recommend_personas_for_context
+    from personas.enhanced_persona_templates import get_all_personas
     from personas.dynamic_persona_generator import dynamic_persona_generator
-    from knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base, UserPreference
     from config.settings import settings
 
 @dataclass
