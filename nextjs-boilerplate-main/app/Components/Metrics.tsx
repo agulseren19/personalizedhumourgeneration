@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, useSpring, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import Lottie from 'react-lottie';
+import Lottie from 'lottie-react';
 import increaseAnimationData from '../assets/increase.json';
 import decreaseAnimationData from '../assets/decrease.json';
 
@@ -32,18 +32,9 @@ const Metrics = () => {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [hoveredMetric, setHoveredMetric] = useState(null);
   const [tooltipX, setTooltipX] = useState(0);
-  const [isStopped, setIsStopped] = useState(true);
-  const [isPaused, setIsPaused] = useState(true);
 
-  useEffect(() => {
-    if (hoveredMetric !== null) {
-      setIsStopped(false);
-      setIsPaused(false);
-    } else {
-      setIsStopped(true);
-      setIsPaused(true);
-    }
-  }, [hoveredMetric]);
+
+
 
   const handleMouseMove = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -73,14 +64,7 @@ const Metrics = () => {
     visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 60, damping: 15, duration: 0.5 } } // Adjust duration for smoothness
   };
 
-  const defaultOptions = (animationData) => ({
-    loop: false,
-    autoplay: false,
-    animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice'
-    }
-  });
+
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -197,11 +181,10 @@ const Metrics = () => {
                   >
                     <span className="mr-2">{changeText}</span>
                     <Lottie
-                      options={defaultOptions(changeAnimation)}
-                      height={30}
-                      width={30}
-                      isStopped={isStopped}
-                      isPaused={isPaused}
+                      animationData={changeAnimation}
+                      loop={false}
+                      autoplay={false}
+                      style={{ width: 30, height: 30 }}
                     />
                   </motion.div>
                 )}
