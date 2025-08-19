@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
 import GameInterface from '../Components/cah/GameInterface';
@@ -9,7 +9,7 @@ import PersonaShowcase from '../Components/cah/PersonaShowcase';
 import { generateUserId } from '../lib/api';
 import { useUser } from '../contexts/UserContext';
 
-export default function CAHPage() {
+function CAHPageContent() {
   const { user, loading } = useUser();
   const [userId, setUserId] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'game' | 'analytics' | 'personas'>('game');
@@ -170,5 +170,13 @@ export default function CAHPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CAHPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CAHPageContent />
+    </Suspense>
   );
 } 

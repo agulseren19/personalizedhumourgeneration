@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function GoogleCallback() {
+function GoogleCallbackContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('Processing...');
   const [error, setError] = useState('');
@@ -92,5 +92,27 @@ export default function GoogleCallback() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GoogleCallback() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+        <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full text-center">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2">Google Sign-In</h1>
+            <p className="text-gray-300">Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <GoogleCallbackContent />
+    </Suspense>
   );
 }
