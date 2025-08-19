@@ -20,7 +20,6 @@ const starIcon = (
     x="0px"
     y="0px"
     viewBox="0 0 122.88 122.88"
-    style={{ enableBackground: 'new 0 0 122.88 122.88' }}
     xmlSpace="preserve"
     className="w-4 h-4 mr-2"
   >
