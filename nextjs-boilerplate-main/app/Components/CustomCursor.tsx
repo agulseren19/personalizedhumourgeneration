@@ -49,7 +49,7 @@ const CustomCursor = ({ isVisible, text }: { isVisible: boolean; text: string })
               width="36px"
               height="36px"
               viewBox="0 0 24 24"
-              style={{ enableBackground: 'new 0 0 512 512' }}
+              style={{}}
               xmlSpace="preserve"
               className="text-teal-500"
             >
