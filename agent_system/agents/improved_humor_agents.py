@@ -20,6 +20,18 @@ except ImportError:
     DETOXIFY_AVAILABLE = False
     print("⚠️  Detoxify not available, using regex fallback")
 
+# Import persona recommendation function
+try:
+    from ..personas.enhanced_persona_templates import recommend_personas_for_context
+except ImportError:
+    try:
+        from personas.enhanced_persona_templates import recommend_personas_for_context
+    except ImportError:
+        print("⚠️  Could not import recommend_personas_for_context, using fallback")
+        def recommend_personas_for_context(context: str, audience: str, topic: str) -> List[str]:
+            """Fallback persona recommendation"""
+            return ["General Comedian", "Witty Observer", "Sarcastic Commentator"]
+
 # Data classes for humor generation
 @dataclass
 class HumorRequest:
