@@ -246,6 +246,140 @@ class ImprovedHumorAgent:
         
         return sanitized
 
+class ContentFilter:
+    """Content filtering using detoxify or regex fallback"""
+    
+    def __init__(self):
+        # Lazy loading for detoxify
+        self._detoxify_model = None
+        
+        # Fallback regex patterns
+        self.toxic_patterns = {
+            "hate_speech": [
+                r"\b(hate|despise|loathe)\s+(all|every)\s+\w+",
+                r"\b(kill|murder|die)\s+(all|every)\s+\w+",
+                r"\b\w+\s+(are|is)\s+(evil|scum|trash|garbage)"
+            ],
+            "profanity": [
+                r"\bf[*]?u[*]?c[*]?k\w*",
+                r"\bs[*]?h[*]?i[*]?t\w*", 
+                r"\bd[*]?a[*]?m[*]?n\w*",
+                r"\bb[*]?i[*]?t[*]?c[*]?h\w*"
+            ],
+            "sexual_explicit": [
+                r"\b(sex|sexual|porn|nude|naked)\s+(scene|act|content)",
+                r"\b(penis|vagina|breast|genitals)\b",
+                r"\bmasturbat\w*"
+            ],
+            "violence": [
+                r"\b(kill|murder|stab|shoot|bomb)\s+\w+",
+                r"\b(blood|gore|violence|torture)\b",
+                r"\b(weapon|gun|knife|explosive)\b"
+            ]
+        }
+
+    @property
+    def detoxify_model(self):
+        """Lazy load detoxify model only when needed"""
+        if self._detoxify_model is None and DETOXIFY_AVAILABLE:
+            try:
+                print("🔄 Loading detoxify model (lazy loading)...")
+                self._detoxify_model = Detoxify('original')
+                print("✅ Detoxify model loaded successfully")
+            except Exception as e:
+                print(f"❌ Failed to load detoxify model: {e}")
+                self._detoxify_model = None
+        return self._detoxify_model
+
+    def is_content_safe(self, text: str) -> Tuple[bool, float, Dict[str, float]]:
+        """Check if content is safe using detoxify or regex fallback"""
+        try:
+            # Try detoxify first if available
+            if self.detoxify_model:
+                return self._check_with_detoxify(text)
+            else:
+                return self._check_with_regex(text)
+                
+        except Exception as e:
+            print(f"Content filter error: {e}")
+            # Fallback: assume content is safe
+            return True, 0.0, {}
+
+    def _check_with_detoxify(self, text: str) -> Tuple[bool, float, Dict[str, float]]:
+        """Use detoxify for content filtering"""
+        try:
+            scores = self.detoxify_model.predict(text)
+            
+            # Check each toxicity type
+            violations = []
+            max_score = 0
+            
+            toxicity_thresholds = {
+                'toxicity': 0.7,
+                'severe_toxicity': 0.5,
+                'obscene': 0.8,
+                'threat': 0.3,
+                'insult': 0.7,
+                'identity_attack': 0.5
+            }
+            
+            for toxicity_type, threshold in toxicity_thresholds.items():
+                if toxicity_type in scores:
+                    score = scores[toxicity_type]
+                    max_score = max(max_score, score)
+                    
+                    if score > threshold:
+                        violations.append(f"{toxicity_type}: {score:.3f}")
+            
+            is_safe = len(violations) == 0
+            return is_safe, max_score, scores
+            
+        except Exception as e:
+            print(f"Detoxify error: {e}, falling back to regex")
+            return self._check_with_regex(text)
+
+    def _check_with_regex(self, text: str) -> Tuple[bool, float, Dict[str, float]]:
+        """Fallback to regex-based filtering"""
+        try:
+            category_scores = {}
+            flagged_categories = []
+            
+            for category, patterns in self.toxic_patterns.items():
+                score = 0.0
+                for pattern in patterns:
+                    matches = len(re.findall(pattern, text, re.IGNORECASE))
+                    if matches > 0:
+                        score = min(1.0, matches * 0.3)
+                        flagged_categories.append(category)
+                category_scores[category] = score
+            
+            overall_toxicity = max(category_scores.values()) if category_scores else 0.0
+            is_safe = overall_toxicity < 0.7
+            
+            return is_safe, overall_toxicity, category_scores
+            
+        except Exception as e:
+            print(f"Regex filter error: {e}")
+            # Ultimate fallback
+            return True, 0.0, {}
+
+    def sanitize_content(self, text: str) -> str:
+        """Sanitize potentially offensive content"""
+        # Simple word replacements
+        replacements = {
+            r"\bf[*]?u[*]?c[*]?k": "fudge",
+            r"\bs[*]?h[*]?i[*]?t": "shoot",
+            r"\bd[*]?a[*]?m[*]?n": "darn",
+            r"\bhate": "dislike",
+            r"\bkill": "defeat"
+        }
+        
+        sanitized = text
+        for pattern, replacement in replacements.items():
+            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
+        
+        return sanitized
+
 class ImprovedHumorEvaluator:
     """Improved evaluation system with meaningful scores"""
     
