@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { GetStarted } from './Buttons/GetStarted';
 import CustomCursor from './CustomCursor';
 import Pricing from './Buttons/Pricing';
-import { Link as ScrollLink, animateScroll as scroll, scroller } from 'react-scroll';
+
 
 export default function Hero() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -40,11 +40,13 @@ export default function Hero() {
   };
 
   const handlePricingClick = () => {
-    scroller.scrollTo('pricingSection', {
-      duration: 500,
-      smooth: true,
-      offset: -50,
-    });
+    const element = document.getElementById('pricingSection');
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   };
 
   return (
