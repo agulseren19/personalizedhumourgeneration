@@ -41,7 +41,10 @@ const Navbar = () => {
 
   useEffect(() => {
     // On load animation for the navbar
-    document.querySelector('nav').classList.add('animate-onload');
+    const navElement = document.querySelector('nav');
+    if (navElement) {
+      navElement.classList.add('animate-onload');
+    }
   }, []);
 
   const handleHomeScroll = () => {
