@@ -10,7 +10,7 @@ const CircleWave = ({ className, delayOffset = 0 }: { className?: string; delayO
                 delay: i * 0.5 + delayOffset,
                 duration: 5,
                 repeat: Infinity,
-                repeatType: 'loop',
+                repeatType: 'loop' as const,
                 ease: 'easeInOut'
             }
         })
