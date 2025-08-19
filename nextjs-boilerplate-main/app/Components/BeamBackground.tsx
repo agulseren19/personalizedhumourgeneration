@@ -231,9 +231,9 @@ const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, b
 };
 
 // BackgroundWrapper Component
-const BackgroundWrapper = ({ children }) => {
+const BackgroundWrapper = ({ children }: { children: React.ReactNode }) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateDimensions = () => {
