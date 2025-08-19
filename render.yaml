@@ -6,7 +6,7 @@ services:
     startCommand: cd agent_system && python api/cah_crewai_api.py
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9
+        value: 3.9.18
       - key: OPENAI_API_KEY
         sync: false
       - key: ANTHROPIC_API_KEY
@@ -32,4 +32,4 @@ services:
     envVars:
       - key: NEXT_PUBLIC_API_URL
         value: https://cah-backend.onrender.com
-    autoDeploy: true 
+    autoDeploy: true
