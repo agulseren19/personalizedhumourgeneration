@@ -36,7 +36,7 @@ const BentoBox = () => {
     };
   }, []);
 
-  const handleMouseEnter = (text: string, videoRef: HTMLVideoElement | null) => {
+  const handleMouseEnter = (text: string, videoRef: React.RefObject<HTMLVideoElement>) => {
     if (!isMobile) {
       setCursorText(text);
       setIsCursorVisible(true);
@@ -46,7 +46,7 @@ const BentoBox = () => {
     }
   };
 
-  const handleMouseLeave = (videoRef) => {
+  const handleMouseLeave = (videoRef: React.RefObject<HTMLVideoElement>) => {
     if (!isMobile) {
       setIsCursorVisible(false);
       if (videoRef && videoRef.current) {
