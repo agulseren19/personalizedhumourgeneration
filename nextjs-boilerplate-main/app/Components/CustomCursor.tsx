@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const CustomCursor = ({ isVisible, text }) => {
+const CustomCursor = ({ isVisible, text }: { isVisible: boolean; text: string }) => {
   const [position, setPosition] = useState({ x: -100, y: -100 });
 
   useEffect(() => {
