@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-const CircleWave = ({ className, delayOffset = 0 }) => {
+const CircleWave = ({ className, delayOffset = 0 }: { className?: string; delayOffset?: number }) => {
     const circleVariants = {
         hidden: { opacity: 0, scale: 0.5 },
         visible: i => ({
