@@ -139,8 +139,9 @@ class PostgreSQLKnowledgeBase:
         print(f"  Updating feedback: {user_id} -> {persona_name}: {feedback_score}/10")
         
         try:
-            from agent_system.models.database import get_session_local, UserFeedback, User
+            from agent_system.models.database import get_session_local, UserFeedback, User, PersonaPreference, Persona
             from agent_system.config.settings import settings
+            from sqlalchemy import and_
             
             SessionLocal = get_session_local(settings.database_url)
             db = SessionLocal()
@@ -168,30 +169,30 @@ class PostgreSQLKnowledgeBase:
                 db.add(feedback)
                 
                 # Update persona scores
-                persona_pref = db.query(PersonaPreference).filter(
-                    PersonaPreference.user_id == user_id,
-                    PersonaPreference.persona_id == (
-                        db.query(Persona).filter(Persona.name == persona_name).first().id
-                    )
-                ).first()
-                
-                if persona_pref:
-                    old_count = persona_pref.interaction_count
-                    old_score = persona_pref.preference_score
+                persona = db.query(Persona).filter(Persona.name == persona_name).first()
+                if persona:
+                    persona_pref = db.query(PersonaPreference).filter(
+                        and_(
+                            PersonaPreference.user_id == user_id,
+                            PersonaPreference.persona_id == persona.id
+                        )
+                    ).first()
                     
-                    new_count = old_count + 1
-                    new_score = ((old_score * old_count) + feedback_score) / new_count
-                    
-                    persona_pref.interaction_count = new_count
-                    persona_pref.preference_score = new_score
-                    persona_pref.last_interaction = datetime.now()
-                else:
-                    # Create new preference if it doesn't exist
-                    new_persona = db.query(Persona).filter(Persona.name == persona_name).first()
-                    if new_persona:
+                    if persona_pref:
+                        old_count = persona_pref.interaction_count
+                        old_score = persona_pref.preference_score
+                        
+                        new_count = old_count + 1
+                        new_score = ((old_score * old_count) + feedback_score) / new_count
+                        
+                        persona_pref.interaction_count = new_count
+                        persona_pref.preference_score = new_score
+                        persona_pref.last_interaction = datetime.now()
+                    else:
+                        # Create new preference if it doesn't exist
                         new_preference = PersonaPreference(
                             user_id=user_id,
-                            persona_id=new_persona.id,
+                            persona_id=persona.id,
                             interaction_count=1,
                             preference_score=feedback_score,
                             last_interaction=datetime.now()
@@ -229,27 +230,15 @@ class PostgreSQLKnowledgeBase:
         # Calculate average score for this persona
         avg_score = user_pref.persona_scores.get(persona_name, 5.0)
         
-        # Update likes/dislikes
-        if avg_score >= self.like_threshold:
-            # Add to liked, remove from disliked
-            if persona_name not in user_pref.liked_personas:
-                user_pref.liked_personas.append(persona_name)
+        # Update liked/disliked lists
+        if avg_score >= self.like_threshold and persona_name not in user_pref.liked_personas:
+            user_pref.liked_personas.append(persona_name)
             if persona_name in user_pref.disliked_personas:
                 user_pref.disliked_personas.remove(persona_name)
-        
-        elif avg_score <= self.dislike_threshold:
-            # Add to disliked, remove from liked
-            if persona_name not in user_pref.disliked_personas:
-                user_pref.disliked_personas.append(persona_name)
+        elif avg_score <= self.dislike_threshold and persona_name not in user_pref.disliked_personas:
+            user_pref.disliked_personas.append(persona_name)
             if persona_name in user_pref.liked_personas:
                 user_pref.liked_personas.remove(persona_name)
-        
-        else:
-            # Neutral - remove from both if present
-            if persona_name in user_pref.liked_personas:
-                user_pref.liked_personas.remove(persona_name)
-            if persona_name in user_pref.disliked_personas:
-                user_pref.disliked_personas.remove(persona_name)
     
     def _update_context_preferences(self, user_pref: UserPreference, context: str, score: float):
         """Update context preferences based on feedback"""
@@ -266,13 +255,13 @@ class PostgreSQLKnowledgeBase:
                     user_pref.context_preferences[keyword] = score
     
     async def get_persona_recommendations(self, user_id: str, context: str, audience: str) -> List[str]:
-        """Get persona recommendations based on user preferences and context - FIXED NUANCED SCORING"""
+        """Get persona recommendations based on user preferences and context"""
         user_pref = await self.get_user_preference(user_id)
         
         if not user_pref:
             # Fallback to context-based recommendations
             try:
-                from ..personas.enhanced_persona_templates import recommend_personas_for_context
+                from agent_system.personas.enhanced_persona_templates import recommend_personas_for_context
                 return recommend_personas_for_context(context, audience, "general")
             except ImportError:
                 try:
@@ -288,7 +277,7 @@ class PostgreSQLKnowledgeBase:
         
         # Get all available personas
         try:
-            from ..personas.enhanced_persona_templates import get_all_personas
+            from agent_system.personas.enhanced_persona_templates import get_all_personas
             all_personas = list(get_all_personas().keys())
         except ImportError:
             try:
@@ -302,7 +291,7 @@ class PostgreSQLKnowledgeBase:
                     print("⚠️  Could not import get_all_personas, using fallback")
                     all_personas = ["General Comedian", "Witty Observer", "Sarcastic Commentator"]
         
-        # FIXED: More nuanced scoring system
+        # Calculate persona scores
         persona_scores = {}
         
         for persona in all_personas:
@@ -353,7 +342,7 @@ class PostgreSQLKnowledgeBase:
             if persona not in user_pref.disliked_personas and score > 0
         ]
         
-        print(f"  FIXED Persona recommendations for {user_id}:")
+        print(f"  Persona recommendations for {user_id}:")
         for persona in filtered_personas[:8]:  # Show more for debugging
             score = persona_scores[persona]
             status = ""
@@ -390,151 +379,64 @@ class PostgreSQLKnowledgeBase:
                 base_score += matches * 1.5  # Bonus for context relevance
         
         # Audience fit
-        if audience == 'colleagues' and persona in ['office_worker', 'corporate_ladder_climber']:
-            base_score += 1.5
-        elif audience == 'family' and persona in ['dad_humor_enthusiast', 'suburban_parent']:
-            base_score += 1.5
-        elif audience == 'friends' and persona in ['millennial_memer', 'gaming_guru', 'gen_z_chaos']:
-            base_score += 1.5
-        
-        # Add some controlled randomness to avoid exact ties
-        base_score += random.uniform(-0.3, 0.3)
-        
-        return max(1.0, min(9.0, base_score))
-    
-    def _calculate_audience_fit(self, persona: str, audience: str) -> float:
-        """Calculate how well a persona fits the audience"""
-        audience_fits = {
-            'colleagues': ['office_worker', 'corporate_ladder_climber', 'wordplay_master'],
-            'family': ['dad_humor_enthusiast', 'suburban_parent', 'wordplay_master'],
-            'friends': ['millennial_memer', 'gaming_guru', 'gen_z_chaos'],
-            'adults': ['dark_humor_specialist', 'wordplay_master', 'office_worker']
+        audience_bonuses = {
+            'friends': ['gaming_guru', 'gen_z_chaos', 'dark_humor_specialist'],
+            'family': ['dad_humor_enthusiast', 'suburban_parent'],
+            'colleagues': ['office_worker', 'corporate_ladder_climber'],
+            'general': ['wordplay_master', 'millennial_memer']
         }
         
-        if audience in audience_fits and persona in audience_fits[audience]:
-            return 1.0
-        return 0.0
+        if audience in audience_bonuses and persona in audience_bonuses[audience]:
+            base_score += 1.0
+        
+        return min(9.0, max(1.0, base_score))
     
     def _calculate_context_relevance(self, context: str, context_preferences: Dict[str, float]) -> float:
-        """Calculate how well this context matches user preferences"""
+        """Calculate context relevance based on user preferences"""
         if not context_preferences:
             return 0.0
         
-        context_words = context.lower().split()
-        relevance_scores = []
+        context_keywords = context.lower().split()
+        total_score = 0.0
+        keyword_count = 0
         
-        for word in context_words:
-            if word in context_preferences:
-                relevance_scores.append(context_preferences[word])
+        for keyword in context_keywords:
+            if len(keyword) > 3 and keyword in context_preferences:
+                total_score += context_preferences[keyword]
+                keyword_count += 1
         
-        if not relevance_scores:
+        if keyword_count == 0:
             return 0.0
         
-        return sum(relevance_scores) / len(relevance_scores) - 5.0  # Normalize around 0
+        return total_score / keyword_count
     
-    async def create_group_context(self, group_id: str, member_ids: List[str]) -> Dict[str, Any]:
-        """Create group context by combining member preferences"""
-        print(f"  Creating group context for {group_id} with members: {member_ids}")
-        
-        # Get preferences for all members
-        member_preferences = []
-        for member_id in member_ids:
-            pref = await self.get_user_preference(member_id)
-            if pref:
-                member_preferences.append(pref)
-        
-        if not member_preferences:
-            return {
-                'group_id': group_id,
-                'member_ids': member_ids,
-                'common_humor_styles': [],
-                'group_preferences': {},
-                'consensus_personas': []
-            }
-        
-        # Find common liked personas
-        liked_sets = [set(pref.liked_personas) for pref in member_preferences]
-        common_liked = set.intersection(*liked_sets) if liked_sets else set()
-        
-        # Find commonly disliked personas
-        disliked_sets = [set(pref.disliked_personas) for pref in member_preferences]
-        common_disliked = set.intersection(*disliked_sets) if disliked_sets else set()
-        
-        # Calculate consensus persona scores
-        all_personas = set()
-        for pref in member_preferences:
-            all_personas.update(pref.persona_scores.keys())
-        
-        consensus_personas = []
-        for persona in all_personas:
-            if persona in common_disliked:
-                continue  # Skip commonly disliked personas
-            
-            scores = [pref.persona_scores.get(persona, 5.0) for pref in member_preferences]
-            avg_score = sum(scores) / len(scores)
-            
-            if avg_score >= 6.0:  # Only include personas with decent group rating
-                consensus_personas.append((persona, avg_score))
-        
-        # Sort by consensus score
-        consensus_personas.sort(key=lambda x: x[1], reverse=True)
-        
-        group_context = {
-            'group_id': group_id,
-            'member_ids': member_ids,
-            'common_humor_styles': list(common_liked),
-            'group_preferences': {
-                'liked_personas': list(common_liked),
-                'disliked_personas': list(common_disliked),
-                'consensus_personas': [persona for persona, score in consensus_personas[:5]]
+    def _calculate_audience_fit(self, persona: str, audience: str) -> float:
+        """Calculate how well a persona fits the audience"""
+        audience_fit_scores = {
+            'friends': {
+                'gaming_guru': 0.8,
+                'gen_z_chaos': 0.9,
+                'dark_humor_specialist': 0.7,
+                'wordplay_master': 0.6
             },
-            'member_count': len(member_preferences)
-        }
-        
-        print(f"  Group consensus personas: {group_context['group_preferences']['consensus_personas']}")
-        
-        return group_context
-    
-    async def get_user_analytics(self, user_id: str) -> Dict[str, Any]:
-        """Get detailed analytics for a user"""
-        user_pref = await self.get_user_preference(user_id)
-        
-        if not user_pref:
-            return {'error': 'User not found'}
-        
-        # Calculate interaction statistics
-        total_interactions = len(user_pref.interaction_history)
-        
-        if total_interactions == 0:
-            return {'error': 'No interaction history'}
-        
-        # Calculate average scores
-        all_scores = [interaction['feedback_score'] for interaction in user_pref.interaction_history]
-        avg_score = sum(all_scores) / len(all_scores)
-        
-        # Persona performance
-        persona_performance = {}
-        for persona, score in user_pref.persona_scores.items():
-            interactions = [
-                i for i in user_pref.interaction_history
-                if i['persona_name'] == persona
-            ]
-            persona_performance[persona] = {
-                'avg_score': score,
-                'interaction_count': len(interactions),
-                'status': 'liked' if persona in user_pref.liked_personas else 
-                         'disliked' if persona in user_pref.disliked_personas else 'neutral'
+            'family': {
+                'dad_humor_enthusiast': 0.9,
+                'suburban_parent': 0.8,
+                'office_worker': 0.5
+            },
+            'colleagues': {
+                'office_worker': 0.9,
+                'corporate_ladder_climber': 0.8,
+                'wordplay_master': 0.6
+            },
+            'general': {
+                'wordplay_master': 0.7,
+                'millennial_memer': 0.6,
+                'gaming_guru': 0.5
             }
-        
-        return {
-            'user_id': user_id,
-            'total_interactions': total_interactions,
-            'average_score': avg_score,
-            'liked_personas': user_pref.liked_personas,
-            'disliked_personas': user_pref.disliked_personas,
-            'persona_performance': persona_performance,
-            'last_updated': user_pref.last_updated.isoformat()
         }
+        
+        return audience_fit_scores.get(audience, {}).get(persona, 0.3)
 
 # Global instance
 improved_aws_knowledge_base = PostgreSQLKnowledgeBase() 
