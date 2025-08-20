@@ -50,16 +50,8 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Convert string user_id to integer for database query
-    try:
-        user_id_int = int(user_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid user ID format"
-        )
-    
-    user = db.query(User).filter(User.id == user_id_int).first()
+    # Query user directly with string user_id (database schema uses String for User.id)
+    user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -168,12 +160,18 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user information"""
-    return UserResponse(
-        id=str(current_user.id),
-        email=current_user.email,
-        username=current_user.username,
-        created_at=current_user.created_at
-    )
+    try:
+        return UserResponse(
+            id=str(current_user.id),
+            email=current_user.email,
+            username=current_user.username,
+            created_at=current_user.created_at
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting user info: {str(e)}"
+        )
 
 @router.post("/logout")
 async def logout():
