@@ -33,8 +33,10 @@ class ProductionConfig:
     # CORS Configuration
     ALLOWED_ORIGINS = [
         "https://cah-frontend.onrender.com",
-        "https://yourdomain.com",  # Change this to your actual domain
-        "http://localhost:3000"    # Keep for local testing
+        "https://personalizedhumourgenerationcah.vercel.app",  # Vercel frontend
+        "https://cah-backend.onrender.com",  # Render backend
+        "http://localhost:3000",    # Keep for local testing
+        "http://localhost:3001"     # Keep for local testing
     ]
     
     # Security

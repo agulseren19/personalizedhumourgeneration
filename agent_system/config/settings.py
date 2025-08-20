@@ -39,7 +39,7 @@ class Settings:
         self.secret_key: str = os.getenv("SECRET_KEY", "your-app-secret-key-change-this-in-production")
         
         # CORS Configuration
-        self.allowed_origins: str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001")
+        self.allowed_origins: str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001,https://cah-backend.onrender.com,https://personalizedhumourgenerationcah.vercel.app")
         
         # Google OAuth Configuration
         self.google_client_id: str = os.getenv("GOOGLE_CLIENT_ID", "")
