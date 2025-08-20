@@ -385,7 +385,7 @@ Response:"""
         
         return final_list if final_list else personas  # Fallback to original if all filtered out
     
-    async def _generate_with_custom_persona(self, request: HumorRequest, custom_persona, model: LLMProvider) -> Optional[GenerationResult]:
+    async def _generate_with_custom_persona_old(self, request: HumorRequest, custom_persona, model: str) -> Optional[GenerationResult]:
         """Generate humor with a custom persona template"""
         start_time = time.time()
         
@@ -461,7 +461,7 @@ White Card:"""
             return GenerationResult(
                 text=humor_text,
                 persona_name=custom_persona.name,
-                model_used=response.provider.value,
+                model_used=getattr(response, 'model', model) if hasattr(response, 'model') else str(model),
                 generation_time=generation_time,
                 toxicity_score=toxicity_score,
                 is_safe=is_safe,
@@ -794,7 +794,7 @@ Black Card:""",
             print(f"    CrewAI black card generation failed for {comedian_name}: {e}")
         
         # Fallback to standard generation
-        return await self._generate_with_persona(request, comedian_name, LLMProvider.OPENAI_GPT4)
+        return await self._generate_with_persona_old(request, comedian_name, "gpt-4")
 
     def _parse_black_card_crew_result(self, result_text: str) -> str:
         """Parse CrewAI result to extract the final black card"""
@@ -840,7 +840,7 @@ Black Card:""",
         
         return ""
     
-    async def _generate_with_persona(self, request: HumorRequest, persona_name: str, model: LLMProvider) -> Optional[GenerationResult]:
+    async def _generate_with_persona_old(self, request: HumorRequest, persona_name: str, model: str) -> Optional[GenerationResult]:
         """Generate humor with specific persona"""
         start_time = time.time()
         
@@ -897,7 +897,7 @@ Generate content that is funny but ethical."""
             return GenerationResult(
                 text=humor_text,
                 persona_name=persona_name,
-                model_used=response.provider.value,
+                model_used=getattr(response, 'model', model) if hasattr(response, 'model') else str(model),
                 generation_time=generation_time,
                 toxicity_score=toxicity_score,
                 is_safe=is_safe,
