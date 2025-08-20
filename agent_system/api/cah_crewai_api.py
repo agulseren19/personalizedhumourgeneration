@@ -845,11 +845,16 @@ async def get_user_analytics(user_id: str):
                     }
                 }
             
-            # Calculate analytics from database data
+            # Calculate analytics from both preferences and feedback
             total_interactions = sum(pref.interaction_count for pref in preferences)
+            total_feedback = len(feedback_records)
             
-            # Calculate average score weighted by interactions
-            if total_interactions > 0:
+            # Calculate average score from feedback records
+            if feedback_records:
+                feedback_scores = [fb.feedback_score for fb in feedback_records]
+                average_score = sum(feedback_scores) / len(feedback_scores)
+            elif total_interactions > 0:
+                # Fallback to preferences if no feedback
                 total_score = sum(pref.preference_score * pref.interaction_count for pref in preferences)
                 average_score = total_score / total_interactions
             else:
@@ -896,13 +901,23 @@ async def get_user_analytics(user_id: str):
             analytics = {
                 'user_id': user_id,
                 'total_interactions': total_interactions,
+                'total_feedback': total_feedback,
                 'average_score': round(average_score, 1),
                 'liked_personas': liked_personas,
                 'disliked_personas': disliked_personas,
                 'top_personas': top_personas,
                 'persona_performance': persona_performance,
                 'last_updated': max([pref.last_interaction for pref in preferences], default=datetime.now()).isoformat(),
-                'favorite_persona': favorite_persona
+                'favorite_persona': favorite_persona,
+                'recent_feedback': [
+                    {
+                        'persona_name': fb.persona_name,
+                        'score': fb.feedback_score,
+                        'context': fb.context,
+                        'created_at': fb.created_at.isoformat() if fb.created_at else None
+                    }
+                    for fb in feedback_records[-5:]  # Last 5 feedback records
+                ]
             }
             
             return {

@@ -107,14 +107,25 @@ export interface HumorResponse {
 }
 
 export interface UserAnalytics {
+  user_id: string;
   total_interactions: number;
+  total_feedback: number;
   average_score: number;
   liked_personas: string[];
   disliked_personas: string[];
+  top_personas: any[];
   persona_performance: Record<string, {
     avg_score: number;
     interaction_count: number;
     status: 'liked' | 'disliked' | 'neutral';
+  }>;
+  last_updated: string;
+  favorite_persona?: string;
+  recent_feedback?: Array<{
+    persona_name: string;
+    score: number;
+    context: string;
+    created_at?: string;
   }>;
 }
 

@@ -256,7 +256,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
   };
 
   const handleCardSelect = async (generation: Generation) => {
-    setSelectedCard(generation.id);
+    setSelectedCard(generation.id || generation.generation?.text || 'unknown');
     try {
       // Use authenticated user ID if available, otherwise fall back to frontend ID
       const consistentUserId = user?.id || userId;
@@ -305,7 +305,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
   };
 
   const handleWhiteCardRating = async (generation: Generation, rating: number) => {
-    setWhiteCardRatings(prev => ({ ...prev, [generation.id]: rating }));
+    setWhiteCardRatings(prev => ({ ...prev, [generation.id || generation.generation?.text || 'unknown']: rating }));
     
     try {
       // Use authenticated user ID if available, otherwise fall back to frontend ID
@@ -313,10 +313,10 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       
       await cahApi.submitFeedback({
         user_id: consistentUserId,
-        persona_name: generation.persona_name || 'Unknown Persona',
+        persona_name: generation.persona_name || generation.generation?.persona_name || 'Unknown Persona',
         feedback_score: rating,
         context: context,
-        response_text: generation.text || 'No text available',
+        response_text: generation.text || generation.generation?.text || 'No text available',
         topic: topic,
         audience: audience
       });
@@ -358,7 +358,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       
       // Generate white cards for this black card
       const whiteRequest: GenerateHumorRequest = {
-        context: generatedBlackCard.text,
+        context: generatedBlackCard.text || generatedBlackCard.generation?.text || 'No context available',
         audience: 'general',
         topic: 'general',
         user_id: consistentUserId,
@@ -1453,7 +1453,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
           <div className="flex flex-row flex-wrap justify-center gap-6 mt-4">
             {generations.map((generation, index) => (
               <div
-                key={generation.id || `generation-${index}`}
+                                    key={generation.id || generation.generation?.text || `generation-${index}`}
                 className={`${cardType === 'black' 
                   ? 'bg-black text-white border-4 border-white' 
                   : 'bg-white text-black border-4 border-black'
@@ -1521,7 +1521,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                             key={rating}
                             onClick={() => handleWhiteCardRating(generation, rating)}
                             className={`w-6 h-6 rounded-full text-xs font-bold transition-all ${
-                              whiteCardRatings[generation.id || 'unknown'] === rating
+                              whiteCardRatings[generation.id || generation.generation?.text || 'unknown'] === rating
                                 ? 'bg-purple-600 text-white shadow-lg scale-110'
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
