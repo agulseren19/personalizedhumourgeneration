@@ -845,55 +845,57 @@ async def get_user_analytics(user_id: str):
                     }
                 }
             
-            # Calculate analytics from both preferences and feedback
-            total_interactions = sum(pref.interaction_count for pref in preferences)
+            # Calculate analytics from feedback records (primary source)
             total_feedback = len(feedback_records)
+            total_interactions = total_feedback  # Each feedback is an interaction
             
             # Calculate average score from feedback records
             if feedback_records:
                 feedback_scores = [fb.feedback_score for fb in feedback_records]
                 average_score = sum(feedback_scores) / len(feedback_scores)
-            elif total_interactions > 0:
-                # Fallback to preferences if no feedback
-                total_score = sum(pref.preference_score * pref.interaction_count for pref in preferences)
-                average_score = total_score / total_interactions
             else:
                 average_score = 0
             
-            # Determine liked/disliked personas (threshold-based)
-            liked_personas = [pref.persona.name for pref in preferences if pref.preference_score >= 7.0]
-            disliked_personas = [pref.persona.name for pref in preferences if pref.preference_score < 5.0]
+            # Build comprehensive persona performance from feedback records
+            from collections import defaultdict
+            persona_stats = defaultdict(lambda: {'scores': [], 'count': 0})
             
-            # Find favorite persona (highest score with significant interactions)
-            favorite_persona = None
-            if preferences:
-                # Only consider personas with at least 2 interactions
-                qualified_prefs = [p for p in preferences if p.interaction_count >= 2]
-                if qualified_prefs:
-                    favorite_pref = max(qualified_prefs, key=lambda x: x.preference_score)
-                    favorite_persona = favorite_pref.persona.name
-                elif preferences:
-                    # Fallback to any persona if none have 2+ interactions
-                    favorite_pref = max(preferences, key=lambda x: x.preference_score)
-                    favorite_persona = favorite_pref.persona.name
+            # Aggregate feedback by persona
+            for fb in feedback_records:
+                persona_name = fb.persona_name
+                if persona_name and persona_name != "Unknown Persona":  # Filter out unknown personas
+                    persona_stats[persona_name]['scores'].append(fb.feedback_score)
+                    persona_stats[persona_name]['count'] += 1
             
-            # Build persona performance data
+            # Build persona performance data from feedback
             persona_performance = {}
-            for pref in preferences:
-                persona_name = pref.persona.name
-                persona_performance[persona_name] = {
-                    'avg_score': round(pref.preference_score, 1),
-                    'interaction_count': pref.interaction_count,
-                    'status': 'liked' if pref.preference_score >= 7.0 else 
-                             'disliked' if pref.preference_score < 5.0 else 'neutral'
-                }
+            for persona_name, stats in persona_stats.items():
+                if stats['count'] > 0:
+                    avg_score = sum(stats['scores']) / len(stats['scores'])
+                    persona_performance[persona_name] = {
+                        'avg_score': round(avg_score, 1),
+                        'interaction_count': stats['count'],
+                        'status': 'liked' if avg_score >= 7.0 else 
+                                 'disliked' if avg_score < 5.0 else 'neutral'
+                    }
             
-            # Get top personas (sorted by score, min 1 interaction)
+            # Determine liked/disliked personas from feedback data
+            liked_personas = [name for name, perf in persona_performance.items() if perf['avg_score'] >= 7.0]
+            disliked_personas = [name for name, perf in persona_performance.items() if perf['avg_score'] < 5.0]
+            
+            # Find favorite persona (highest average score with at least 1 interaction)
+            favorite_persona = None
+            if persona_performance:
+                # Get persona with highest average score
+                favorite_entry = max(persona_performance.items(), key=lambda x: x[1]['avg_score'])
+                favorite_persona = favorite_entry[0]
+            
+            # Get top personas (sorted by average score)
             top_personas = sorted(
-                [{'persona_name': pref.persona.name, 
-                  'avg_score': pref.preference_score,
-                  'interaction_count': pref.interaction_count} 
-                 for pref in preferences if pref.interaction_count > 0],
+                [{'persona_name': name, 
+                  'avg_score': perf['avg_score'],
+                  'interaction_count': perf['interaction_count']} 
+                 for name, perf in persona_performance.items()],
                 key=lambda x: x['avg_score'], 
                 reverse=True
             )[:5]

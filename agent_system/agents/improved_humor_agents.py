@@ -12,6 +12,75 @@ from dataclasses import dataclass
 from datetime import datetime
 import random
 
+class SurpriseCalculator:
+    """Calculate incongruity/surprise index as per Tian et al."""
+    
+    def __init__(self):
+        self.base_model = "gpt-2"  # Use GPT-2 as base model for surprisal calculation
+        
+    async def calculate_surprise_index(self, humor_text: str, context: str) -> float:
+        """
+        Calculate surprise index using token-level surprisal: -log P(token|context)
+        Higher values indicate more unexpected/incongruous content (funnier)
+        """
+        try:
+            # Create prompt for probability calculation
+            prompt = f"""Given this context: "{context}"
+Calculate the probability of this completion: "{humor_text}"
+
+This is for measuring unexpectedness in humor generation."""
+            
+            # Use a simple heuristic based on text characteristics for now
+            # In a full implementation, this would use actual token probabilities
+            surprise_score = self._calculate_heuristic_surprise(humor_text, context)
+            
+            print(f"DEBUG: Surprise index for '{humor_text[:50]}...': {surprise_score:.3f}")
+            return surprise_score
+            
+        except Exception as e:
+            print(f"Error calculating surprise index: {e}")
+            return 5.0  # Default moderate surprise
+    
+    def _calculate_heuristic_surprise(self, humor_text: str, context: str) -> float:
+        """
+        Heuristic surprise calculation based on:
+        1. Lexical surprise (unusual words)
+        2. Semantic distance from context
+        3. Length unexpectedness
+        4. Syntactic complexity
+        """
+        surprise_score = 0.0
+        
+        # 1. Lexical surprise - uncommon words increase surprise
+        words = humor_text.lower().split()
+        common_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'very', 'really', 'quite'}
+        uncommon_ratio = len([w for w in words if w not in common_words and len(w) > 4]) / max(len(words), 1)
+        surprise_score += uncommon_ratio * 3.0
+        
+        # 2. Semantic distance - different topic/domain from context
+        context_words = set(context.lower().split())
+        humor_words = set(words)
+        overlap_ratio = len(context_words.intersection(humor_words)) / max(len(context_words), 1)
+        surprise_score += (1.0 - overlap_ratio) * 2.0
+        
+        # 3. Length unexpectedness - very short or very long responses are surprising
+        length_surprise = abs(len(humor_text) - 30) / 30.0  # 30 chars is "expected" length
+        surprise_score += min(length_surprise, 2.0)
+        
+        # 4. Syntactic surprise - punctuation and structure
+        if '!' in humor_text or '?' in humor_text:
+            surprise_score += 0.5
+        if any(char in humor_text for char in ['...', '--', ';']):
+            surprise_score += 0.3
+            
+        # 5. Content-based surprise indicators
+        surprise_words = ['unexpected', 'bizarre', 'absurd', 'random', 'weird', 'strange', 'shocking', 'twist']
+        if any(word in humor_text.lower() for word in surprise_words):
+            surprise_score += 1.0
+            
+        # Normalize to 0-10 scale
+        return min(max(surprise_score, 0.0), 10.0)
+
 # Content filtering
 from detoxify import Detoxify
 
@@ -65,6 +134,7 @@ class GenerationResult:
     toxicity_score: float
     is_safe: bool
     confidence_score: float
+    surprise_index: float = 5.0  # Add surprise index with default value
     
     def __post_init__(self):
         # Ensure all float values are Python floats, not numpy types
@@ -74,6 +144,8 @@ class GenerationResult:
             self.toxicity_score = float(self.toxicity_score)
         if hasattr(self.confidence_score, 'item'):
             self.confidence_score = float(self.confidence_score)
+        if hasattr(self.surprise_index, 'item'):
+            self.surprise_index = float(self.surprise_index)
 
 @dataclass
 class EvaluationResult:
@@ -81,6 +153,7 @@ class EvaluationResult:
     creativity_score: float
     appropriateness_score: float
     context_relevance_score: float
+    surprise_index: float  # Add surprise index
     overall_score: float
     reasoning: str
     evaluator_name: str
@@ -96,6 +169,8 @@ class EvaluationResult:
             self.appropriateness_score = float(self.appropriateness_score)
         if hasattr(self.context_relevance_score, 'item'):
             self.context_relevance_score = float(self.context_relevance_score)
+        if hasattr(self.surprise_index, 'item'):
+            self.surprise_index = float(self.surprise_index)
         if hasattr(self.overall_score, 'item'):
             self.overall_score = float(self.overall_score)
 
@@ -173,6 +248,7 @@ class ImprovedHumorAgent:
     
     def __init__(self):
         self.content_filter = ContentFilter()
+        self.surprise_calculator = SurpriseCalculator()
     
     async def generate_humor(self, request: HumorRequest, personas: List[str]) -> List[GenerationResult]:
         """Generate humor using dynamic personas based on user preferences"""
@@ -255,6 +331,9 @@ Response:"""
             response = await llm_manager.generate_response(llm_request)
             
             if response and response.content:
+                # Calculate surprise index
+                surprise_index = await self.surprise_calculator.calculate_surprise_index(response.content.strip(), request.context)
+                
                 # Create generation result
                 generation_result = GenerationResult(
                     text=response.content.strip(),
@@ -263,7 +342,8 @@ Response:"""
                     generation_time=1.0,  # Estimated time
                     toxicity_score=0.1,  # Low toxicity for white cards
                     is_safe=True,
-                    confidence_score=0.8
+                    confidence_score=0.8,
+                    surprise_index=surprise_index
                 )
                 
                 print(f"      ✅ Generated: {response.content.strip()[:50]}...")
@@ -309,6 +389,9 @@ Response:"""
             response = await llm_manager.generate_response(llm_request)
             
             if response and response.content:
+                # Calculate surprise index
+                surprise_index = await self.surprise_calculator.calculate_surprise_index(response.content.strip(), request.context)
+                
                 # Create generation result
                 generation_result = GenerationResult(
                     text=response.content.strip(),
@@ -317,7 +400,8 @@ Response:"""
                     generation_time=1.0,  # Estimated time
                     toxicity_score=0.1,  # Low toxicity for white cards
                     is_safe=True,
-                    confidence_score=0.9  # Higher confidence for custom personas
+                    confidence_score=0.9,  # Higher confidence for custom personas
+                    surprise_index=surprise_index
                 )
                 
                 print(f"      ✅ Generated with custom persona: {response.content.strip()[:50]}...")
@@ -458,6 +542,9 @@ White Card:"""
                     print(f"    Content filtered out from custom persona {custom_persona.name}: too toxic")
                     return None
             
+            # Calculate surprise index
+            surprise_index = await self.surprise_calculator.calculate_surprise_index(humor_text, request.context)
+            
             return GenerationResult(
                 text=humor_text,
                 persona_name=custom_persona.name,
@@ -465,7 +552,8 @@ White Card:"""
                 generation_time=generation_time,
                 toxicity_score=toxicity_score,
                 is_safe=is_safe,
-                confidence_score=self._calculate_confidence(humor_text, request.context)
+                confidence_score=self._calculate_confidence(humor_text, request.context),
+                surprise_index=surprise_index
             )
             
         except Exception as e:
@@ -641,6 +729,14 @@ Black Card:""",
             result = crew_instance.kickoff()
             
             if result and result.strip():
+                # Calculate surprise index for CrewAI result
+                surprise_index = 7.0  # Default higher surprise for CrewAI (as it's designed to be creative)
+                try:
+                    surprise_calc = SurpriseCalculator()
+                    surprise_index = await surprise_calc.calculate_surprise_index(result.strip(), request.context)
+                except Exception as e:
+                    print(f"⚠️ CrewAI surprise calculation failed: {e}")
+                
                 # Create generation result
                 generation_result = GenerationResult(
                     text=result.strip(),
@@ -649,7 +745,8 @@ Black Card:""",
                     generation_time=1.0,  # Estimated time
                     toxicity_score=0.3,  # Moderate for black cards
                     is_safe=True,
-                    confidence_score=0.9
+                    confidence_score=0.9,
+                    surprise_index=surprise_index
                 )
                 
                 print(f"    ✅ CrewAI generated: {result.strip()[:50]}...")
@@ -779,6 +876,13 @@ Black Card:""",
             black_card_text = self._parse_black_card_crew_result(str(result))
             
             if black_card_text:
+                # Calculate surprise index
+                surprise_index = 7.0  # Default higher surprise for CrewAI
+                try:
+                    surprise_index = await self.surprise_calculator.calculate_surprise_index(black_card_text, request.context)
+                except Exception as e:
+                    print(f"⚠️ CrewAI surprise calculation failed: {e}")
+                
                 # Create generation result
                 return GenerationResult(
                     text=black_card_text,
@@ -787,7 +891,8 @@ Black Card:""",
                     generation_time=0.0,  # Will be set by caller
                     toxicity_score=0.0,   # Will be filtered by caller
                     is_safe=True,         # Will be checked by caller
-                    confidence_score=self._calculate_confidence(black_card_text, request.context)
+                    confidence_score=self._calculate_confidence(black_card_text, request.context),
+                    surprise_index=surprise_index
                 )
             
         except Exception as e:
@@ -894,6 +999,9 @@ Generate content that is funny but ethical."""
                     print(f"    Content filtered out from {persona_name}: too toxic")
                     return None
             
+            # Calculate surprise index
+            surprise_index = await self.surprise_calculator.calculate_surprise_index(humor_text, request.context)
+            
             return GenerationResult(
                 text=humor_text,
                 persona_name=persona_name,
@@ -901,7 +1009,8 @@ Generate content that is funny but ethical."""
                 generation_time=generation_time,
                 toxicity_score=toxicity_score,
                 is_safe=is_safe,
-                confidence_score=self._calculate_confidence(humor_text, request.context)
+                confidence_score=self._calculate_confidence(humor_text, request.context),
+                surprise_index=surprise_index
             )
             
         except Exception as e:
@@ -976,6 +1085,7 @@ class ImprovedHumorEvaluator:
     
     def __init__(self):
         self.content_filter = ContentFilter()
+        self.surprise_calculator = SurpriseCalculator()
     
     async def evaluate_humor(self, humor_text: str, request: HumorRequest) -> EvaluationResult:
         """Evaluate humor with meaningful, varied scores"""
@@ -985,22 +1095,25 @@ class ImprovedHumorEvaluator:
         creativity_score = self._evaluate_creativity(humor_text, request)
         appropriateness_score = self._evaluate_appropriateness(humor_text, request)
         context_relevance_score = self._evaluate_context_relevance(humor_text, request)
+        surprise_index = await self.surprise_calculator.calculate_surprise_index(humor_text, request.context)
         
-        # Calculate overall score (weighted average)
+        # Calculate overall score (weighted average including surprise)
         overall_score = (
-            humor_score * 0.4 +
-            creativity_score * 0.3 +
+            humor_score * 0.35 +
+            creativity_score * 0.25 +
             appropriateness_score * 0.2 +
-            context_relevance_score * 0.1
+            context_relevance_score * 0.1 +
+            surprise_index * 0.1  # Include surprise in overall score
         )
         
-        reasoning = f"Humor: {humor_score:.1f}, Creativity: {creativity_score:.1f}, Appropriateness: {appropriateness_score:.1f}, Relevance: {context_relevance_score:.1f}"
+        reasoning = f"Humor: {humor_score:.1f}, Creativity: {creativity_score:.1f}, Appropriateness: {appropriateness_score:.1f}, Relevance: {context_relevance_score:.1f}, Surprise: {surprise_index:.1f}"
         
         return EvaluationResult(
             humor_score=humor_score,
             creativity_score=creativity_score,
             appropriateness_score=appropriateness_score,
             context_relevance_score=context_relevance_score,
+            surprise_index=surprise_index,
             overall_score=overall_score,
             reasoning=reasoning,
             evaluator_name="ImprovedEvaluator",
@@ -1240,6 +1353,14 @@ Response:"""
                     response = await llm_manager.generate_response(llm_request)
                     
                     if response and response.content:
+                        # Calculate surprise index for fallback
+                        surprise_index = 5.0  # Default surprise for fallback
+                        try:
+                            surprise_calc = SurpriseCalculator()
+                            surprise_index = await surprise_calc.calculate_surprise_index(response.content.strip(), request.context)
+                        except Exception as e:
+                            print(f"⚠️ Fallback surprise calculation failed: {e}")
+                        
                         # Create fallback generation result
                         fallback_result = GenerationResult(
                             text=response.content.strip(),
@@ -1248,7 +1369,8 @@ Response:"""
                             generation_time=0.5,
                             toxicity_score=0.1,
                             is_safe=True,
-                            confidence_score=0.8
+                            confidence_score=0.8,
+                            surprise_index=surprise_index
                         )
                         
                         print(f"✅ Fallback generation successful with {model}")

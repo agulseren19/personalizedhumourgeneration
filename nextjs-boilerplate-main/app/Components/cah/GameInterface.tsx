@@ -1508,7 +1508,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                     <div>
                       <span className="text-gray-400">Surprise:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {generation.surprise_index?.toFixed(1) || 'N/A'}/10
+                        {(generation.surprise_index ?? generation.evaluation?.surprise_index)?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
                   </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { cahApi, UserAnalytics } from '../../lib/api';
-import { TrendingUp, TrendingDown, Brain, BarChart3, MessageSquare } from 'lucide-react';
+import { TrendingUp, TrendingDown, Brain, BarChart3 } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 
 interface AnalyticsProps {
@@ -130,16 +130,7 @@ export default function Analytics({ userId }: AnalyticsProps) {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-xl p-6 border border-blue-400/30">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Total Feedback</h3>
-            <MessageSquare className="w-6 h-6 text-blue-400" />
-          </div>
-          <div className="text-3xl font-bold text-white">{analytics.total_feedback || 0}</div>
-          <div className="text-sm text-blue-300 mt-2">
-            Individual ratings you&apos;ve given
-          </div>
-        </div>
+
 
         <div className="bg-gradient-to-br from-indigo-600/20 to-indigo-800/20 rounded-xl p-6 border border-indigo-400/30">
           <div className="flex items-center justify-between mb-4">
