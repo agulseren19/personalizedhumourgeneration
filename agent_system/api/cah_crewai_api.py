@@ -617,15 +617,15 @@ async def generate_humor(request: HumorRequest):
             
             # Use asyncio.wait_for to prevent infinite hanging
             result = await asyncio.wait_for(
-                humor_system.generate_humor(request),
-                timeout=45.0  # 45 second timeout (less than 60s client timeout)
+                humor_system.generate_and_evaluate_humor(request),
+                timeout=120.0  # 120 second timeout for complex humor generation
             )
             
             print("✅ Humor generation completed successfully")
             return result
             
         except asyncio.TimeoutError:
-            print("❌ Humor generation timed out after 45 seconds")
+            print("❌ Humor generation timed out after 120 seconds")
             return JSONResponse(
                 status_code=408,
                 content={"detail": "Humor generation timed out. Please try again."}
