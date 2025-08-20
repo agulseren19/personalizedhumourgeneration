@@ -6,9 +6,28 @@ from dataclasses import dataclass
 from enum import Enum
 
 import openai
-from anthropic import Anthropic
-import boto3
-from botocore.exceptions import ClientError
+
+# Safe imports for optional dependencies
+try:
+    from anthropic import Anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
+    print("⚠️  Anthropic not available - Claude models will not work")
+
+try:
+    import boto3
+    BOTO3_AVAILABLE = True
+except ImportError:
+    BOTO3_AVAILABLE = False
+    print("⚠️  Boto3 not available - AWS Bedrock will not work")
+
+try:
+    from botocore.exceptions import ClientError
+    BOTOCORE_AVAILABLE = True
+except ImportError:
+    BOTOCORE_AVAILABLE = False
+    print("⚠️  Botocore not available - AWS Bedrock will not work")
 
 # Handle imports for different execution contexts
 import sys
@@ -107,10 +126,10 @@ class LLMManager:
         if settings.openai_api_key:
             self.openai_client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
         
-        if settings.anthropic_api_key:
+        if settings.anthropic_api_key and ANTHROPIC_AVAILABLE:
             self.anthropic_client = Anthropic(api_key=settings.anthropic_api_key)
         
-        if settings.aws_access_key_id and settings.aws_secret_access_key:
+        if settings.aws_access_key_id and settings.aws_secret_access_key and BOTO3_AVAILABLE:
             self.bedrock_client = boto3.client(
                 'bedrock-runtime',
                 region_name=settings.aws_bedrock_region,

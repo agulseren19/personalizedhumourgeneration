@@ -1235,7 +1235,9 @@ Response:"""
                         system_prompt="You are a comedy expert. Generate hilarious Cards Against Humanity content."
                     )
                     
-                    response = await multi_llm_manager.generate_response(llm_request)
+                    # Use llm_manager directly instead of multi_llm_manager
+                    from agent_system.llm_clients.llm_manager import llm_manager
+                    response = await llm_manager.generate_response(llm_request)
                     
                     if response and response.content:
                         # Create fallback generation result
