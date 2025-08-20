@@ -81,12 +81,14 @@ export interface Generation {
     toxicity_score: number;
     is_safe: boolean;
     confidence_score: number;
+    surprise_index: number;
   };
   evaluation?: {
     humor_score: number;
     creativity_score: number;
     appropriateness_score: number;
     context_relevance_score: number;
+    surprise_index: number;
     overall_score: number;
     reasoning: string;
     evaluator_name: string;
