@@ -1484,72 +1484,70 @@ async def migrate_database(secret_key: str = ""):
         
         engine = create_engine(database_url)
         
-        with engine.connect() as conn:
-            # Check current User.id type
-            result = conn.execute(text("""
-                SELECT column_name, data_type 
-                FROM information_schema.columns 
-                WHERE table_name = 'users' AND column_name = 'id'
-            """))
-            
-            row = result.fetchone()
-            if not row:
-                return {"error": "Users table not found"}
-            
-            current_type = row[1]
-            
-            if 'character' in current_type.lower() or 'varchar' in current_type.lower():
-                return {
-                    "status": "already_migrated",
-                    "current_type": current_type,
-                    "message": "User.id is already String type"
-                }
-            
-            if current_type != 'integer':
-                return {
-                    "error": f"Unexpected data type: {current_type}",
-                    "current_type": current_type
-                }
-            
-            # Start migration
-            trans = conn.begin()
-            
-            try:
-                # Step 1: Drop foreign key constraints
-                conn.execute(text("ALTER TABLE game_players DROP CONSTRAINT IF EXISTS game_players_user_id_fkey"))
-                conn.execute(text("ALTER TABLE game_rounds DROP CONSTRAINT IF EXISTS game_rounds_judge_user_id_fkey"))
-                
-                # Step 2: Convert types
-                conn.execute(text("ALTER TABLE users ALTER COLUMN id TYPE VARCHAR USING id::VARCHAR"))
-                conn.execute(text("ALTER TABLE game_players ALTER COLUMN user_id TYPE VARCHAR USING user_id::VARCHAR"))
-                conn.execute(text("ALTER TABLE game_rounds ALTER COLUMN judge_user_id TYPE VARCHAR USING judge_user_id::VARCHAR"))
-                
-                # Step 3: Recreate foreign keys
-                conn.execute(text("ALTER TABLE game_players ADD CONSTRAINT game_players_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id)"))
-                conn.execute(text("ALTER TABLE game_rounds ADD CONSTRAINT game_rounds_judge_user_id_fkey FOREIGN KEY (judge_user_id) REFERENCES users(id)"))
-                
-                trans.commit()
-                
-                # Verify
-                result = conn.execute(text("""
-                    SELECT column_name, data_type 
-                    FROM information_schema.columns 
-                    WHERE table_name = 'users' AND column_name = 'id'
-                """))
-                
-                row = result.fetchone()
-                new_type = row[1]
-                
-                return {
-                    "status": "migration_successful",
-                    "old_type": current_type,
-                    "new_type": new_type,
-                    "message": "User.id successfully migrated to String"
-                }
-                
-            except Exception as e:
-                trans.rollback()
-                return {"error": f"Migration failed: {str(e)}"}
+        # Check current User.id type
+        result = conn.execute(text("""
+            SELECT column_name, data_type 
+            FROM information_schema.columns 
+            WHERE table_name = 'users' AND column_name = 'id'
+        """))
+        
+        row = result.fetchone()
+        if not row:
+            return {"error": "Users table not found"}
+        
+        current_type = row[1]
+        
+        if 'character' in current_type.lower() or 'varchar' in current_type.lower():
+            return {
+                "status": "already_migrated",
+                "current_type": current_type,
+                "message": "User.id is already String type"
+            }
+        
+        if current_type != 'integer':
+            return {
+                "error": f"Unexpected data type: {current_type}",
+                "current_type": current_type
+            }
+        
+        print(f"🚀 Starting migration from {current_type} to VARCHAR...")
+        
+        # Step 1: Drop foreign key constraints
+        print("🔗 Dropping foreign key constraints...")
+        conn.execute(text("ALTER TABLE game_players DROP CONSTRAINT IF EXISTS game_players_user_id_fkey"))
+        conn.execute(text("ALTER TABLE game_rounds DROP CONSTRAINT IF EXISTS game_rounds_judge_user_id_fkey"))
+        
+        # Step 2: Convert types
+        print("🔄 Converting column types...")
+        conn.execute(text("ALTER TABLE users ALTER COLUMN id TYPE VARCHAR USING id::VARCHAR"))
+        conn.execute(text("ALTER TABLE game_players ALTER COLUMN user_id TYPE VARCHAR USING user_id::VARCHAR"))
+        conn.execute(text("ALTER TABLE game_rounds ALTER COLUMN judge_user_id TYPE VARCHAR USING judge_user_id::VARCHAR"))
+        
+        # Step 3: Recreate foreign keys
+        print("🔗 Recreating foreign key constraints...")
+        conn.execute(text("ALTER TABLE game_players ADD CONSTRAINT game_players_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id)"))
+        conn.execute(text("ALTER TABLE game_rounds ADD CONSTRAINT game_rounds_judge_user_id_fkey FOREIGN KEY (judge_user_id) REFERENCES users(id)"))
+        
+        # Commit changes
+        print("💾 Committing changes...")
+        
+        # Verify
+        print("🔍 Verifying migration...")
+        result = conn.execute(text("""
+            SELECT column_name, data_type 
+            FROM information_schema.columns 
+            WHERE table_name = 'users' AND column_name = 'id'
+        """))
+        
+        row = result.fetchone()
+        new_type = row[1]
+        
+        return {
+            "status": "migration_successful",
+            "old_type": current_type,
+            "new_type": new_type,
+            "message": "User.id successfully migrated to String"
+        }
                 
     except Exception as e:
         return {"error": f"Database connection failed: {str(e)}"}
