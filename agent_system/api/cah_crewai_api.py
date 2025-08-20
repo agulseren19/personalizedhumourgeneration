@@ -635,7 +635,30 @@ async def generate_humor(request: HumorRequest):
                     "best_result": result.get("best_result"),
                     "recommended_personas": result.get("recommended_personas", [])
                 }
-                
+
+                # If zero generations, return 500 so frontend shows an error instead of silent 0 cards
+                try:
+                    has_results = bool(standardized_result.get("results"))
+                    num_results = int(standardized_result.get("num_results", 0) or 0)
+                except Exception:
+                    has_results = False
+                    num_results = 0
+
+                if (not has_results) or num_results <= 0:
+                    return JSONResponse(
+                        status_code=500,
+                        content={
+                            "detail": "No humor generated",
+                            "success": False,
+                            "results": [],
+                            "top_results": [],
+                            "num_results": 0,
+                            "generation_time": float(standardized_result.get("generation_time", 0.0) or 0.0),
+                            "fallback_used": bool(standardized_result.get("fallback_used", False)),
+                            "recommended_personas": standardized_result.get("recommended_personas", [])
+                        }
+                    )
+
                 # Convert numpy types to Python types
                 standardized_result = convert_numpy_types(standardized_result)
                 return standardized_result
