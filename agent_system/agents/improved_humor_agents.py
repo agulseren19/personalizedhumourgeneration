@@ -65,6 +65,15 @@ class GenerationResult:
     toxicity_score: float
     is_safe: bool
     confidence_score: float
+    
+    def __post_init__(self):
+        # Ensure all float values are Python floats, not numpy types
+        if hasattr(self.generation_time, 'item'):
+            self.generation_time = float(self.generation_time)
+        if hasattr(self.toxicity_score, 'item'):
+            self.toxicity_score = float(self.toxicity_score)
+        if hasattr(self.confidence_score, 'item'):
+            self.confidence_score = float(self.confidence_score)
 
 @dataclass
 class EvaluationResult:
@@ -76,6 +85,19 @@ class EvaluationResult:
     reasoning: str
     evaluator_name: str
     model_used: str
+    
+    def __post_init__(self):
+        # Ensure all float values are Python floats, not numpy types
+        if hasattr(self.humor_score, 'item'):
+            self.humor_score = float(self.humor_score)
+        if hasattr(self.creativity_score, 'item'):
+            self.creativity_score = float(self.creativity_score)
+        if hasattr(self.appropriateness_score, 'item'):
+            self.appropriateness_score = float(self.appropriateness_score)
+        if hasattr(self.context_relevance_score, 'item'):
+            self.context_relevance_score = float(self.context_relevance_score)
+        if hasattr(self.overall_score, 'item'):
+            self.overall_score = float(self.overall_score)
 
 class ContentFilter:
     """Advanced content filtering using detoxify"""
@@ -98,13 +120,21 @@ class ContentFilter:
         try:
             scores = self.detoxify.predict(text)
             
+            # Convert numpy types to Python types
+            converted_scores = {}
+            for key, value in scores.items():
+                if hasattr(value, 'item'):  # numpy scalar
+                    converted_scores[key] = float(value)
+                else:
+                    converted_scores[key] = value
+            
             # Check each toxicity type
             violations = []
-            max_score = 0
+            max_score = 0.0
             
             for toxicity_type, threshold in self.toxicity_thresholds.items():
-                if toxicity_type in scores:
-                    score = scores[toxicity_type]
+                if toxicity_type in converted_scores:
+                    score = float(converted_scores[toxicity_type])
                     max_score = max(max_score, score)
                     
                     if score > threshold:
@@ -112,7 +142,7 @@ class ContentFilter:
             
             is_safe = len(violations) == 0
             
-            return is_safe, max_score, scores
+            return is_safe, max_score, converted_scores
             
         except Exception as e:
             print(f"Content filtering error: {e}")

@@ -201,18 +201,15 @@ app = FastAPI(
 print("🔧 Adding CORS middleware...")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000", 
-        "http://localhost:3001",  # Next.js dev servers
-        "https://cah-frontend.onrender.com",  # Render frontend
-        "https://personalizedhumourgenerationcah.vercel.app"  # Vercel frontend
-    ],
+    allow_origins=["*"],  # Allow ALL origins temporarily
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=86400,  # Cache preflight for 24 hours
 )
 print("✅ CORS middleware added successfully")
-print("   Allowed origins: localhost:3000, localhost:3001, cah-frontend.onrender.com, personalizedhumourgenerationcah.vercel.app")
+print("   Allowed origins: * (ALL origins)")
 print("   Allow credentials: True")
 print("   Allow methods: *")
 print("   Allow headers: *")
