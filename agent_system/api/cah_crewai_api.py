@@ -54,7 +54,8 @@ try:
     from agent_system.knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base
     print("✅ AWS knowledge base imported successfully")
 except ImportError as e:
-    print(f"❌ AWS knowledge base import failed: {e}")
+    print(f"⚠️  AWS knowledge base import failed: {e}")
+    print("⚠️  Using mock mode for knowledge base functionality")
     improved_aws_knowledge_base = None
 
 try:
@@ -221,7 +222,7 @@ app.add_middleware(
         "http://localhost:3000", 
         "http://localhost:3001",  # Next.js dev servers
         "https://cah-frontend.onrender.com",  # Render frontend
-        "*"  # Allow all origins for now (can be restricted later)
+        "https://personalizedhumourgenerationcah.vercel.app"  # Vercel frontend
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -342,12 +342,36 @@ class ImprovedAWSKnowledgeBase:
         
         if not user_pref:
             # Fallback to context-based recommendations
-            from ..personas.enhanced_persona_templates import recommend_personas_for_context
-            return recommend_personas_for_context(context, audience, "general")
+            try:
+                from ..personas.enhanced_persona_templates import recommend_personas_for_context
+                return recommend_personas_for_context(context, audience, "general")
+            except ImportError:
+                try:
+                    from personas.enhanced_persona_templates import recommend_personas_for_context
+                    return recommend_personas_for_context(context, audience, "general")
+                except ImportError:
+                    try:
+                        from agent_system.personas.enhanced_persona_templates import recommend_personas_for_context
+                        return recommend_personas_for_context(context, audience, "general")
+                    except ImportError:
+                        print("⚠️  Could not import recommend_personas_for_context, using fallback")
+                        return ["General Comedian", "Witty Observer", "Sarcastic Commentator"]
         
         # Get all available personas
-        from ..personas.enhanced_persona_templates import get_all_personas
-        all_personas = list(get_all_personas().keys())
+        try:
+            from ..personas.enhanced_persona_templates import get_all_personas
+            all_personas = list(get_all_personas().keys())
+        except ImportError:
+            try:
+                from personas.enhanced_persona_templates import get_all_personas
+                all_personas = list(get_all_personas().keys())
+            except ImportError:
+                try:
+                    from agent_system.personas.enhanced_persona_templates import get_all_personas
+                    all_personas = list(get_all_personas().keys())
+                except ImportError:
+                    print("⚠️  Could not import get_all_personas, using fallback")
+                    all_personas = ["General Comedian", "Witty Observer", "Sarcastic Commentator"]
         
         # FIXED: More nuanced scoring system
         persona_scores = {}
