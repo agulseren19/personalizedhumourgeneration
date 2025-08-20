@@ -38,6 +38,7 @@ try:
     print("✅ Core humor agents imported successfully")
 except ImportError as e:
     print(f"❌ Core humor agents import failed: {e}")
+    deployment_errors.append(f"Core humor agents: {str(e)}")
     # Create fallback classes
     class ImprovedHumorOrchestrator:
         def __init__(self):
@@ -56,6 +57,7 @@ try:
     print("✅ PostgreSQL knowledge base imported successfully")
 except ImportError as e:
     print(f"⚠️  PostgreSQL knowledge base import failed: {e}")
+    deployment_errors.append(f"PostgreSQL knowledge base: {str(e)}")
     print("⚠️  Using fallback knowledge base functionality")
     improved_aws_knowledge_base = None
 
@@ -210,10 +212,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 print("✅ CORS middleware added successfully")
-print(f"   Allowed origins: {app.user_middleware[0].allow_origins}")
-print(f"   Allow credentials: {app.user_middleware[0].allow_credentials}")
-print(f"   Allow methods: {app.user_middleware[0].allow_methods}")
-print(f"   Allow headers: {app.user_middleware[0].allow_headers}")
+print("   Allowed origins: localhost:3000, localhost:3001, cah-frontend.onrender.com, personalizedhumourgenerationcah.vercel.app")
+print("   Allow credentials: True")
+print("   Allow methods: *")
+print("   Allow headers: *")
 
 # Add authentication routes if available
 if auth_router:
@@ -245,6 +247,10 @@ broadcast_function = None
 # Initialize CrewAI humor system
 humor_system = None
 content_filter = None
+persona_manager = None
+
+# Add global error tracking
+deployment_errors = []
 
 async def initialize_humor_system():
     """Initialize the humor system"""
@@ -358,51 +364,88 @@ async def create_sample_dynamic_personas():
 @app.get("/")
 async def root():
     """Health check endpoint"""
-    return {"message": "Cards Against Humanity CrewAI API is running!", "status": "healthy"}
+    return {
+        "message": "Cards Against Humanity CrewAI API is running!", 
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "version": "1.0.0"
+    }
+
+@app.get("/deployment-status")
+async def deployment_status():
+    """Get detailed deployment status for debugging"""
+    return {
+        "status": "deployed",
+        "timestamp": datetime.now().isoformat(),
+        "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        "imports": {
+            "humor_system": humor_system is not None,
+            "content_filter": content_filter is not None,
+            "knowledge_base": improved_aws_knowledge_base is not None,
+            "persona_templates": "get_all_personas" in globals(),
+            "dynamic_persona_generator": dynamic_persona_generator is not None,
+            "bws_evaluation": bws_evaluator is not None,
+            "multiplayer_game": AuthenticatedMultiplayerCAHGame is not None,
+            "auth_routes": auth_router is not None,
+            "google_oauth_routes": google_oauth_router is not None,
+            "multiplayer_routes": multiplayer_router is not None
+        },
+        "deployment_errors": deployment_errors,
+        "cors_enabled": True
+    }
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint for Render"""
     try:
-        # Test database connection
-        from agent_system.models.database import get_session_local
-        from agent_system.config.settings import settings
-        
-        SessionLocal = get_session_local(settings.database_url)
-        db = SessionLocal()
-        
-        try:
-            result = db.execute("SELECT 1")
-            db_status = "healthy"
-        except Exception as e:
-            db_status = f"unhealthy: {e}"
-        finally:
-            db.close()
-        
-        # Test knowledge base
-        kb_status = "healthy" if improved_aws_knowledge_base else "unavailable"
-        
-        # Test humor system
-        humor_status = "healthy" if humor_system else "unavailable"
-        
-        return {
+        # Basic health check - don't fail on external service issues
+        health_status = {
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
-            "database": db_status,
-            "knowledge_base": kb_status,
-            "humor_system": humor_status,
+            "api_server": "running",
             "cors_middleware": "enabled"
         }
         
+        # Try database connection (but don't fail if it's down)
+        try:
+            from agent_system.models.database import get_session_local
+            from agent_system.config.settings import settings
+            
+            SessionLocal = get_session_local(settings.database_url)
+            db = SessionLocal()
+            
+            try:
+                result = db.execute("SELECT 1")
+                health_status["database"] = "healthy"
+            except Exception as e:
+                health_status["database"] = f"unhealthy: {str(e)[:100]}"
+            finally:
+                db.close()
+        except Exception as e:
+            health_status["database"] = f"unavailable: {str(e)[:100]}"
+        
+        # Test knowledge base (but don't fail if it's down)
+        try:
+            health_status["knowledge_base"] = "healthy" if improved_aws_knowledge_base else "unavailable"
+        except Exception as e:
+            health_status["knowledge_base"] = f"unavailable: {str(e)[:100]}"
+        
+        # Test humor system (but don't fail if it's down)
+        try:
+            health_status["humor_system"] = "healthy" if humor_system else "unavailable"
+        except Exception as e:
+            health_status["humor_system"] = f"unavailable: {str(e)[:100]}"
+        
+        return health_status
+        
     except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={
-                "status": "unhealthy",
-                "error": str(e),
-                "timestamp": datetime.now().isoformat()
-            }
-        )
+        # Return basic health status even if detailed check fails
+        return {
+            "status": "degraded",
+            "timestamp": datetime.now().isoformat(),
+            "api_server": "running",
+            "error": str(e)[:200]
+        }
 
 @app.get("/test-humor")
 async def test_humor():
@@ -1437,4 +1480,18 @@ if __name__ == "__main__":
     print(f"🎮 Game endpoints: http://{host}:{port}/game/")
     print(f"🧠 Humor generation: http://{host}:{port}/generate")
     
-    uvicorn.run(app, host=host, port=port) 
+    # Add timeout protection and better error handling for deployment
+    try:
+        uvicorn.run(
+            app, 
+            host=host, 
+            port=port,
+            timeout_keep_alive=30,
+            timeout_graceful_shutdown=30,
+            access_log=True
+        )
+    except Exception as e:
+        print(f"❌ Server startup failed: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1) 
