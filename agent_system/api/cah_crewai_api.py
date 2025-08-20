@@ -1465,6 +1465,95 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str, user_id: str):
 
 # Broadcast functionality is now handled directly in multiplayer_routes.py to avoid circular imports
 
+@app.post("/migrate-database")
+async def migrate_database(secret_key: str = ""):
+    """Migrate database schema - ADMIN ONLY"""
+    if secret_key != "migrate_user_id_2025":
+        raise HTTPException(status_code=403, detail="Invalid secret key")
+    
+    try:
+        # Import and run migration
+        import os
+        from sqlalchemy import create_engine, text
+        
+        # Get database URL
+        database_url = os.getenv("DATABASE_URL")
+        if not database_url:
+            from agent_system.config.settings import settings
+            database_url = settings.database_url
+        
+        engine = create_engine(database_url)
+        
+        with engine.connect() as conn:
+            # Check current User.id type
+            result = conn.execute(text("""
+                SELECT column_name, data_type 
+                FROM information_schema.columns 
+                WHERE table_name = 'users' AND column_name = 'id'
+            """))
+            
+            row = result.fetchone()
+            if not row:
+                return {"error": "Users table not found"}
+            
+            current_type = row[1]
+            
+            if 'character' in current_type.lower() or 'varchar' in current_type.lower():
+                return {
+                    "status": "already_migrated",
+                    "current_type": current_type,
+                    "message": "User.id is already String type"
+                }
+            
+            if current_type != 'integer':
+                return {
+                    "error": f"Unexpected data type: {current_type}",
+                    "current_type": current_type
+                }
+            
+            # Start migration
+            trans = conn.begin()
+            
+            try:
+                # Step 1: Drop foreign key constraints
+                conn.execute(text("ALTER TABLE game_players DROP CONSTRAINT IF EXISTS game_players_user_id_fkey"))
+                conn.execute(text("ALTER TABLE game_rounds DROP CONSTRAINT IF EXISTS game_rounds_judge_user_id_fkey"))
+                
+                # Step 2: Convert types
+                conn.execute(text("ALTER TABLE users ALTER COLUMN id TYPE VARCHAR USING id::VARCHAR"))
+                conn.execute(text("ALTER TABLE game_players ALTER COLUMN user_id TYPE VARCHAR USING user_id::VARCHAR"))
+                conn.execute(text("ALTER TABLE game_rounds ALTER COLUMN judge_user_id TYPE VARCHAR USING judge_user_id::VARCHAR"))
+                
+                # Step 3: Recreate foreign keys
+                conn.execute(text("ALTER TABLE game_players ADD CONSTRAINT game_players_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id)"))
+                conn.execute(text("ALTER TABLE game_rounds ADD CONSTRAINT game_rounds_judge_user_id_fkey FOREIGN KEY (judge_user_id) REFERENCES users(id)"))
+                
+                trans.commit()
+                
+                # Verify
+                result = conn.execute(text("""
+                    SELECT column_name, data_type 
+                    FROM information_schema.columns 
+                    WHERE table_name = 'users' AND column_name = 'id'
+                """))
+                
+                row = result.fetchone()
+                new_type = row[1]
+                
+                return {
+                    "status": "migration_successful",
+                    "old_type": current_type,
+                    "new_type": new_type,
+                    "message": "User.id successfully migrated to String"
+                }
+                
+            except Exception as e:
+                trans.rollback()
+                return {"error": f"Migration failed: {str(e)}"}
+                
+    except Exception as e:
+        return {"error": f"Database connection failed: {str(e)}"}
+
 if __name__ == "__main__":
     import os
     from dotenv import load_dotenv
