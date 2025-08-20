@@ -627,20 +627,44 @@ async def generate_humor(request: HumorRequest):
             print("❌ Humor generation timed out after 120 seconds")
             return JSONResponse(
                 status_code=408,
-                content={"detail": "Humor generation timed out. Please try again."}
+                content={
+                    "detail": "Humor generation timed out. Please try again.",
+                    "success": False,
+                    "results": [],
+                    "top_results": [],
+                    "num_results": 0,
+                    "generation_time": 0.0,
+                    "fallback_used": False
+                }
             )
         except Exception as gen_error:
             print(f"❌ Humor generation failed: {gen_error}")
             return JSONResponse(
                 status_code=500,
-                content={"detail": f"Error generating humor: {gen_error}"}
+                content={
+                    "detail": f"Error generating humor: {gen_error}",
+                    "success": False,
+                    "results": [],
+                    "top_results": [],
+                    "num_results": 0,
+                    "generation_time": 0.0,
+                    "fallback_used": False
+                }
             )
             
     except Exception as e:
         print(f"❌ Unexpected error in generate endpoint: {e}")
         return JSONResponse(
             status_code=500,
-            content={"detail": f"Unexpected error: {e}"}
+            content={
+                "detail": f"Unexpected error: {e}",
+                "success": False,
+                "results": [],
+                "top_results": [],
+                "num_results": 0,
+                "generation_time": 0.0,
+                "fallback_used": False
+            }
         )
 
 @app.post("/feedback")
