@@ -621,7 +621,36 @@ async def generate_humor(request: HumorRequest):
             )
             
             print("✅ Humor generation completed successfully")
-            return result
+            
+            # Ensure result has all required fields for frontend
+            if isinstance(result, dict):
+                # Standardize the response structure
+                standardized_result = {
+                    "success": result.get("success", True),
+                    "results": result.get("results", []),
+                    "top_results": result.get("top_results", []),
+                    "num_results": result.get("num_results", 0),
+                    "generation_time": result.get("generation_time", 0.0),
+                    "fallback_used": result.get("fallback_used", False),
+                    "best_result": result.get("best_result"),
+                    "recommended_personas": result.get("recommended_personas", [])
+                }
+                
+                # Convert numpy types to Python types
+                standardized_result = convert_numpy_types(standardized_result)
+                return standardized_result
+            else:
+                # Fallback if result is not a dict
+                return {
+                    "success": True,
+                    "results": [],
+                    "top_results": [],
+                    "num_results": 0,
+                    "generation_time": 0.0,
+                    "fallback_used": False,
+                    "best_result": None,
+                    "recommended_personas": []
+                }
             
         except asyncio.TimeoutError:
             print("❌ Humor generation timed out after 120 seconds")
