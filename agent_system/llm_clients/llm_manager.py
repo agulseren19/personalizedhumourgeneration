@@ -129,11 +129,15 @@ class LLMManager:
         try:
             return await self._generate_with_provider(request, provider)
         except Exception as e:
+            print(f"⚠️ Primary model {request.model} failed: {e}")
             if retry_count > 0:
                 # Try fallback models
                 fallback_models = self._get_fallback_models(request.model)
+                print(f"🔄 Trying fallback models: {fallback_models}")
+                
                 for fallback_model in fallback_models:
                     try:
+                        print(f"🔄 Attempting fallback with {fallback_model}")
                         fallback_request = LLMRequest(
                             prompt=request.prompt,
                             model=fallback_model,
@@ -145,27 +149,72 @@ class LLMManager:
                             fallback_request, 
                             self.model_provider_map[fallback_model]
                         )
-                    except Exception:
+                    except Exception as fallback_error:
+                        print(f"❌ Fallback {fallback_model} failed: {fallback_error}")
                         continue
                 
-                # If all fallbacks fail, retry with original model
+                # If all fallbacks fail, try ANY available model
+                print("🔄 All fallbacks failed, trying ANY available model...")
+                available_models = self._get_available_models()
+                for available_model in available_models:
+                    try:
+                        print(f"🔄 Trying available model: {available_model}")
+                        available_request = LLMRequest(
+                            prompt=request.prompt,
+                            model=available_model,
+                            temperature=request.temperature,
+                            max_tokens=request.max_tokens,
+                            system_prompt=request.system_prompt
+                        )
+                        return await self._generate_with_provider(
+                            available_request, 
+                            self.model_provider_map[available_model]
+                        )
+                    except Exception as available_error:
+                        print(f"❌ Available model {available_model} failed: {available_error}")
+                        continue
+                
+                # If all available models fail, retry with original model
+                print(f"🔄 All models failed, retrying with {request.model}...")
                 return await self.generate_response(request, retry_count - 1)
             else:
+                print(f"❌ All retry attempts failed for {request.model}")
                 raise e
     
     def _get_fallback_models(self, primary_model: str) -> List[str]:
-        """Get fallback models based on the primary model"""
-        fallback_map = {
-            "gpt-4": ["claude-3-sonnet", "gpt-4-turbo"],
-            "gpt-4-turbo": ["gpt-4", "claude-3-sonnet"],
-            "gpt-3.5-turbo": ["claude-3-haiku", "deepseek-chat"],
-            "claude-3-sonnet": ["gpt-4", "claude-3-opus"],
-            "claude-3-haiku": ["gpt-3.5-turbo", "claude-3-sonnet"],
-            "claude-3-opus": ["claude-3-sonnet", "gpt-4"],
-            "deepseek-chat": ["gpt-3.5-turbo", "claude-3-haiku"],
-            "deepseek-coder": ["deepseek-chat", "gpt-3.5-turbo"],
+        """Get fallback models based on the primary model - OpenAI-only strategy"""
+        # Since we only have OpenAI, prioritize OpenAI models
+        openai_fallback_map = {
+            "gpt-4": ["gpt-4-turbo", "gpt-3.5-turbo"],
+            "gpt-4-turbo": ["gpt-4", "gpt-3.5-turbo"],
+            "gpt-3.5-turbo": ["gpt-4-turbo", "gpt-4"],
+            "claude-3-sonnet": ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"],
+            "claude-3-haiku": ["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4"],
+            "claude-3-opus": ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"],
+            "deepseek-chat": ["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4"],
+            "deepseek-coder": ["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4"],
         }
-        return fallback_map.get(primary_model, [])
+        return openai_fallback_map.get(primary_model, [])
+    
+    def _get_available_models(self) -> List[str]:
+        """Get all available models based on initialized clients - OpenAI-only strategy"""
+        available_models = []
+        
+        if self.openai_client:
+            available_models.extend(["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"])
+            print(f"✅ OpenAI models available: {available_models}")
+        else:
+            print("❌ OpenAI client not available")
+        
+        # Since we only have OpenAI, don't check other clients
+        # if self.anthropic_client:
+        #     available_models.extend(["claude-3-sonnet", "claude-3-haiku", "claude-3-opus"])
+        
+        # if self.bedrock_client:
+        #     available_models.extend(["deepseek-chat", "deepseek-coder"])
+        
+        # Remove duplicates and return
+        return list(set(available_models))
     
     async def _generate_with_provider(self, request: LLMRequest, provider: LLMProvider) -> LLMResponse:
         """Generate response with specific provider"""

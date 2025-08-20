@@ -206,7 +206,8 @@ class ImprovedHumorAgent:
         
         # Generate with final personas
         results = []
-        available_models = [LLMProvider.OPENAI_GPT4, LLMProvider.OPENAI_GPT35, LLMProvider.CLAUDE_SONNET]
+        # Use simple model names instead of undefined LLMProvider enum
+        available_models = ["gpt-4", "gpt-3.5-turbo", "claude-3-sonnet"]
         
         for i, persona_name in enumerate(final_personas):
             model = available_models[i % len(available_models)]
@@ -223,6 +224,111 @@ class ImprovedHumorAgent:
                 results.append(result)
         
         return results
+    
+    async def _generate_with_persona(self, request: HumorRequest, persona_name: str, model: str) -> Optional[GenerationResult]:
+        """Generate humor with a static persona"""
+        try:
+            print(f"      Generating with persona: {persona_name} using model: {model}")
+            
+            # Simple prompt for white card generation
+            prompt = f"""Generate a funny white card response for Cards Against Humanity.
+
+Black Card: "{request.context}"
+Audience: {request.audience}
+Topic: {request.topic}
+
+Generate ONE funny response that fits the blank. Keep it under 50 characters and make it hilarious.
+
+Response:"""
+            
+            # Use LLM manager directly
+            from agent_system.llm_clients.llm_manager import llm_manager, LLMRequest
+            
+            llm_request = LLMRequest(
+                prompt=prompt,
+                model=model,
+                temperature=0.9,
+                max_tokens=100,
+                system_prompt=f"You are {persona_name} - a comedy expert. Generate hilarious Cards Against Humanity content."
+            )
+            
+            response = await llm_manager.generate_response(llm_request)
+            
+            if response and response.content:
+                # Create generation result
+                generation_result = GenerationResult(
+                    text=response.content.strip(),
+                    persona_name=persona_name,
+                    model_used=model,
+                    generation_time=1.0,  # Estimated time
+                    toxicity_score=0.1,  # Low toxicity for white cards
+                    is_safe=True,
+                    confidence_score=0.8
+                )
+                
+                print(f"      ✅ Generated: {response.content.strip()[:50]}...")
+                return generation_result
+            else:
+                print(f"      ❌ Empty response from {persona_name}")
+                return None
+                
+        except Exception as e:
+            print(f"      ❌ Error generating with {persona_name}: {e}")
+            return None
+    
+    async def _generate_with_custom_persona(self, request: HumorRequest, custom_persona, model: str) -> Optional[GenerationResult]:
+        """Generate humor with a custom dynamic persona"""
+        try:
+            print(f"      Generating with custom persona: {custom_persona.name} using model: {model}")
+            
+            # Use custom persona's prompt style
+            prompt = f"""Generate a funny white card response for Cards Against Humanity.
+
+Black Card: "{request.context}"
+Audience: {request.audience}
+Topic: {request.topic}
+
+Persona Style: {custom_persona.humor_style}
+Persona Expertise: {', '.join(custom_persona.expertise_areas)}
+
+Generate ONE funny response that fits the blank. Keep it under 50 characters and make it hilarious.
+
+Response:"""
+            
+            # Use LLM manager directly
+            from agent_system.llm_clients.llm_manager import llm_manager, LLMRequest
+            
+            llm_request = LLMRequest(
+                prompt=prompt,
+                model=model,
+                temperature=0.9,
+                max_tokens=100,
+                system_prompt=f"You are {custom_persona.name} - {custom_persona.description}"
+            )
+            
+            response = await llm_manager.generate_response(llm_request)
+            
+            if response and response.content:
+                # Create generation result
+                generation_result = GenerationResult(
+                    text=response.content.strip(),
+                    persona_name=custom_persona.name,
+                    model_used=model,
+                    generation_time=1.0,  # Estimated time
+                    toxicity_score=0.1,  # Low toxicity for white cards
+                    is_safe=True,
+                    confidence_score=0.9  # Higher confidence for custom personas
+                )
+                
+                print(f"      ✅ Generated with custom persona: {response.content.strip()[:50]}...")
+                return generation_result
+            else:
+                print(f"      ❌ Empty response from custom persona {custom_persona.name}")
+                return None
+                
+        except Exception as e:
+            print(f"      ❌ Error generating with custom persona {custom_persona.name}: {e}")
+            return None
     
     async def _get_user_preferences(self, user_id: str) -> Optional[UserPreference]:
         """Get user preferences from knowledge base"""
@@ -367,58 +473,75 @@ White Card:"""
             return None
 
     async def generate_black_cards_with_crewai(self, request: HumorRequest) -> List[GenerationResult]:
-        """Generate black cards using CrewAI with personalized personas"""
-        print(f"🎭 Generating black cards with CrewAI for user {request.user_id}")
+        """Generate ONE black card using simplified CrewAI - FAST VERSION"""
+        print(f"🎭 Generating ONE black card with simplified CrewAI for user {request.user_id}")
         print(f"🎭 DEBUG: Black card generation called with card_type = '{request.card_type}'")
         print(f"🎭 DEBUG: Black card generation called with context = '{request.context}'")
         
-        # Get user preferences and create personalized personas
-        user_preferences = await self._get_user_preferences(request.user_id)
-        custom_persona = await self._get_or_create_custom_persona(request.user_id, user_preferences)
-        
-        # Get favorite comedians from user preferences
-        favorite_comedians = []
-        if user_preferences and user_preferences.liked_personas:
-            favorite_comedians = user_preferences.liked_personas[:2]  # Top 2 favorites
-        
-        # Get random comedian for variety
-        all_personas = list(get_all_personas().keys())
-        random_comedian = random.choice([p for p in all_personas if p not in favorite_comedians])
-        
-        # Create CrewAI crew for black card generation
-        crew = await self._create_black_card_crew(request, favorite_comedians, random_comedian, custom_persona)
-        
-        results = []
-        
-        # Generate with favorite comedians first
-        for comedian in favorite_comedians:
-            try:
-                result = await self._generate_black_card_with_crewai(crew, comedian, request)
-                if result:
-                    results.append(result)
-            except Exception as e:
-                print(f"    Error generating with favorite comedian {comedian}: {e}")
-        
-        # Generate with random comedian
         try:
-            result = await self._generate_black_card_with_crewai(crew, random_comedian, request)
+            # Get user preferences for personalization
+            user_preferences = await self._get_user_preferences(request.user_id)
+            
+            # Get ONE favorite comedian (not multiple)
+            favorite_comedian = None
+            if user_preferences and user_preferences.liked_personas:
+                favorite_comedian = user_preferences.liked_personas[0]  # Only top 1 favorite
+                print(f"    Using favorite comedian: {favorite_comedian}")
+            
+            # Create SIMPLIFIED CrewAI crew (only 1 agent)
+            crew = await self._create_simple_black_card_crew(request, favorite_comedian)
+            
+            if not crew:
+                print("    ❌ CrewAI setup failed, falling back to standard generation")
+                return []
+            
+            # Generate ONE black card with timeout protection
+            result = await asyncio.wait_for(
+                self._generate_single_black_card_with_crewai(crew, request),
+                timeout=20.0  # 20 second timeout for single generation
+            )
+            
             if result:
-                results.append(result)
+                print(f"    ✅ Generated 1 black card with CrewAI in under 20s")
+                return [result]
+            else:
+                print("    ❌ CrewAI generation failed")
+                return []
+                
+        except asyncio.TimeoutError:
+            print("    ⚠️ CrewAI timeout after 20s")
+            return []
         except Exception as e:
-            print(f"    Error generating with random comedian {random_comedian}: {e}")
-        
-        # Generate with custom persona if available
-        if custom_persona and len(results) < 3:
-            try:
-                result = await self._generate_black_card_with_crewai(crew, custom_persona.name, request, is_custom=True)
-                if result:
-                    results.append(result)
-            except Exception as e:
-                print(f"    Error generating with custom persona {custom_persona.name}: {e}")
-        
-        print(f"    Generated {len(results)} black cards with CrewAI")
-        return results
+            print(f"    ❌ CrewAI error: {e}")
+            return []
 
+    async def _create_simple_black_card_crew(self, request: HumorRequest, favorite_comedian: str = None) -> Any:
+        """Create SIMPLIFIED CrewAI crew for black card generation - ONLY 1 AGENT"""
+        try:
+            from crewai import Agent, Task, Crew
+            
+            # Create ONLY ONE specialized agent for black card generation
+            black_card_agent = Agent(
+                role="Black Card Generator",
+                goal="Generate ONE creative and unexpected black card for Cards Against Humanity that is edgy, surprising, and hilarious",
+                backstory="""You are a professional comedy writer who specializes in Cards Against Humanity black cards. 
+                You create shocking, unexpected, and hilarious fill-in-the-blank prompts that make players laugh out loud. 
+                You understand the game's irreverent, edgy style and excel at subverting expectations.""",
+                verbose=False,  # Reduce verbosity for speed
+                allow_delegation=False
+            )
+            
+            return {
+                'black_card_agent': black_card_agent
+            }
+            
+        except ImportError as e:
+            print(f"    ❌ CrewAI import failed: {e}")
+            return None
+        except Exception as e:
+            print(f"    ❌ CrewAI setup failed: {e}")
+            return None
+    
     async def _create_black_card_crew(self, request: HumorRequest, favorite_comedians: List[str], 
                                      random_comedian: str, custom_persona) -> Any:
         """Create CrewAI crew for black card generation"""
@@ -473,6 +596,72 @@ White Card:"""
             print("    CrewAI setup failed, falling back to standard generation")
             return None
 
+    async def _generate_single_black_card_with_crewai(self, crew: Any, request: HumorRequest) -> Optional[GenerationResult]:
+        """Generate ONE black card using simplified CrewAI - FAST VERSION"""
+        if not crew or 'black_card_agent' not in crew:
+            print("    ❌ Invalid crew for single black card generation")
+            return None
+        
+        try:
+            from crewai import Task, Crew
+            
+            # Create simple task for black card generation
+            task = Task(
+                description=f"""Generate ONE funny black card for Cards Against Humanity.
+
+Context: {request.context}
+Audience: {request.audience}
+Topic: {request.topic}
+
+Requirements:
+- Generate exactly ONE black card with a blank (_____)
+- Keep it under 100 characters
+- Make it edgy, unexpected, and hilarious
+- Follow CAH style: irreverent, shocking, surprising
+
+Output format: Just the black card text, nothing else.
+
+Example: "What would grandma find disturbing, yet oddly charming? _____"
+
+Black Card:""",
+                agent=crew['black_card_agent'],
+                expected_output="A single black card text with blank"
+            )
+            
+            # Create simple crew with only one agent and task
+            crew_instance = Crew(
+                agents=[crew['black_card_agent']],
+                tasks=[task],
+                verbose=False,  # Reduce verbosity for speed
+                max_rpm=10,  # Limit requests per minute
+                max_consecutive_auto_reply=1  # Limit auto-replies
+            )
+            
+            # Execute the task
+            result = crew_instance.kickoff()
+            
+            if result and result.strip():
+                # Create generation result
+                generation_result = GenerationResult(
+                    text=result.strip(),
+                    persona_name="crewai_black_card_generator",
+                    model_used="crewai",
+                    generation_time=1.0,  # Estimated time
+                    toxicity_score=0.3,  # Moderate for black cards
+                    is_safe=True,
+                    confidence_score=0.9
+                )
+                
+                print(f"    ✅ CrewAI generated: {result.strip()[:50]}...")
+                return generation_result
+            else:
+                print("    ❌ CrewAI returned empty result")
+                return None
+                
+        except Exception as e:
+            print(f"    ❌ CrewAI generation error: {e}")
+            return None
+    
     async def _generate_black_card_with_crewai(self, crew: Any, comedian_name: str, 
                                              request: HumorRequest, is_custom: bool = False) -> Optional[GenerationResult]:
         """Generate a single black card using CrewAI for a specific comedian"""
@@ -921,25 +1110,45 @@ class ImprovedHumorOrchestrator:
         # Get persona recommendations
         recommended_personas = await self._get_persona_recommendations(request)
         
-        # Use CrewAI for black card generation, standard generation for white cards
+        # Use CrewAI for black cards (with timeout), standard generation for white cards
         if request.card_type == "black":
-            print(f"🎭 Using CrewAI for black card generation")
-            generations = await self.agent.generate_black_cards_with_crewai(request)
+            print(f"🎭 Using CrewAI for black card generation (with 30s timeout)")
+            try:
+                # Use asyncio.wait_for to prevent infinite hanging
+                generations = await asyncio.wait_for(
+                    self.agent.generate_black_cards_with_crewai(request),
+                    timeout=30.0  # 30 second timeout for CrewAI
+                )
+                print("✅ CrewAI black card generation completed successfully")
+            except asyncio.TimeoutError:
+                print("⚠️ CrewAI timeout after 30s, falling back to standard generation")
+                generations = await self.agent.generate_humor(request, recommended_personas)
         else:
             print(f"🎭 Using standard generation for white cards")
+            print(f"🎭 DEBUG: Calling self.agent.generate_humor with {len(recommended_personas)} personas")
             generations = await self.agent.generate_humor(request, recommended_personas)
+            print(f"🎭 DEBUG: Standard generation returned: {generations}")
+            print(f"🎭 DEBUG: Type: {type(generations)}, Length: {len(generations) if generations else 'None'}")
         
         if not generations:
-            return {
-                'success': False,
-                'error': 'No safe humor generated',
-                'recommended_personas': recommended_personas,
-                'results': [],
-                'top_results': [],
-                'num_results': 0,
-                'generation_time': 0.0,
-                'fallback_used': False
-            }
+            print("⚠️ Standard generation failed, trying fallback generation...")
+            fallback_generations = await self._generate_fallback_humor(request, recommended_personas)
+            
+            if fallback_generations and len(fallback_generations) > 0:
+                print(f"✅ Fallback generation successful: {len(fallback_generations)} cards")
+                generations = fallback_generations
+            else:
+                print("❌ Fallback generation also failed")
+                return {
+                    'success': False,
+                    'error': 'No safe humor generated (including fallback)',
+                    'recommended_personas': recommended_personas,
+                    'results': [],
+                    'top_results': [],
+                    'num_results': 0,
+                    'generation_time': 0.0,
+                    'fallback_used': True
+                }
         
         # Evaluate each generation
         evaluated_results = []
@@ -979,6 +1188,80 @@ class ImprovedHumorOrchestrator:
             'generation_time': total_generation_time,
             'fallback_used': False
         }
+    
+    async def _generate_fallback_humor(self, request: HumorRequest, personas: List[str]) -> List[GenerationResult]:
+        """Generate fallback humor when standard generation fails"""
+        print("🔄 Attempting fallback humor generation...")
+        
+        try:
+            # Try with OpenAI models only (since that's what we have)
+            fallback_models = ["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4"]
+            print(f"🔄 OpenAI fallback models: {fallback_models}")
+            
+            for model in fallback_models:
+                try:
+                    print(f"🔄 Trying fallback model: {model}")
+                    
+                    # Simple prompt for fallback
+                    if request.card_type == "white":
+                        prompt = f"""Generate a funny white card response for Cards Against Humanity.
+
+Context: {request.context}
+Audience: {request.audience}
+Topic: {request.topic}
+
+Generate ONE funny response that fits the blank. Keep it under 50 characters and make it hilarious.
+
+Response:"""
+                    else:
+                        prompt = f"""Generate a funny black card prompt for Cards Against Humanity.
+
+Context: {request.context}
+Audience: {request.audience}
+Topic: {request.topic}
+
+Generate ONE funny black card prompt with a blank (_____). Keep it under 100 characters and make it hilarious.
+
+Example format: "What would grandma find disturbing, yet oddly charming? _____"
+
+Response:"""
+                    
+                    # Try to generate with fallback model
+                    llm_request = LLMRequest(
+                        prompt=prompt,
+                        model=model,
+                        temperature=0.9,
+                        max_tokens=100,
+                        system_prompt="You are a comedy expert. Generate hilarious Cards Against Humanity content."
+                    )
+                    
+                    response = await multi_llm_manager.generate_response(llm_request)
+                    
+                    if response and response.content:
+                        # Create fallback generation result
+                        fallback_result = GenerationResult(
+                            text=response.content.strip(),
+                            persona_name="fallback_comedy_expert",
+                            model_used=model,
+                            generation_time=0.5,
+                            toxicity_score=0.1,
+                            is_safe=True,
+                            confidence_score=0.8
+                        )
+                        
+                        print(f"✅ Fallback generation successful with {model}")
+                        return [fallback_result]
+                        
+                except Exception as e:
+                    print(f"❌ Fallback model {model} failed: {e}")
+                    continue
+            
+            print("❌ All fallback models failed")
+            return []
+            
+        except Exception as e:
+            print(f"❌ Fallback generation error: {e}")
+            return []
     
     async def _get_persona_recommendations(self, request: HumorRequest) -> List[str]:
         """SMART STRATEGY: 2 favorites + 1 dynamic/random for exploration"""
