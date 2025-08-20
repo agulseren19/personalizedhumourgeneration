@@ -1453,7 +1453,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
           <div className="flex flex-row flex-wrap justify-center gap-6 mt-4">
             {generations.map((generation, index) => (
               <div
-                key={generation.id}
+                key={generation.id || `generation-${index}`}
                 className={`${cardType === 'black' 
                   ? 'bg-black text-white border-4 border-white' 
                   : 'bg-white text-black border-4 border-black'
@@ -1463,20 +1463,20 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                   className={`flex-grow flex items-center justify-center mb-2 ${cardType === 'white' ? 'cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors' : ''}`}
                   onClick={cardType === 'white' ? () => handleWhiteCardRating(generation, 10) : undefined}
                 >
-                  {cardType === 'black' ? generation.text.toUpperCase() : `"${generation.text}"`}
+                  {cardType === 'black' ? (generation.text || 'No text available').toUpperCase() : `"${generation.text || 'No text available'}"`}
                 </div>
                 <div className={`absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded-full font-bold shadow-sm ${
                   cardType === 'black' 
                     ? 'bg-white text-black' 
                     : 'bg-gray-200 text-gray-700'
                 }`}>
-                  {generation.persona_name.replace(/_/g, ' ')}
+                  {(generation.persona_name || 'Unknown Persona').replace(/_/g, ' ')}
                 </div>
                 <div className="w-full flex flex-col items-center">
                   <div className="flex items-center space-x-1 mb-2">
                     <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${generation.is_safe ? 'bg-green-600/20 text-green-300' : 'bg-red-600/20 text-red-300'}`}>{generation.is_safe ? '✅ Safe' : '⚠️ Filtered'}</span>
                     <span className="px-1.5 py-0.5 bg-blue-600/20 text-blue-300 rounded text-xs font-medium">
-                      {whiteCardRatings[generation.id] || 5}/10
+                      {whiteCardRatings[generation.id || 'unknown'] || 5}/10
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-1 text-xs mb-2">
@@ -1521,7 +1521,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                             key={rating}
                             onClick={() => handleWhiteCardRating(generation, rating)}
                             className={`w-6 h-6 rounded-full text-xs font-bold transition-all ${
-                              whiteCardRatings[generation.id] === rating
+                              whiteCardRatings[generation.id || 'unknown'] === rating
                                 ? 'bg-purple-600 text-white shadow-lg scale-110'
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
