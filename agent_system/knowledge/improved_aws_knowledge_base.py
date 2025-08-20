@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Improved AWS Knowledge Base Integration
-Fixes feedback storage, likes/dislikes tracking, and learning from user feedback
+PostgreSQL Knowledge Base Integration
+Uses PostgreSQL for user preferences, feedback storage, and learning
 """
 
 import json
@@ -16,33 +16,16 @@ import time
 from collections import defaultdict
 import random
 
-# Optional boto3 import - only if available
-try:
-    import boto3
-    from boto3.dynamodb.conditions import Key
-    from decimal import Decimal
-    BOTO3_AVAILABLE = True
-except ImportError:
-    BOTO3_AVAILABLE = False
-    print("⚠️  boto3 not available, using mock mode")
-    
-    # Mock Decimal for when boto3 is not available
-    class Decimal:
-        def __init__(self, value):
-            self.value = float(value)
-        def __float__(self):
-            return self.value
-
 @dataclass
 class UserPreference:
     user_id: str
     humor_styles: List[str]
-    liked_personas: List[str]  # Fixed: properly populated
-    disliked_personas: List[str]  # Fixed: properly populated
+    liked_personas: List[str]
+    disliked_personas: List[str]
     context_preferences: Dict[str, float]
     demographic_profile: Dict[str, Any]
     interaction_history: List[Dict[str, Any]]
-    persona_scores: Dict[str, float]  # Added: track average scores per persona
+    persona_scores: Dict[str, float]
     last_updated: datetime
 
 @dataclass
@@ -54,133 +37,182 @@ class FeedbackData:
     timestamp: datetime
     improvement_suggestions: List[str]
 
-class ImprovedAWSKnowledgeBase:
-    """Improved AWS-powered knowledge base with proper feedback learning"""
+class PostgreSQLKnowledgeBase:
+    """PostgreSQL-powered knowledge base for user preferences and feedback"""
     
-    def __init__(self, mock_mode=True):  # Default to mock mode for demo
-        self.mock_mode = mock_mode
-        
-        # Mock storage for demonstration
-        self.mock_users = {}
-        self.mock_feedback_history = defaultdict(list)
-        self.mock_interaction_counts = defaultdict(int)
-        
-        # Thresholds for likes/dislikes - FIXED: More responsive
+    def __init__(self):
         self.like_threshold = 7.0  # Score >= 7 = liked
         self.dislike_threshold = 4.0  # Score <= 4 = disliked
-        self.min_interactions = 1  # FIXED: Single interaction is enough for classification
-        
-        if not mock_mode:
-            self._init_aws_resources()
-    
-    def _init_aws_resources(self):
-        """Initialize AWS resources (DynamoDB, etc.)"""
-        if not BOTO3_AVAILABLE:
-            print("⚠️  boto3 not available, staying in mock mode")
-            self.mock_mode = True
-            return
-            
-        try:
-            self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-            self.user_table = self.dynamodb.Table('humor-user-preferences')
-            self.feedback_table = self.dynamodb.Table('humor-feedback-data')
-        except Exception as e:
-            print(f"AWS initialization failed, falling back to mock mode: {e}")
-            self.mock_mode = True
+        self.min_interactions = 1  # Single interaction is enough for classification
     
     async def get_user_preference(self, user_id: str) -> Optional[UserPreference]:
-        """Get user preferences with properly populated likes/dislikes"""
-        if self.mock_mode:
-            return self._get_mock_user_preference(user_id)
-        else:
-            return await self._get_aws_user_preference(user_id)
-    
-    def _get_mock_user_preference(self, user_id: str) -> Optional[UserPreference]:
-        """Get user preferences from mock storage"""
-        if user_id in self.mock_users:
-            return self.mock_users[user_id]
-        
-        # Create new user with empty preferences
-        user_pref = UserPreference(
-            user_id=user_id,
-            humor_styles=[],
-            liked_personas=[],
-            disliked_personas=[],
-            context_preferences={},
-            demographic_profile={},
-            interaction_history=[],
-            persona_scores={},
-            last_updated=datetime.now()
-        )
-        self.mock_users[user_id] = user_pref
-        return user_pref
+        """Get user preferences from PostgreSQL"""
+        try:
+            from agent_system.models.database import get_session_local, User, PersonaPreference, Persona
+            from agent_system.config.settings import settings
+            
+            SessionLocal = get_session_local(settings.database_url)
+            db = SessionLocal()
+            
+            try:
+                # Get user
+                user = db.query(User).filter(User.id == user_id).first()
+                if not user:
+                    return None
+                
+                # Get persona preferences
+                persona_prefs = db.query(PersonaPreference).filter(
+                    PersonaPreference.user_id == user_id
+                ).all()
+                
+                # Build user preference object
+                liked_personas = []
+                disliked_personas = []
+                persona_scores = {}
+                
+                for pref in persona_prefs:
+                    persona = db.query(Persona).filter(Persona.id == pref.persona_id).first()
+                    if persona:
+                        persona_name = persona.name
+                        persona_scores[persona_name] = pref.preference_score
+                        
+                        if pref.preference_score >= self.like_threshold:
+                            liked_personas.append(persona_name)
+                        elif pref.preference_score <= self.dislike_threshold:
+                            disliked_personas.append(persona_name)
+                
+                # Get interaction history from feedback
+                from agent_system.models.database import UserFeedback
+                feedback_history = db.query(UserFeedback).filter(
+                    UserFeedback.user_id == user_id
+                ).order_by(UserFeedback.created_at.desc()).limit(50).all()
+                
+                interaction_history = []
+                context_preferences = {}
+                
+                for feedback in feedback_history:
+                    interaction = {
+                        'persona_name': feedback.persona_name,
+                        'context': feedback.context,
+                        'feedback_score': feedback.feedback_score,
+                        'response_text': feedback.response_text,
+                        'topic': feedback.topic,
+                        'audience': feedback.audience,
+                        'timestamp': feedback.created_at.isoformat(),
+                        'user_id': feedback.user_id
+                    }
+                    interaction_history.append(interaction)
+                    
+                    # Update context preferences
+                    if feedback.context:
+                        context_keywords = feedback.context.lower().split()
+                        for keyword in context_keywords:
+                            if len(keyword) > 3:
+                                if keyword in context_preferences:
+                                    context_preferences[keyword] = (context_preferences[keyword] + feedback.feedback_score) / 2
+                                else:
+                                    context_preferences[keyword] = feedback.feedback_score
+                
+                user_pref = UserPreference(
+                    user_id=user_id,
+                    humor_styles=[],
+                    liked_personas=liked_personas,
+                    disliked_personas=disliked_personas,
+                    context_preferences=context_preferences,
+                    demographic_profile={},
+                    interaction_history=interaction_history,
+                    persona_scores=persona_scores,
+                    last_updated=datetime.now()
+                )
+                
+                return user_pref
+                
+            finally:
+                db.close()
+                
+        except Exception as e:
+            print(f"Error getting user preference: {e}")
+            return None
     
     async def update_user_feedback(self, user_id: str, persona_name: str, feedback_score: float, context: str, response_text: str = "", topic: str = "", audience: str = "") -> bool:
         """Update user feedback and properly calculate likes/dislikes"""
         print(f"  Updating feedback: {user_id} -> {persona_name}: {feedback_score}/10")
         
-        if self.mock_mode:
-            return self._update_mock_feedback(user_id, persona_name, feedback_score, context, response_text, topic, audience)
-        else:
-            return await self._update_aws_feedback(user_id, persona_name, feedback_score, context, response_text, topic, audience)
-    
-    def _update_mock_feedback(self, user_id: str, persona_name: str, feedback_score: float, context: str, response_text: str = "", topic: str = "", audience: str = "") -> bool:
-        """Update feedback in mock storage with proper learning"""
         try:
-            # Get or create user preferences
-            user_pref = self._get_mock_user_preference(user_id)
+            from agent_system.models.database import get_session_local, UserFeedback, User
+            from agent_system.config.settings import settings
             
-            # Store feedback in history
-            feedback_data = FeedbackData(
-                user_id=user_id,
-                persona_name=persona_name,
-                context=context,
-                score=feedback_score,
-                timestamp=datetime.now(),
-                improvement_suggestions=[]
-            )
+            SessionLocal = get_session_local(settings.database_url)
+            db = SessionLocal()
             
-            self.mock_feedback_history[user_id].append(feedback_data)
-            
-            # Update interaction history with more detailed data for persona generation
-            interaction = {
-                'persona_name': persona_name,
-                'context': context,
-                'feedback_score': feedback_score,
-                'response_text': response_text,
-                'topic': topic,
-                'audience': audience,
-                'timestamp': datetime.now().isoformat(),
-                'user_id': user_id
-            }
-            user_pref.interaction_history.append(interaction)
-            
-            # Keep only last 50 interactions to avoid memory issues
-            if len(user_pref.interaction_history) > 50:
-                user_pref.interaction_history = user_pref.interaction_history[-50:]
-            
-            # FIXED: More responsive weighted average - give more weight to recent scores
-            if persona_name in user_pref.persona_scores:
-                current_score = user_pref.persona_scores[persona_name]
-                # Give 50/50 weight instead of 70/30 to be more responsive to recent feedback
-                user_pref.persona_scores[persona_name] = (current_score * 0.5) + (feedback_score * 0.5)
-            else:
-                user_pref.persona_scores[persona_name] = feedback_score
-            
-            # Update likes/dislikes based on scores and interaction count
-            self._update_persona_preferences(user_pref, persona_name)
-            
-            # Update context preferences
-            self._update_context_preferences(user_pref, context, feedback_score)
-            
-            user_pref.last_updated = datetime.now()
-            
-            print(f"  Updated preferences - Liked: {user_pref.liked_personas}, Disliked: {user_pref.disliked_personas}")
-            
-            return True
-            
+            try:
+                # Get current user preference
+                user = db.query(User).filter(User.id == user_id).first()
+                if not user:
+                    user = User(id=user_id) # Create user if not found
+                    db.add(user)
+                    db.commit()
+                    print(f"  User {user_id} not found, creating new user.")
+                
+                # Add new feedback to interaction history
+                feedback = UserFeedback(
+                    user_id=user_id,
+                    persona_name=persona_name,
+                    feedback_score=feedback_score,
+                    context=context,
+                    response_text=response_text,
+                    topic=topic,
+                    audience=audience,
+                    created_at=datetime.now()
+                )
+                db.add(feedback)
+                
+                # Update persona scores
+                persona_pref = db.query(PersonaPreference).filter(
+                    PersonaPreference.user_id == user_id,
+                    PersonaPreference.persona_id == (
+                        db.query(Persona).filter(Persona.name == persona_name).first().id
+                    )
+                ).first()
+                
+                if persona_pref:
+                    old_count = persona_pref.interaction_count
+                    old_score = persona_pref.preference_score
+                    
+                    new_count = old_count + 1
+                    new_score = ((old_score * old_count) + feedback_score) / new_count
+                    
+                    persona_pref.interaction_count = new_count
+                    persona_pref.preference_score = new_score
+                    persona_pref.last_interaction = datetime.now()
+                else:
+                    # Create new preference if it doesn't exist
+                    new_persona = db.query(Persona).filter(Persona.name == persona_name).first()
+                    if new_persona:
+                        new_preference = PersonaPreference(
+                            user_id=user_id,
+                            persona_id=new_persona.id,
+                            interaction_count=1,
+                            preference_score=feedback_score,
+                            last_interaction=datetime.now()
+                        )
+                        db.add(new_preference)
+                
+                db.commit()
+                print(f"  ✅ Database save successful for {user_id} -> {persona_name}")
+                
+                return True
+                
+            except Exception as db_error:
+                print(f"  ⚠️  Database save failed: {db_error}")
+                db.rollback()
+                return False
+                
+            finally:
+                db.close()
+                
         except Exception as e:
-            print(f"  Error updating feedback: {e}")
+            print(f"Error updating feedback: {e}")
             return False
     
     def _update_persona_preferences(self, user_pref: UserPreference, persona_name: str):
@@ -232,109 +264,6 @@ class ImprovedAWSKnowledgeBase:
                     user_pref.context_preferences[keyword] = (current * 0.8) + (score * 0.2)
                 else:
                     user_pref.context_preferences[keyword] = score
-    
-    async def _get_aws_user_preference(self, user_id: str) -> Optional[UserPreference]:
-        """Get user preferences from DynamoDB"""
-        if not BOTO3_AVAILABLE:
-            print("⚠️  boto3 not available, cannot access DynamoDB")
-            return None
-            
-        try:
-            if not hasattr(self, 'user_table'):
-                self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-                self.user_table = self.dynamodb.Table('humor-user-preferences')
-            response = self.user_table.get_item(Key={'user_id': user_id})
-            if 'Item' not in response:
-                return None
-            item = response['Item']
-            # Convert Decimals to float
-            def convert_decimals(obj):
-                if isinstance(obj, list):
-                    return [convert_decimals(i) for i in obj]
-                elif isinstance(obj, dict):
-                    return {k: convert_decimals(v) for k, v in obj.items()}
-                elif isinstance(obj, Decimal):
-                    return float(obj)
-                return obj
-            item = convert_decimals(item)
-            # Parse datetime
-            from datetime import datetime
-            if 'last_updated' in item and isinstance(item['last_updated'], str):
-                try:
-                    item['last_updated'] = datetime.fromisoformat(item['last_updated'])
-                except Exception:
-                    item['last_updated'] = datetime.now()
-            return UserPreference(**item)
-        except Exception as e:
-            print(f"DynamoDB get_user_preference error: {e}")
-            return None
-
-    async def _update_aws_feedback(self, user_id: str, persona_name: str, feedback_score: float, context: str, response_text: str = "", topic: str = "", audience: str = "") -> bool:
-        """Update user feedback in DynamoDB"""
-        if not BOTO3_AVAILABLE:
-            print("⚠️  boto3 not available, cannot update DynamoDB")
-            return False
-            
-        try:
-            if not hasattr(self, 'user_table'):
-                self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-                self.user_table = self.dynamodb.Table('humor-user-preferences')
-            # Get current user preference
-            user_pref = await self._get_aws_user_preference(user_id)
-            from datetime import datetime
-            if not user_pref:
-                user_pref = UserPreference(
-                    user_id=user_id,
-                    humor_styles=[],
-                    liked_personas=[],
-                    disliked_personas=[],
-                    context_preferences={},
-                    demographic_profile={},
-                    interaction_history=[],
-                    persona_scores={},
-                    last_updated=datetime.now()
-                )
-            # Add new feedback to interaction history
-            interaction = {
-                'persona_name': persona_name,
-                'context': context,
-                'feedback_score': feedback_score,
-                'response_text': response_text,
-                'topic': topic,
-                'audience': audience,
-                'timestamp': datetime.now().isoformat(),
-                'user_id': user_id
-            }
-            user_pref.interaction_history.append(interaction)
-            if len(user_pref.interaction_history) > 50:
-                user_pref.interaction_history = user_pref.interaction_history[-50:]
-            # Update persona scores
-            if persona_name in user_pref.persona_scores:
-                current_score = user_pref.persona_scores[persona_name]
-                user_pref.persona_scores[persona_name] = (current_score * 0.5) + (feedback_score * 0.5)
-            else:
-                user_pref.persona_scores[persona_name] = feedback_score
-            # Update likes/dislikes
-            self._update_persona_preferences(user_pref, persona_name)
-            self._update_context_preferences(user_pref, context, feedback_score)
-            user_pref.last_updated = datetime.now()
-            # Convert dataclass to dict and handle Decimals
-            def to_dynamo(obj):
-                if isinstance(obj, list):
-                    return [to_dynamo(i) for i in obj]
-                elif isinstance(obj, dict):
-                    return {k: to_dynamo(v) for k, v in obj.items()}
-                elif isinstance(obj, float):
-                    return Decimal(str(obj))
-                return obj
-            item = user_pref.__dict__.copy()
-            item['last_updated'] = user_pref.last_updated.isoformat()
-            item = to_dynamo(item)
-            self.user_table.put_item(Item=item)
-            return True
-        except Exception as e:
-            print(f"DynamoDB update_user_feedback error: {e}")
-            return False
     
     async def get_persona_recommendations(self, user_id: str, context: str, audience: str) -> List[str]:
         """Get persona recommendations based on user preferences and context - FIXED NUANCED SCORING"""
@@ -608,4 +537,4 @@ class ImprovedAWSKnowledgeBase:
         }
 
 # Global instance
-improved_aws_knowledge_base = ImprovedAWSKnowledgeBase(mock_mode=False) 
+improved_aws_knowledge_base = PostgreSQLKnowledgeBase() 

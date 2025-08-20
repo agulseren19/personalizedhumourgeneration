@@ -52,10 +52,10 @@ except ImportError as e:
 
 try:
     from agent_system.knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base
-    print("✅ AWS knowledge base imported successfully")
+    print("✅ PostgreSQL knowledge base imported successfully")
 except ImportError as e:
-    print(f"⚠️  AWS knowledge base import failed: {e}")
-    print("⚠️  Using mock mode for knowledge base functionality")
+    print(f"⚠️  PostgreSQL knowledge base import failed: {e}")
+    print("⚠️  Using fallback knowledge base functionality")
     improved_aws_knowledge_base = None
 
 try:
@@ -194,6 +194,20 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Add CORS middleware FIRST - before any routes
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://localhost:3001",  # Next.js dev servers
+        "https://cah-frontend.onrender.com",  # Render frontend
+        "https://personalizedhumourgenerationcah.vercel.app"  # Vercel frontend
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Add authentication routes if available
 if auth_router:
     app.include_router(auth_router)
@@ -214,20 +228,6 @@ if multiplayer_router:
     print("✅ Multiplayer routes added to API")
 else:
     print("⚠️  Multiplayer routes not available")
-
-# Add CORS middleware for frontend and Render deployment
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000", 
-        "http://localhost:3001",  # Next.js dev servers
-        "https://cah-frontend.onrender.com",  # Render frontend
-        "https://personalizedhumourgenerationcah.vercel.app"  # Vercel frontend
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # WebSocket connection management - defined at module level for accessibility
 active_connections: Dict[str, Dict[str, WebSocket]] = {}  # game_id -> {user_id: websocket}
