@@ -230,10 +230,10 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       
       await cahApi.submitFeedback({
         user_id: consistentUserId,
-        persona_name: generation.persona_name,
+        persona_name: generation.persona_name || 'Unknown Persona',
         feedback_score: score,
         context: context,
-        response_text: generation.text,
+        response_text: generation.text || 'No text available',
         topic: topic,
         audience: audience
       });
@@ -263,10 +263,10 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       
       await cahApi.submitFeedback({
         user_id: consistentUserId,
-        persona_name: generation.persona_name,
+        persona_name: generation.persona_name || 'Unknown Persona',
         feedback_score: 10,
         context: context,
-        response_text: generation.text,
+        response_text: generation.text || 'No text available',
         topic: topic,
         audience: audience
       });
@@ -313,10 +313,10 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       
       await cahApi.submitFeedback({
         user_id: consistentUserId,
-        persona_name: generation.persona_name,
+        persona_name: generation.persona_name || 'Unknown Persona',
         feedback_score: rating,
         context: context,
-        response_text: generation.text,
+        response_text: generation.text || 'No text available',
         topic: topic,
         audience: audience
       });
@@ -367,9 +367,9 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       const whiteResult = await cahApi.generateHumor(whiteRequest);
       if (whiteResult.success && whiteResult.results) {
         setBlackCardWhiteCards(whiteResult.results.slice(0, 3).map((g: any) => ({
-          id: g.id,
-          text: g.text,
-          persona: g.persona_name
+          id: g.id || 'unknown',
+          text: g.text || 'No text available',
+          persona: g.persona_name || 'Unknown Persona'
         })));
       }
       setRound(r => r + 1);
