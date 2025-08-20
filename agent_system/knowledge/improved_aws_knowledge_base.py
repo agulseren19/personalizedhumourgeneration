@@ -5,7 +5,6 @@ Fixes feedback storage, likes/dislikes tracking, and learning from user feedback
 """
 
 import json
-import boto3
 import asyncio
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
@@ -16,8 +15,23 @@ import threading
 import time
 from collections import defaultdict
 import random
-from boto3.dynamodb.conditions import Key
-from decimal import Decimal
+
+# Optional boto3 import - only if available
+try:
+    import boto3
+    from boto3.dynamodb.conditions import Key
+    from decimal import Decimal
+    BOTO3_AVAILABLE = True
+except ImportError:
+    BOTO3_AVAILABLE = False
+    print("⚠️  boto3 not available, using mock mode")
+    
+    # Mock Decimal for when boto3 is not available
+    class Decimal:
+        def __init__(self, value):
+            self.value = float(value)
+        def __float__(self):
+            return self.value
 
 @dataclass
 class UserPreference:
@@ -61,6 +75,11 @@ class ImprovedAWSKnowledgeBase:
     
     def _init_aws_resources(self):
         """Initialize AWS resources (DynamoDB, etc.)"""
+        if not BOTO3_AVAILABLE:
+            print("⚠️  boto3 not available, staying in mock mode")
+            self.mock_mode = True
+            return
+            
         try:
             self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
             self.user_table = self.dynamodb.Table('humor-user-preferences')
@@ -216,6 +235,10 @@ class ImprovedAWSKnowledgeBase:
     
     async def _get_aws_user_preference(self, user_id: str) -> Optional[UserPreference]:
         """Get user preferences from DynamoDB"""
+        if not BOTO3_AVAILABLE:
+            print("⚠️  boto3 not available, cannot access DynamoDB")
+            return None
+            
         try:
             if not hasattr(self, 'user_table'):
                 self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
@@ -248,6 +271,10 @@ class ImprovedAWSKnowledgeBase:
 
     async def _update_aws_feedback(self, user_id: str, persona_name: str, feedback_score: float, context: str, response_text: str = "", topic: str = "", audience: str = "") -> bool:
         """Update user feedback in DynamoDB"""
+        if not BOTO3_AVAILABLE:
+            print("⚠️  boto3 not available, cannot update DynamoDB")
+            return False
+            
         try:
             if not hasattr(self, 'user_table'):
                 self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
