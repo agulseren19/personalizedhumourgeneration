@@ -415,7 +415,8 @@ async def health_check():
             db = SessionLocal()
             
             try:
-                result = db.execute("SELECT 1")
+                from sqlalchemy import text
+                result = db.execute(text("SELECT 1"))
                 health_status["database"] = "healthy"
             except Exception as e:
                 health_status["database"] = f"unhealthy: {str(e)[:100]}"
@@ -562,7 +563,8 @@ async def generate_humor(request: HumorRequest):
             
             try:
                 # Simple database test
-                result = db.execute("SELECT 1")
+                from sqlalchemy import text
+                result = db.execute(text("SELECT 1"))
                 print("✅ Database connection test successful")
             except Exception as db_error:
                 print(f"❌ Database connection test failed: {db_error}")
@@ -653,7 +655,7 @@ async def submit_feedback(request: FeedbackRequest):
         from agent_system.config.settings import settings
         from agent_system.personas.persona_manager import PersonaManager
         from datetime import datetime
-        from sqlalchemy import and_
+        from sqlalchemy import and_, text
         
         # Get database session
         SessionLocal = get_session_local(settings.database_url)

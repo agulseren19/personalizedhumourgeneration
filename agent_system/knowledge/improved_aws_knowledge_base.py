@@ -437,6 +437,45 @@ class PostgreSQLKnowledgeBase:
         }
         
         return audience_fit_scores.get(audience, {}).get(persona, 0.3)
+    
+    async def get_user_interaction_history(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get user interaction history from database for dynamic persona generation"""
+        try:
+            from agent_system.models.database import get_session_local, UserFeedback
+            from agent_system.config.settings import settings
+            
+            SessionLocal = get_session_local(settings.database_url)
+            db = SessionLocal()
+            
+            try:
+                # Get user feedback history
+                feedback_history = db.query(UserFeedback).filter(
+                    UserFeedback.user_id == user_id
+                ).order_by(UserFeedback.created_at.desc()).limit(50).all()
+                
+                # Convert to list of dictionaries
+                interaction_history = []
+                for feedback in feedback_history:
+                    interaction = {
+                        'persona_name': feedback.persona_name,
+                        'context': feedback.context,
+                        'feedback_score': feedback.feedback_score,
+                        'response_text': feedback.response_text,
+                        'topic': feedback.topic,
+                        'audience': feedback.audience,
+                        'created_at': feedback.created_at.isoformat() if feedback.created_at else None
+                    }
+                    interaction_history.append(interaction)
+                
+                print(f"  📊 Retrieved {len(interaction_history)} interactions for user {user_id}")
+                return interaction_history
+                
+            finally:
+                db.close()
+                
+        except Exception as e:
+            print(f"  ❌ Error getting user interaction history: {e}")
+            return []
 
 # Global instance
 improved_aws_knowledge_base = PostgreSQLKnowledgeBase() 
