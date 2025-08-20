@@ -17,6 +17,7 @@ import uvicorn
 import time
 import sys
 import os
+from fastapi.responses import JSONResponse
 
 # Fix import paths for Render deployment
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -195,6 +196,7 @@ app = FastAPI(
 )
 
 # Add CORS middleware FIRST - before any routes
+print("🔧 Adding CORS middleware...")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -207,6 +209,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+print("✅ CORS middleware added successfully")
+print(f"   Allowed origins: {app.user_middleware[0].allow_origins}")
+print(f"   Allow credentials: {app.user_middleware[0].allow_credentials}")
+print(f"   Allow methods: {app.user_middleware[0].allow_methods}")
+print(f"   Allow headers: {app.user_middleware[0].allow_headers}")
 
 # Add authentication routes if available
 if auth_router:
@@ -353,6 +360,50 @@ async def root():
     """Health check endpoint"""
     return {"message": "Cards Against Humanity CrewAI API is running!", "status": "healthy"}
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Render"""
+    try:
+        # Test database connection
+        from agent_system.models.database import get_session_local
+        from agent_system.config.settings import settings
+        
+        SessionLocal = get_session_local(settings.database_url)
+        db = SessionLocal()
+        
+        try:
+            result = db.execute("SELECT 1")
+            db_status = "healthy"
+        except Exception as e:
+            db_status = f"unhealthy: {e}"
+        finally:
+            db.close()
+        
+        # Test knowledge base
+        kb_status = "healthy" if improved_aws_knowledge_base else "unavailable"
+        
+        # Test humor system
+        humor_status = "healthy" if humor_system else "unavailable"
+        
+        return {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "database": db_status,
+            "knowledge_base": kb_status,
+            "humor_system": humor_status,
+            "cors_middleware": "enabled"
+        }
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "unhealthy",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
+        )
+
 @app.get("/test-humor")
 async def test_humor():
     """Test CrewAI humor generation system"""
@@ -450,123 +501,105 @@ async def get_personas():
         raise HTTPException(status_code=500, detail=f"Error getting personas: {str(e)}")
 
 @app.post("/generate")
-async def generate_humor(request: GenerateHumorRequest):
-    """Generate humor using CrewAI multi-agent system"""
+async def generate_humor(request: HumorRequest):
+    """Generate humor with improved error handling and database testing"""
     try:
-        # Ensure humor system is initialized
-        if humor_system is None:
-            await initialize_humor_system()
+        print(f"🎭 Generating humor for user {request.user_id}")
+        print(f"   Context: {request.context}")
+        print(f"   Audience: {request.audience}")
+        print(f"   Topic: {request.topic}")
+        
+        # Test database connection first
+        try:
+            from agent_system.models.database import get_session_local
+            from agent_system.config.settings import settings
             
-        if humor_system is None:
-            return {"error": "CrewAI humor system not initialized yet"}
-        
-        start_time = time.time()
-        
-        # Create humor request
-        humor_request = HumorRequest(
-            context=request.context,
-            audience=request.audience,
-            topic=request.topic,
-            user_id=request.user_id,
-            card_type=request.card_type
-        )
-        
-        # Generate humor using CrewAI
-        result = await humor_system.generate_and_evaluate_humor(humor_request)
-        generation_time = time.time() - start_time
-        
-        if result['success']:
+            SessionLocal = get_session_local(settings.database_url)
+            db = SessionLocal()
+            
             try:
-                # Format generations for frontend
-                generations = []
-                # Handle both old and new result formats
-                top_results = result.get('top_results', [])  # Old format
-                if not top_results:
-                    top_results = result.get('results', [])  # New format
+                # Simple database test
+                result = db.execute("SELECT 1")
+                print("✅ Database connection test successful")
+            except Exception as db_error:
+                print(f"❌ Database connection test failed: {db_error}")
+                return JSONResponse(
+                    status_code=500,
+                    content={"detail": f"Database connection failed: {db_error}"}
+                )
+            finally:
+                db.close()
                 
-                print('DEBUG: result =', result)
-                print('DEBUG: top_results =', top_results)
-                
-                for i, evaluated_result in enumerate(top_results):
-                    try:
-                        generation = evaluated_result['generation']
-                        
-                        # Handle both old and new evaluation formats
-                        evaluations = evaluated_result.get('evaluations', [])
-                        evaluation = evaluated_result.get('evaluation', None)
-                        
-                        # Get evaluation scores
-                        if evaluation:
-                            # New format - single evaluation
-                            average_scores = {
-                                'humor_score': evaluation.humor_score,
-                                'creativity_score': evaluation.creativity_score,
-                                'appropriateness_score': evaluation.appropriateness_score,
-                                'context_relevance_score': evaluation.context_relevance_score,
-                                'overall_score': evaluation.overall_score
-                            }
-                        elif evaluations:
-                            # Old format - evaluations list
-                            evaluation = evaluations[0]
-                            average_scores = evaluated_result.get('average_scores', {})
-                        else:
-                            # Fallback
-                            evaluation = None
-                            average_scores = {}
-                        
-                        # Debug the scores
-                        print(f"DEBUG: Average scores for generation {i}: {average_scores}")
-                        
-                        generation_dict = {
-                            "id": f"{generation.persona_name}_{generation.model_used}_{int(time.time())}",
-                            "text": str(generation.text),
-                            "persona_name": str(generation.persona_name),
-                            "model_used": str(generation.model_used),
-                            "score": convert_numpy_types(average_scores.get('overall_score', 5.0)),
-                            "humor_score": convert_numpy_types(average_scores.get('humor_score', 5.0)),
-                            "creativity_score": convert_numpy_types(average_scores.get('creativity_score', 5.0)),
-                            "appropriateness_score": convert_numpy_types(average_scores.get('appropriateness_score', 5.0)),
-                            "context_relevance_score": convert_numpy_types(average_scores.get('context_relevance_score', 5.0)),
-                            "is_safe": True,  # CrewAI handles safety internally
-                            "toxicity_score": 0.0,  # CrewAI doesn't use detoxify
-                            "reasoning": evaluation.reasoning if evaluation else "No evaluation available"
-                        }
-                        
-                        # Ensure all values are properly converted
-                        generation_dict = convert_numpy_types(generation_dict)
-                        
-                        generations.append(generation_dict)
-                        
-                    except Exception as e:
-                        return {"error": f"Error processing result {i}: {str(e)}", "type": "generation_processing"}
-                
-                # Create response data
-                response_data = {
-                    "success": True,
-                    "generations": generations,
-                    "recommended_personas": result.get('generation_personas', []),
-                    "generation_time": convert_numpy_types(generation_time),
-                    "error": None
-                }
-                
-                # Ensure all response data is properly serializable
-                response_data = convert_numpy_types(response_data)
-                
-                return response_data
-                
-            except Exception as e:
-                return {"error": f"Error in response formatting: {str(e)}", "type": "response_formatting"}
-        else:
-            return HumorResponse(
-                success=False,
-                generations=[],
-                recommended_personas=[],
-                generation_time=generation_time,
-                error=result.get('error', 'Unknown error')
+        except Exception as e:
+            print(f"❌ Database setup failed: {e}")
+            return JSONResponse(
+                status_code=500,
+                content={"detail": f"Database setup failed: {e}"}
+            )
+        
+        # Test knowledge base
+        try:
+            if improved_aws_knowledge_base:
+                print("✅ Knowledge base available")
+                # Test user preference retrieval
+                user_pref = await improved_aws_knowledge_base.get_user_preference(request.user_id)
+                if user_pref:
+                    print(f"✅ User preferences loaded: {len(user_pref.interaction_history)} interactions")
+                else:
+                    print("⚠️ No user preferences found, creating new user")
+            else:
+                print("❌ Knowledge base not available")
+                return JSONResponse(
+                    status_code=500,
+                    content={"detail": "Knowledge base not available"}
+                )
+        except Exception as kb_error:
+            print(f"❌ Knowledge base test failed: {kb_error}")
+            return JSONResponse(
+                status_code=500,
+                content={"detail": f"Knowledge base test failed: {kb_error}"}
+            )
+        
+        # Generate humor with timeout protection
+        try:
+            print("🚀 Starting humor generation...")
+            
+            # Check if humor system is available
+            if humor_system is None:
+                print("❌ Humor system not initialized")
+                return JSONResponse(
+                    status_code=500,
+                    content={"detail": "Humor system not initialized"}
+                )
+            
+            # Use asyncio.wait_for to prevent infinite hanging
+            result = await asyncio.wait_for(
+                humor_system.generate_humor(request),
+                timeout=45.0  # 45 second timeout (less than 60s client timeout)
+            )
+            
+            print("✅ Humor generation completed successfully")
+            return result
+            
+        except asyncio.TimeoutError:
+            print("❌ Humor generation timed out after 45 seconds")
+            return JSONResponse(
+                status_code=408,
+                content={"detail": "Humor generation timed out. Please try again."}
+            )
+        except Exception as gen_error:
+            print(f"❌ Humor generation failed: {gen_error}")
+            return JSONResponse(
+                status_code=500,
+                content={"detail": f"Error generating humor: {gen_error}"}
             )
             
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating humor: {str(e)}")
+        print(f"❌ Unexpected error in generate endpoint: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": f"Unexpected error: {e}"}
+        )
 
 @app.post("/feedback")
 async def submit_feedback(request: FeedbackRequest):
@@ -1297,6 +1330,20 @@ if AuthenticatedMultiplayerCAHGame is not None:
 
 else:
     print("⚠️ Multiplayer game endpoints not available - MultiplayerCAHGame import failed")
+
+@app.get("/cors-test")
+async def cors_test():
+    """Test CORS middleware"""
+    return {
+        "message": "CORS test successful",
+        "timestamp": datetime.now().isoformat(),
+        "cors_working": True
+    }
+
+@app.options("/cors-test")
+async def cors_test_options():
+    """Test CORS preflight"""
+    return {"message": "CORS preflight successful"}
 
 # WebSocket endpoint - ALWAYS register this regardless of import status
 @app.websocket("/ws/{game_id}/{user_id}")
