@@ -1483,19 +1483,19 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                     <div>
                       <span className="text-gray-400">Humor:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {generation.humor_score.toFixed(1)}/10
+                        {generation.humor_score?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-400">Creativity:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {generation.creativity_score.toFixed(1)}/10
+                        {generation.creativity_score?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-400">Appropriate:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {generation.appropriateness_score.toFixed(1)}/10
+                        {generation.appropriateness_score?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
                     <div>
@@ -1532,7 +1532,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                       </div>
                     </div>
                   )}
-                  <div className="text-xs text-gray-500 mt-1 line-clamp-1">{generation.reasoning}</div>
+                  <div className="text-xs text-gray-500 mt-1 line-clamp-1">{generation.reasoning || 'No reasoning available'}</div>
                 </div>
               </div>
             ))}
