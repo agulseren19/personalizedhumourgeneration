@@ -263,6 +263,10 @@ async def generate_humor(
         if not result['success']:
             raise HTTPException(status_code=500, detail=result.get('error', 'Generation failed'))
         
+        # Ensure result has required fields
+        if not result.get('results') or len(result['results']) == 0:
+            raise HTTPException(status_code=500, detail='No humor generated')
+        
         # Store results in database asynchronously
         background_tasks.add_task(
             store_generation_results, 

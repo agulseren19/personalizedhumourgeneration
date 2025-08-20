@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 import json
 
 # Module load test - this should appear in logs when module is imported

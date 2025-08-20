@@ -201,16 +201,16 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       const result = await cahApi.generateHumor(request);
       
       if (result.success) {
-        setGenerations(result.generations);
-        setRecommendations(result.recommended_personas);
-        setGenerationTime(result.generation_time);
+        setGenerations(result.results || []);  // Backend'den gelen 'results' field'ı
+        setRecommendations(result.recommended_personas || []);
+        setGenerationTime(result.generation_time || 0);
         setRound(r => r + 1); // increment round
         
         // Show appropriate message based on what was generated
         if (isAlreadyBlackCard) {
-          toast.success(`Generated ${result.generations?.length || 0} white cards for your black card in ${result.generation_time?.toFixed(2) || '0.00'}s`);
+          toast.success(`Generated ${result.results?.length || 0} white cards for your black card in ${result.generation_time?.toFixed(2) || '0.00'}s`);
         } else {
-          toast.success(`Generated ${result.generations?.length || 0} responses in ${result.generation_time?.toFixed(2) || '0.00'}s`);
+          toast.success(`Generated ${result.results?.length || 0} responses in ${result.generation_time?.toFixed(2) || '0.00'}s`);
         }
       } else {
         toast.error(result.error || 'Generation failed');
@@ -346,10 +346,10 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
         card_type: 'black'
       };
       const blackResult = await cahApi.generateHumor(blackRequest);
-      if (!blackResult.success || !blackResult.generations || blackResult.generations.length === 0) {
+      if (!blackResult.success || !blackResult.results || blackResult.results.length === 0) {
         throw new Error('Failed to generate black card');
       }
-      const generatedBlackCard = blackResult.generations[0];
+      const generatedBlackCard = blackResult.results[0];
       setBlackCard({
         id: generatedBlackCard.id,
         text: generatedBlackCard.text,
@@ -365,8 +365,8 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
         card_type: 'white'
       };
       const whiteResult = await cahApi.generateHumor(whiteRequest);
-      if (whiteResult.success && whiteResult.generations) {
-        setBlackCardWhiteCards(whiteResult.generations.slice(0, 3).map((g: any) => ({
+      if (whiteResult.success && whiteResult.results) {
+        setBlackCardWhiteCards(whiteResult.results.slice(0, 3).map((g: any) => ({
           id: g.id,
           text: g.text,
           persona: g.persona_name

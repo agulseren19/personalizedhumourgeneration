@@ -62,22 +62,26 @@ export interface Generation {
   text: string;
   persona_name: string;
   model_used: string;
-  score: number;
-  humor_score: number;
-  creativity_score: number;
-  appropriateness_score: number;
+  score?: number;           // Optional - backend'de farklı field'larda olabilir
+  humor_score?: number;     // Optional - backend'de evaluation içinde olabilir
+  creativity_score?: number; // Optional - backend'de evaluation içinde olabilir
+  appropriateness_score?: number; // Optional - backend'de evaluation içinde olabilir
   context_relevance_score?: number;
   surprise_index?: number;  // Add surprise index property
-  is_safe: boolean;
-  toxicity_score: number;
-  reasoning: string;
+  is_safe?: boolean;        // Optional - backend'de generation içinde olabilir
+  toxicity_score?: number;  // Optional - backend'de generation içinde olabilir
+  reasoning?: string;       // Optional - backend'de evaluation içinde olabilir
 }
 
 export interface HumorResponse {
   success: boolean;
-  generations: Generation[];
-  recommended_personas: string[];
+  results: Generation[];  // Backend'den gelen 'results' field'ı
+  top_results: any[];     // Backend'den gelen 'top_results' field'ı
+  num_results: number;    // Backend'den gelen 'num_results' field'ı
   generation_time: number;
+  fallback_used: boolean; // Backend'den gelen 'fallback_used' field'ı
+  best_result?: any;      // Backend'den gelen 'best_result' field'ı
+  recommended_personas: string[];
   error?: string;
 }
 
