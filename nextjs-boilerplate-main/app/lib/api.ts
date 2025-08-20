@@ -58,19 +58,40 @@ export interface Persona {
 }
 
 export interface Generation {
-  id: string;
-  text: string;
-  persona_name: string;
-  model_used: string;
-  score?: number;           // Optional - backend'de farklı field'larda olabilir
-  humor_score?: number;     // Optional - backend'de evaluation içinde olabilir
-  creativity_score?: number; // Optional - backend'de evaluation içinde olabilir
-  appropriateness_score?: number; // Optional - backend'de evaluation içinde olabilir
+  id?: string;
+  text?: string;
+  persona_name?: string;
+  model_used?: string;
+  score?: number;
+  humor_score?: number;
+  creativity_score?: number;
+  appropriateness_score?: number;
   context_relevance_score?: number;
-  surprise_index?: number;  // Add surprise index property
-  is_safe?: boolean;        // Optional - backend'de generation içinde olabilir
-  toxicity_score?: number;  // Optional - backend'de generation içinde olabilir
-  reasoning?: string;       // Optional - backend'de evaluation içinde olabilir
+  surprise_index?: number;
+  is_safe?: boolean;
+  toxicity_score?: number;
+  reasoning?: string;
+  
+  // Backend'den gelen nested structure için
+  generation?: {
+    text: string;
+    persona_name: string;
+    model_used: string;
+    generation_time: number;
+    toxicity_score: number;
+    is_safe: boolean;
+    confidence_score: number;
+  };
+  evaluation?: {
+    humor_score: number;
+    creativity_score: number;
+    appropriateness_score: number;
+    context_relevance_score: number;
+    overall_score: number;
+    reasoning: string;
+    evaluator_name: string;
+    model_used: string;
+  };
 }
 
 export interface HumorResponse {

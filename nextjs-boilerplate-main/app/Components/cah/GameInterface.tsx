@@ -1463,18 +1463,18 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                   className={`flex-grow flex items-center justify-center mb-2 ${cardType === 'white' ? 'cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors' : ''}`}
                   onClick={cardType === 'white' ? () => handleWhiteCardRating(generation, 10) : undefined}
                 >
-                  {cardType === 'black' ? (generation.text || 'No text available').toUpperCase() : `"${generation.text || 'No text available'}"`}
+                  {cardType === 'black' ? (generation.text || generation.generation?.text || 'No text available').toUpperCase() : `"${generation.text || generation.generation?.text || 'No text available'}"`}
                 </div>
                 <div className={`absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded-full font-bold shadow-sm ${
                   cardType === 'black' 
                     ? 'bg-white text-black' 
                     : 'bg-gray-200 text-gray-700'
                 }`}>
-                  {(generation.persona_name || 'Unknown Persona').replace(/_/g, ' ')}
+                  {(generation.persona_name || generation.generation?.persona_name || 'Unknown Persona').replace(/_/g, ' ')}
                 </div>
                 <div className="w-full flex flex-col items-center">
                   <div className="flex items-center space-x-1 mb-2">
-                    <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${generation.is_safe ? 'bg-green-600/20 text-green-300' : 'bg-red-600/20 text-red-300'}`}>{generation.is_safe ? '✅ Safe' : '⚠️ Filtered'}</span>
+                    <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${(generation.is_safe ?? generation.generation?.is_safe) ? 'bg-green-600/20 text-green-300' : 'bg-red-600/20 text-red-300'}`}>{(generation.is_safe ?? generation.generation?.is_safe) ? '✅ Safe' : '⚠️ Filtered'}</span>
                     <span className="px-1.5 py-0.5 bg-blue-600/20 text-blue-300 rounded text-xs font-medium">
                       {whiteCardRatings[generation.id || 'unknown'] || 5}/10
                     </span>
@@ -1483,25 +1483,25 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                     <div>
                       <span className="text-gray-400">Humor:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {generation.humor_score?.toFixed(1) || 'N/A'}/10
+                        {(generation.humor_score ?? generation.evaluation?.humor_score)?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-400">Creativity:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {generation.creativity_score?.toFixed(1) || 'N/A'}/10
+                        {(generation.creativity_score ?? generation.evaluation?.creativity_score)?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-400">Appropriate:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {generation.appropriateness_score?.toFixed(1) || 'N/A'}/10
+                        {(generation.appropriateness_score ?? generation.evaluation?.appropriateness_score)?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-400">Context:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {generation.context_relevance_score?.toFixed(1) || 'N/A'}/10
+                        {(generation.context_relevance_score ?? generation.evaluation?.context_relevance_score)?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
                     {/* Add Surprise Index display */}
@@ -1532,7 +1532,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                       </div>
                     </div>
                   )}
-                  <div className="text-xs text-gray-500 mt-1 line-clamp-1">{generation.reasoning || 'No reasoning available'}</div>
+                  <div className="text-xs text-gray-500 mt-1 line-clamp-1">{generation.reasoning || generation.evaluation?.reasoning || 'No reasoning available'}</div>
                 </div>
               </div>
             ))}

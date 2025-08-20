@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import jwt
 import bcrypt
+import uuid
 from typing import Optional
 
 from .auth_models import UserCreate, UserLogin, AuthResponse, UserResponse, ErrorResponse
@@ -72,9 +73,11 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
                 detail="Email already registered"
             )
         
-        # Create new user
+        # Create new user with generated ID
+        user_id = str(uuid.uuid4())
         hashed_password = get_password_hash(user_data.password)
         new_user = User(
+            id=user_id,
             email=user_data.email,
             username=user_data.email.split('@')[0],  # Use email prefix as username
             password_hash=hashed_password,

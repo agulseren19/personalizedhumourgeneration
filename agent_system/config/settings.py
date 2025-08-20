@@ -25,7 +25,7 @@ class Settings:
         self.aws_bedrock_region: str = os.getenv("AWS_BEDROCK_REGION", "us-east-1")
         
         # Database
-        self.database_url: str = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/cah_db")
+        self.database_url: str = os.getenv("DATABASE_URL", "postgresql://localhost:5432/cah_local_db")
         
         # Redis
         self.redis_url: str = os.getenv("REDIS_URL", "redis://localhost:6379")

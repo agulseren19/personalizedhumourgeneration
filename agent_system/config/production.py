@@ -10,7 +10,7 @@ class ProductionConfig:
     """Production configuration settings"""
     
     # Database Configuration
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/cah_db")
+    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://localhost:5432/cah_local_db")
     
     # JWT Configuration
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "change-this-in-production")
@@ -55,7 +55,7 @@ class ProductionConfig:
             return cls.DATABASE_URL
         
         # Fallback to local PostgreSQL
-        return "postgresql://postgres:postgres@localhost:5432/cah_db"
+        return "postgresql://localhost:5432/cah_local_db"
     
     @classmethod
     def validate_config(cls) -> List[str]:
