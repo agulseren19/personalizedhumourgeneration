@@ -208,9 +208,9 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
         
         // Show appropriate message based on what was generated
         if (isAlreadyBlackCard) {
-          toast.success(`Generated ${result.generations.length} white cards for your black card in ${result.generation_time.toFixed(2)}s`);
+          toast.success(`Generated ${result.generations?.length || 0} white cards for your black card in ${result.generation_time?.toFixed(2) || '0.00'}s`);
         } else {
-          toast.success(`Generated ${result.generations.length} responses in ${result.generation_time.toFixed(2)}s`);
+          toast.success(`Generated ${result.generations?.length || 0} responses in ${result.generation_time?.toFixed(2) || '0.00'}s`);
         }
       } else {
         toast.error(result.error || 'Generation failed');
@@ -1330,7 +1330,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       </div>
 
       {/* Recommendations */}
-      {recommendations.length > 0 && (
+      {recommendations && recommendations.length > 0 && (
         <div className="bg-gradient-to-r from-purple-600/20 to-indigo-600/20 rounded-xl p-6 border border-purple-400/30">
           <h3 className="text-lg font-semibold text-white mb-3">
             🎭 Recommended AI Comedians for You
@@ -1368,7 +1368,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
             </div>
           </div>
           
-          {blackCardWhiteCards.length > 0 && (
+          {blackCardWhiteCards && blackCardWhiteCards.length > 0 && (
             <div className="flex flex-row flex-wrap justify-center gap-6 mt-4">
               {blackCardWhiteCards.map((card) => (
                 <div
@@ -1433,7 +1433,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       )}
 
       {/* Results */}
-      {generations.length > 0 && (
+      {generations && generations.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold text-white">
@@ -1444,7 +1444,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
             </div>
           </div>
 
-          {generations.length > 0 && (
+          {generations && generations.length > 0 && (
             <div className="flex items-center justify-center mb-2">
               <span className="text-lg font-bold text-white">Round {round}</span>
             </div>
@@ -1541,7 +1541,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       )}
 
       {/* Empty State */}
-      {!loading && generations.length === 0 && (
+      {!loading && (!generations || generations.length === 0) && (
         <div className="text-center py-12 text-gray-400">
           <Sparkles className="w-16 h-16 mx-auto mb-4 opacity-50" />
           <h3 className="text-xl font-semibold mb-2">Ready to Generate Some Laughs?</h3>
