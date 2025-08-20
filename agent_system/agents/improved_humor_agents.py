@@ -903,7 +903,12 @@ class ImprovedHumorOrchestrator:
             return {
                 'success': False,
                 'error': 'No safe humor generated',
-                'recommended_personas': recommended_personas
+                'recommended_personas': recommended_personas,
+                'results': [],
+                'top_results': [],
+                'num_results': 0,
+                'generation_time': 0.0,
+                'fallback_used': False
             }
         
         # Evaluate each generation
@@ -920,11 +925,29 @@ class ImprovedHumorOrchestrator:
         # Sort by combined score
         evaluated_results.sort(key=lambda x: x['combined_score'], reverse=True)
         
+        # Convert numpy types to Python types for JSON serialization
+        def convert_numpy_types(obj):
+            if hasattr(obj, 'dtype'):  # numpy array or scalar
+                return float(obj) if hasattr(obj, 'item') else obj.tolist()
+            elif isinstance(obj, dict):
+                return {k: convert_numpy_types(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_numpy_types(item) for item in obj]
+            else:
+                return obj
+        
+        # Convert generation_time to ensure it's a regular Python float
+        total_generation_time = sum(float(r['generation'].generation_time) for r in evaluated_results) if evaluated_results else 0.0
+        
         return {
             'success': True,
-            'results': evaluated_results,
-            'best_result': evaluated_results[0] if evaluated_results else None,
-            'recommended_personas': recommended_personas
+            'results': convert_numpy_types(evaluated_results),
+            'best_result': convert_numpy_types(evaluated_results[0]) if evaluated_results else None,
+            'recommended_personas': recommended_personas,
+            'top_results': convert_numpy_types(evaluated_results[:3]) if evaluated_results else [],
+            'num_results': len(evaluated_results) if evaluated_results else 0,
+            'generation_time': total_generation_time,
+            'fallback_used': False
         }
     
     async def _get_persona_recommendations(self, request: HumorRequest) -> List[str]:

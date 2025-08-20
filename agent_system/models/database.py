@@ -11,7 +11,7 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=True)
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)  # For authentication
@@ -47,7 +47,7 @@ class GamePlayer(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     game_id = Column(String, ForeignKey("games.id"))
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(String, ForeignKey("users.id"))
     username = Column(String, nullable=False)
     is_host = Column(Boolean, default=False)
     is_judge = Column(Boolean, default=False)
@@ -67,7 +67,7 @@ class GameRound(Base):
     game_id = Column(String, ForeignKey("games.id"))
     round_number = Column(Integer, default=1)
     black_card = Column(Text, nullable=False)
-    judge_user_id = Column(Integer, ForeignKey("users.id"))
+    judge_user_id = Column(String, ForeignKey("users.id"))
     status = Column(String, default="collecting")  # collecting, judging, completed
     created_at = Column(DateTime, default=func.now())
     completed_at = Column(DateTime, nullable=True)
