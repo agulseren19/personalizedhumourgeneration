@@ -585,7 +585,7 @@ White Card:"""
             
             # Generate ONE black card with timeout protection
             result = await asyncio.wait_for(
-                self._generate_single_black_card_with_crewai(crew, request),
+                self._generate_single_black_card_with_crewai(crew, request, favorite_comedian),
                 timeout=20.0  # 20 second timeout for single generation
             )
             
@@ -684,7 +684,7 @@ White Card:"""
             print("    CrewAI setup failed, falling back to standard generation")
             return None
 
-    async def _generate_single_black_card_with_crewai(self, crew: Any, request: HumorRequest) -> Optional[GenerationResult]:
+    async def _generate_single_black_card_with_crewai(self, crew: Any, request: HumorRequest, comedian_name: str = None) -> Optional[GenerationResult]:
         """Generate ONE black card using simplified CrewAI - FAST VERSION"""
         if not crew or 'black_card_agent' not in crew:
             print("    ❌ Invalid crew for single black card generation")
@@ -737,10 +737,11 @@ Black Card:""",
                 except Exception as e:
                     print(f"⚠️ CrewAI surprise calculation failed: {e}")
                 
-                # Create generation result
+                # Create generation result with dynamic persona name
+                persona_name = comedian_name if comedian_name else "Professional Comedy Writer"
                 generation_result = GenerationResult(
                     text=result.strip(),
-                    persona_name="crewai_black_card_generator",
+                    persona_name=persona_name,
                     model_used="crewai",
                     generation_time=1.0,  # Estimated time
                     toxicity_score=0.3,  # Moderate for black cards

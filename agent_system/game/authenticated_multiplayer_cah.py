@@ -42,7 +42,7 @@ class RoundPhase(Enum):
 
 @dataclass
 class AuthenticatedPlayer:
-    user_id: int  # Now using actual user ID from database
+    user_id: str  # Now using actual user ID from database (UUID)
     email: str
     username: str
     score: int = 0
@@ -63,9 +63,9 @@ class AuthenticatedPlayer:
 class GameRound:
     round_number: int
     black_card: str
-    judge_id: int  # Now using user ID
-    submissions: Dict[int, str]  # user_id -> white_card
-    winner_id: Optional[int] = None
+    judge_id: str  # Now using user ID (UUID)
+    submissions: Dict[str, str]  # user_id -> white_card
+    winner_id: Optional[str] = None
     winning_card: Optional[str] = None
     phase: RoundPhase = RoundPhase.CARD_SUBMISSION
     start_time: datetime = None
@@ -77,7 +77,7 @@ class GameRound:
 @dataclass
 class GameState:
     game_id: str
-    players: Dict[int, AuthenticatedPlayer]  # user_id -> player
+    players: Dict[str, AuthenticatedPlayer]  # user_id -> player (UUID)
     status: GameStatus
     current_round: Optional[GameRound]
     round_history: List[GameRound]
@@ -105,7 +105,7 @@ class AuthenticatedMultiplayerCAHGame:
         self.background_generation_running: Dict[str, bool] = {}
         
         # WebSocket connection management - store connections per game
-        self.active_connections: Dict[str, Dict[int, Any]] = {}  # game_id -> {user_id: websocket}
+        self.active_connections: Dict[str, Dict[str, Any]] = {}  # game_id -> {user_id: websocket}
         
         # Default black cards for quick start
         self.default_black_cards = [
@@ -146,14 +146,14 @@ class AuthenticatedMultiplayerCAHGame:
         ]
     
     # WebSocket connection management methods
-    def add_websocket_connection(self, game_id: str, user_id: int, websocket: Any):
+    def add_websocket_connection(self, game_id: str, user_id: str, websocket: Any):
         """Add a WebSocket connection for a user in a game"""
         if game_id not in self.active_connections:
             self.active_connections[game_id] = {}
         self.active_connections[game_id][user_id] = websocket
         logger.info(f"Added WebSocket connection for user {user_id} in game {game_id}")
     
-    def remove_websocket_connection(self, game_id: str, user_id: int):
+    def remove_websocket_connection(self, game_id: str, user_id: str):
         """Remove a WebSocket connection for a user in a game"""
         if game_id in self.active_connections and user_id in self.active_connections[game_id]:
             del self.active_connections[game_id][user_id]
@@ -164,18 +164,20 @@ class AuthenticatedMultiplayerCAHGame:
                 del self.active_connections[game_id]
                 logger.info(f"Cleaned up empty game connections for {game_id}")
     
-    def get_websocket_connections(self, game_id: str) -> Dict[int, Any]:
+    def get_websocket_connections(self, game_id: str) -> Dict[str, Any]:
         """Get all WebSocket connections for a game"""
         return self.active_connections.get(game_id, {})
     
-    async def broadcast_to_game(self, game_id: str, message: dict, exclude_user: int = None):
+    async def broadcast_to_game(self, game_id: str, message: dict, exclude_user: str = None):
         """Broadcast a message to all connected players in a game"""
         if game_id not in self.active_connections:
             logger.warning(f"No active WebSocket connections for game {game_id}")
+            print(f"🎯 BROADCAST DEBUG: No active connections found for game {game_id}")
             return
         
         connections = self.active_connections[game_id]
         logger.info(f"Broadcasting to {len(connections)} players in game {game_id}")
+        print(f"🎯 BROADCAST DEBUG: Found {len(connections)} connections: {list(connections.keys())}")
         
         # Also try to broadcast via main.py WebSocket connections if available
         try:
@@ -184,13 +186,12 @@ class AuthenticatedMultiplayerCAHGame:
                 from ..api.main import active_websocket_connections
                 if game_id in active_websocket_connections:
                     main_connections = active_websocket_connections[game_id]
-                    logger.info(f"🎯 Found {len(main_connections)} connections in main.py for game {game_id}")
+                    logger.info(f"🎯 BROADCAST DEBUG: Found {len(main_connections)} connections in main.py for game {game_id}")
                     
                     # Broadcast to main.py connections as well
                     for user_id_str, websocket in main_connections.items():
                         try:
-                            user_id_int = int(user_id_str)
-                            if exclude_user and user_id_int == exclude_user:
+                            if exclude_user and user_id_str == exclude_user:
                                 continue
                             await websocket.send_text(json.dumps(message))
                             logger.info(f"✅ Broadcasted via main.py to user {user_id_str}")
@@ -205,12 +206,13 @@ class AuthenticatedMultiplayerCAHGame:
                 continue
             try:
                 await websocket.send_text(json.dumps(message))
+                print(f"🎯 BROADCAST DEBUG: Successfully sent to user {user_id}")
             except Exception as e:
                 logger.error(f"Failed to send message to user {user_id}: {e}")
                 # Remove dead connection
                 self.remove_websocket_connection(game_id, user_id)
     
-    async def create_game(self, db: Session, game_id: str, host_user_id: int, settings: Dict[str, Any] = None) -> GameState:
+    async def create_game(self, db: Session, game_id: str, host_user_id: str, settings: Dict[str, Any] = None) -> GameState:
         """Create a new game with authenticated host"""
         try:
             # Get host user from database using the provided session
@@ -277,7 +279,7 @@ class AuthenticatedMultiplayerCAHGame:
             logger.error(f"Failed to create game: {e}")
             raise
     
-    async def join_game(self, db: Session, game_id: str, user_id: int) -> bool:
+    async def join_game(self, db: Session, game_id: str, user_id: str) -> bool:
         """Join a game with authenticated user"""
         try:
             if game_id not in self.games:
@@ -329,6 +331,10 @@ class AuthenticatedMultiplayerCAHGame:
             
             game.players[user_id] = player
             logger.info(f"User {user.email} joined game {game_id}")
+            
+            # Note: Broadcasting is handled by multiplayer_routes.py after this method returns
+            # This prevents duplicate broadcasting and ensures proper synchronization
+            
             return True
             
         except Exception as e:
@@ -616,7 +622,7 @@ class AuthenticatedMultiplayerCAHGame:
         except Exception as e:
             logger.error(f"Failed to start new round: {e}")
     
-    async def submit_card(self, game_id: str, user_id: int, white_card: str) -> bool:
+    async def submit_card(self, game_id: str, user_id: str, white_card: str) -> bool:
         """Submit a white card for the current round"""
         try:
             if game_id not in self.games:
@@ -886,7 +892,7 @@ class AuthenticatedMultiplayerCAHGame:
             logger.error(f"Failed to judge round: {e}")
             return False
     
-    async def _store_learning_data(self, db: Session, game: GameState, winning_user_id: int, round_data: GameRound):
+    async def _store_learning_data(self, db: Session, game: GameState, winning_user_id: str, round_data: GameRound):
         """Store learning data for the winning player"""
         try:
             # Create user feedback record
@@ -945,13 +951,13 @@ class AuthenticatedMultiplayerCAHGame:
         """Get current game state"""
         return self.games.get(game_id)
     
-    def get_player_info(self, game_id: str, user_id: int) -> Optional[AuthenticatedPlayer]:
+    def get_player_info(self, game_id: str, user_id: str) -> Optional[AuthenticatedPlayer]:
         """Get player information for a specific user"""
         if game_id in self.games:
             return self.games[game_id].players.get(user_id)
         return None
     
-    def leave_game(self, game_id: str, user_id: int) -> bool:
+    def leave_game(self, game_id: str, user_id: str) -> bool:
         """Leave a game"""
         try:
             if game_id in self.games:
@@ -976,7 +982,7 @@ class AuthenticatedMultiplayerCAHGame:
             logger.error(f"Failed to leave game: {e}")
             return False
 
-    def is_user_host(self, game_id: str, user_id: int) -> bool:
+    def is_user_host(self, game_id: str, user_id: str) -> bool:
         """Check if a user is the host of a specific game"""
         try:
             if game_id not in self.games:
@@ -1009,7 +1015,7 @@ class AuthenticatedMultiplayerCAHGame:
             logger.error(f"Failed to get host player: {e}")
             return None
 
-    def can_user_judge(self, game_id: str, user_id: int) -> bool:
+    def can_user_judge(self, game_id: str, user_id: str) -> bool:
         """Check if a user can currently judge the round"""
         try:
             if game_id not in self.games:
@@ -1404,7 +1410,7 @@ class AuthenticatedMultiplayerCAHGame:
             if game.game_id in self.background_generation_running:
                 del self.background_generation_running[game.game_id]
 
-    async def _generate_white_card(self, db: Session, user_id: int) -> str:
+    async def _generate_white_card(self, db: Session, user_id: str) -> str:
         """Generate a single white card using the personalized humor system"""
         try:
             # Create a humor request for card generation with personalized context
@@ -1504,7 +1510,7 @@ class AuthenticatedMultiplayerCAHGame:
         
         return cleaned
 
-    async def replenish_player_hand(self, db: Session, game_id: str, user_id: int, min_cards: int = 5):
+    async def replenish_player_hand(self, db: Session, game_id: str, user_id: str, min_cards: int = 5):
         """Replenish a player's hand when they run low on cards"""
         try:
             if game_id not in self.games:
@@ -1571,7 +1577,7 @@ class AuthenticatedMultiplayerCAHGame:
             logger.error(f"Failed to replenish hand for player {user_id}: {e}")
             return False
 
-    def get_player_hand(self, game_id: str, user_id: int) -> List[str]:
+    def get_player_hand(self, game_id: str, user_id: str) -> List[str]:
         """Get the current hand for a specific player"""
         try:
             if game_id not in self.games:
@@ -1588,7 +1594,7 @@ class AuthenticatedMultiplayerCAHGame:
             logger.error(f"Failed to get hand for player {user_id}: {e}")
             return []
 
-    def get_available_cards_for_player(self, game_id: str, user_id: int) -> List[str]:
+    def get_available_cards_for_player(self, game_id: str, user_id: str) -> List[str]:
         """Get available cards for a player (excluding already submitted ones)"""
         try:
             if game_id not in self.games:
@@ -1648,7 +1654,7 @@ class AuthenticatedMultiplayerCAHGame:
             logger.error(f"Failed to get debug game info: {e}")
             return {"error": str(e)}
 
-    def get_submissions_for_judging(self, game_id: str, user_id: int) -> Optional[Dict[str, Any]]:
+    def get_submissions_for_judging(self, game_id: str, user_id: str) -> Optional[Dict[str, Any]]:
         """Get submissions specifically formatted for judging (only for judges)"""
         try:
             if game_id not in self.games:
@@ -1689,7 +1695,7 @@ class AuthenticatedMultiplayerCAHGame:
             logger.error(f"Failed to get submissions for judging: {e}")
             return None
 
-    def get_submissions_status_for_judge(self, game_id: str, user_id: int) -> Optional[Dict[str, Any]]:
+    def get_submissions_status_for_judge(self, game_id: str, user_id: str) -> Optional[Dict[str, Any]]:
         """Get submissions status for judges during card submission phase"""
         try:
             if game_id not in self.games:
@@ -1742,7 +1748,7 @@ class AuthenticatedMultiplayerCAHGame:
             logger.error(f"Failed to get submissions status for judge: {e}")
             return None
 
-    def get_game_state_for_user(self, game_id: str, user_id: int) -> Optional[Dict[str, Any]]:
+    def get_game_state_for_user(self, game_id: str, user_id: str) -> Optional[Dict[str, Any]]:
         """Get game state formatted for a specific user (hiding other players' hands)"""
         try:
             if game_id not in self.games:

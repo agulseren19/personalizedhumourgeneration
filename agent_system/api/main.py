@@ -615,7 +615,7 @@ try:
                     
                     # Add WebSocket connection to game manager
                     if hasattr(game_manager, 'add_websocket_connection'):
-                        game_manager.add_websocket_connection(game_id, int(user_id), websocket)
+                        game_manager.add_websocket_connection(game_id, user_id, websocket)
                         logger.info(f"✅ Added WebSocket connection to game manager for user {user_id}")
                     else:
                         logger.warning(f"⚠️ Game manager doesn't have add_websocket_connection method")
@@ -701,7 +701,7 @@ try:
                     from .multiplayer_routes import get_game_manager
                     game_manager = get_game_manager(db)
                     if hasattr(game_manager, 'remove_websocket_connection'):
-                        game_manager.remove_websocket_connection(game_id, int(user_id))
+                        game_manager.remove_websocket_connection(game_id, user_id)
                         logger.info(f"🧹 Cleaned up WebSocket connection from game manager for user {user_id}")
                 finally:
                     db.close()
@@ -847,9 +847,9 @@ try:
         for game_id, connections in active_websocket_connections.items():
             for user_id, websocket in connections.items():
                 try:
-                    # Add to game manager with integer user_id
+                    # Add to game manager with string user_id
                     if hasattr(game_manager, 'add_websocket_connection'):
-                        game_manager.add_websocket_connection(game_id, int(user_id), websocket)
+                        game_manager.add_websocket_connection(game_id, user_id, websocket)
                         logger.info(f"✅ Synced WebSocket connection for user {user_id} in game {game_id}")
                 except Exception as e:
                     logger.error(f"❌ Failed to sync WebSocket connection for user {user_id}: {e}")

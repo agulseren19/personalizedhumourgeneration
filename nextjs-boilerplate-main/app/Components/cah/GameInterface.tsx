@@ -575,6 +575,14 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
           // Refresh game state when cards are submitted
           refreshGameState();
           toast.success(message.message || 'Game state updated');
+        } else if (message.type === 'game_state_refreshed') {
+          // Handle game state refresh messages (sent when players join/leave)
+          if (message.game_state) {
+            setGameState(message.game_state);
+            toast.success(message.message || 'Game state refreshed');
+          } else {
+            refreshGameState();
+          }
         } else if (message.type === 'phase_changed') {
           // Refresh game state when phase changes
           refreshGameState();

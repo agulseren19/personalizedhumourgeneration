@@ -1498,7 +1498,7 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str, user_id: str):
             db = next(get_db())
             game_manager = get_game_manager(db)
             if hasattr(game_manager, 'add_websocket_connection'):
-                game_manager.add_websocket_connection(game_id, int(user_id), websocket)
+                game_manager.add_websocket_connection(game_id, user_id, websocket)
                 print(f"🔍 DEBUG: Stored connection in authenticated game manager for game {game_id}, user {user_id}")
             else:
                 print(f"⚠️ WARNING: Game manager doesn't have add_websocket_connection method")
