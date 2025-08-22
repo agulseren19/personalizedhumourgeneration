@@ -401,7 +401,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       const token = localStorage.getItem('cah_token');
       
       const result = await cahApi.createGame({
-        max_score: 5,
+        max_score: 5,  // Game ends after 5 rounds
         max_players: 6,
         round_timer: 300
       });

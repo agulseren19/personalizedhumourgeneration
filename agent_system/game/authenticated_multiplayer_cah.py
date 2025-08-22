@@ -13,6 +13,7 @@ from datetime import datetime
 from dataclasses import dataclass, asdict
 from enum import Enum
 from sqlalchemy.orm import Session
+import inspect
 
 # Import database models and authentication
 try:
@@ -36,6 +37,7 @@ class GameStatus(Enum):
     FINISHED = "finished"
 
 class RoundPhase(Enum):
+    WAITING = "waiting"
     CARD_SUBMISSION = "card_submission"
     JUDGING = "judging"
     RESULTS = "results"
@@ -76,6 +78,7 @@ class GameRound:
 
 @dataclass
 class GameState:
+    """Game state for multiplayer CAH"""
     game_id: str
     players: Dict[str, AuthenticatedPlayer]  # user_id -> player (UUID)
     status: GameStatus
@@ -83,7 +86,7 @@ class GameState:
     round_history: List[GameRound]
     settings: Dict[str, Any]
     created_at: datetime
-    max_score: int = 5
+    max_score: int = 5  # Game ends after 5 rounds
     max_players: int = 6
     prepared_white_cards: List[str] = None
     prepared_black_cards: List[str] = None
@@ -292,7 +295,7 @@ class AuthenticatedMultiplayerCAHGame:
             if user_id in game.players:
                 return True  # Already in game
             
-            if len(game.players) >= game.max_players:
+            if len(game.players) >= getattr(game, 'max_players', 6):
                 return False
             
             # Get user from database using the provided session
@@ -344,23 +347,34 @@ class AuthenticatedMultiplayerCAHGame:
     async def start_game(self, db: Session, game_id: str) -> bool:
         """Start the game and begin first round"""
         try:
+            logger.info(f"🎯 start_game CALLED for game {game_id}")
+            
             if game_id not in self.games:
+                logger.error(f"Game {game_id} not found in start_game")
                 return False
             
             game = self.games[game_id]
             if game.status != GameStatus.WAITING or len(game.players) < 2:
+                logger.error(f"Game {game_id} cannot start: status={game.status.value}, players={len(game.players)}")
                 return False
             
+            logger.info(f"🎯 Starting game {game_id} with {len(game.players)} players")
             game.status = GameStatus.STARTING
             
             # Prepare cards for all players based on their preferences
+            logger.info(f"🎯 About to call _prepare_cards_for_game for game {game_id}")
             await self._prepare_cards_for_game(db, game)
+            logger.info(f"🎯 _prepare_cards_for_game completed for game {game_id}")
             
             # Deal initial hands to all players
+            logger.info(f"🎯 About to call _deal_initial_hands for game {game_id}")
             await self._deal_initial_hands(game)
+            logger.info(f"🎯 _deal_initial_hands completed for game {game_id}")
             
             # Start first round
+            logger.info(f"🎯 About to call _start_new_round for game {game_id}")
             await self._start_new_round(game)
+            logger.info(f"🎯 _start_new_round completed for game {game_id}")
             
             game.status = GameStatus.IN_PROGRESS
             logger.info(f"Game {game_id} started with {len(game.players)} players")
@@ -371,59 +385,38 @@ class AuthenticatedMultiplayerCAHGame:
             return False
     
     async def _deal_initial_hands(self, game: GameState):
-        """Deal initial white cards to all players - prioritize fallback cards for immediate game start"""
+        """Deal initial white cards to all players - use personalized cards if available, otherwise fallback"""
         try:
-            cards_per_player = game.settings.get("cards_per_player", 7)
+            cards_per_player = 3  # Reduced from 7 to 3 to match the new system
             logger.info(f"🎯 Dealing {cards_per_player} cards per player. Total prepared cards: {len(game.prepared_white_cards)}")
             
-            # Always start with fallback cards to ensure game can start immediately
-            fallback_cards = [
-                "My crippling anxiety", "Student loan debt", "The void that stares back",
-                "Emotional baggage", "My terrible life choices", "Existential dread",
-                "Millennial burnout", "A disappointing birthday party", "The crushing weight of responsibility",
-                "My collection of participation trophies", "The awkward silence", "Unexpected emotional baggage",
-                "A disappointing revelation", "My secret shame", "Questionable life choices",
-                "The printer's existential crisis", "Accidentally sending 'love you' to the entire company",
-                "The coffee machine's passive-aggressive messages", "My child's elaborate excuses for bedtime",
-                "The toy that only works when I'm not looking", "My kid's negotiation skills are better than mine",
-                "Accidentally speedrunning my morning routine", "Lag in real life", "Achievement unlocked: Adulting",
-                "My browser history", "What I found in my browser history", "My secret guilty pleasure",
-                "The worst part about adult life", "My most embarrassing moment", "The real reason I can't sleep at night",
-                "My questionable decisions", "The thing I regret most", "My biggest fear", "What keeps me up at night",
-                "My greatest weakness", "What I brought to the potluck", "My secret talent", "The thing I'm most ashamed of",
-                "My biggest mistake", "What I learned the hard way", "My most embarrassing purchase",
-                "The thing I can't live without", "My biggest pet peeve", "What I'm most afraid of",
-                "My greatest achievement", "The thing I'm most proud of", "My biggest regret",
-                "What I wish I knew earlier", "My most embarrassing moment", "The thing I can't stop thinking about"
-            ]
+            # Check if we have personalized cards generated
+            has_personalized_cards = hasattr(game, 'player_personalized_cards') and game.player_personalized_cards
             
-            # Shuffle fallback cards
-            random.shuffle(fallback_cards)
-            
-            for player in game.players.values():
-                player.hand = []
-                logger.info(f"🎯 Dealing fallback cards to player {player.user_id} ({player.username})")
-                
-                # Give each player fallback cards to ensure game can start
-                for i in range(cards_per_player):
-                    if i < len(fallback_cards):
-                        card = fallback_cards[i]
-                        cleaned_card = self._validate_and_clean_card(card)
-                        if cleaned_card:
-                            player.hand.append(cleaned_card)
-                            logger.debug(f"✅ Dealt fallback card {i+1}: {cleaned_card}")
-                        else:
-                            # Use emergency fallback if validation fails
-                            emergency_card = "Something unexpectedly funny"
-                            player.hand.append(emergency_card)
-                            logger.debug(f"🔄 Used emergency fallback card {i+1}: {emergency_card}")
+            if has_personalized_cards:
+                logger.info(f"🎯 Using personalized cards for initial hands")
+                # Use personalized cards for initial hands
+                for player_id, player in game.players.items():
+                    if player_id in game.player_personalized_cards:
+                        personalized_cards = game.player_personalized_cards[player_id]
+                        cards_to_deal = min(cards_per_player, len(personalized_cards))
+                        
+                        player.hand = []
+                        for i in range(cards_to_deal):
+                            if personalized_cards:
+                                card = personalized_cards.pop(0)  # Take from the top
+                                player.hand.append(card)
+                                logger.info(f"✅ Dealt personalized card {i+1} to {player.username}: {card}")
+                        
+                        logger.info(f"✅ Dealt {len(player.hand)} personalized cards to {player.username}")
                     else:
-                        # If we run out of fallback cards, use emergency cards
-                        emergency_card = "Something unexpectedly funny"
-                        player.hand.append(emergency_card)
-                        logger.debug(f"🔄 Used emergency fallback card {i+1}: {emergency_card}")
-                
-                logger.info(f"✅ Dealt {len(player.hand)} fallback cards to player {player.user_id} ({player.username})")
+                        logger.warning(f"⚠️ No personalized cards found for {player.username}, using fallback")
+                        self._give_fallback_cards(player, cards_per_player)
+            else:
+                logger.info(f"🎯 No personalized cards available, using fallback cards for initial hands")
+                # Use fallback cards if no personalized cards available
+                for player in game.players.values():
+                    self._give_fallback_cards(player, cards_per_player)
                 
         except Exception as e:
             logger.error(f"❌ Failed to deal initial hands: {e}")
@@ -431,97 +424,326 @@ class AuthenticatedMultiplayerCAHGame:
             for player in game.players.values():
                 if len(player.hand) == 0:
                     logger.warning(f"🚨 Player {player.user_id} has no cards, giving emergency fallback")
-                    emergency_cards = [
-                        "Something unexpectedly funny", "A terrible mistake", "My hidden talent",
-                        "An awkward situation", "The wrong answer", "My questionable decisions",
-                        "The awkward silence", "Unexpected emotional baggage", "A disappointing revelation"
-                    ]
-                    player.hand = emergency_cards[:7]  # Give 7 emergency cards
-                    logger.info(f"🚨 Emergency fallback: gave {len(player.hand)} emergency cards to player {player.user_id}")
+                    self._give_emergency_cards(player, 3)
+    
+    def _give_fallback_cards(self, player: AuthenticatedPlayer, num_cards: int):
+        """Give fallback cards to a player"""
+        fallback_cards = [
+            "My crippling anxiety", "Student loan debt", "The void that stares back",
+            "Emotional baggage", "My terrible life choices", "Existential dread",
+            "Millennial burnout", "A disappointing birthday party", "The crushing weight of responsibility",
+            "My collection of participation trophies", "The awkward silence", "Unexpected emotional baggage",
+            "A disappointing revelation", "My secret shame", "Questionable life choices",
+            "The printer's existential crisis", "Accidentally sending 'love you' to the entire company",
+            "The coffee machine's passive-aggressive messages", "My child's elaborate excuses for bedtime",
+            "The toy that only works when I'm not looking", "My kid's negotiation skills are better than mine",
+            "Accidentally speedrunning my morning routine", "Lag in real life", "Achievement unlocked: Adulting",
+            "My browser history", "What I found in my browser history", "My secret guilty pleasure",
+            "The worst part about adult life", "My most embarrassing moment", "The real reason I can't sleep at night",
+            "My questionable decisions", "The thing I regret most", "My biggest fear", "What keeps me up at night",
+            "My greatest weakness", "What I brought to the potluck", "My secret talent", "The thing I'm most ashamed of",
+            "My biggest mistake", "What I learned the hard way", "My most embarrassing purchase",
+            "The thing I can't live without", "My biggest pet peeve", "What I'm most afraid of",
+            "My greatest achievement", "The thing I'm most proud of", "My biggest regret",
+            "What I wish I knew earlier", "My most embarrassing moment", "The thing I can't stop thinking about"
+        ]
+        
+        # Shuffle fallback cards
+        random.shuffle(fallback_cards)
+        
+        player.hand = []
+        for i in range(num_cards):
+            if i < len(fallback_cards):
+                card = fallback_cards[i]
+                cleaned_card = self._validate_and_clean_card(card)
+                if cleaned_card:
+                    player.hand.append(cleaned_card)
+                    logger.debug(f"✅ Dealt fallback card {i+1}: {cleaned_card}")
+                else:
+                    # Use emergency fallback if validation fails
+                    emergency_card = "Something unexpectedly funny"
+                    player.hand.append(emergency_card)
+                    logger.debug(f"🔄 Used emergency fallback card {i+1}: {emergency_card}")
+            else:
+                # If we run out of fallback cards, use emergency cards
+                emergency_card = "Something unexpectedly funny"
+                player.hand.append(emergency_card)
+                logger.debug(f"🔄 Used emergency fallback card {i+1}: {emergency_card}")
+        
+        logger.info(f"✅ Dealt {len(player.hand)} fallback cards to player {player.user_id} ({player.username})")
+    
+    def _give_emergency_cards(self, player: AuthenticatedPlayer, num_cards: int):
+        """Give emergency fallback cards to a player"""
+        emergency_cards = [
+            "Something unexpectedly funny", "A terrible mistake", "My hidden talent",
+            "An awkward situation", "The wrong answer", "My questionable decisions",
+            "The awkward silence", "Unexpected emotional baggage", "A disappointing revelation"
+        ]
+        player.hand = emergency_cards[:num_cards]
+        logger.info(f"🚨 Emergency fallback: gave {len(player.hand)} emergency cards to player {player.user_id}")
     
     async def _deal_card_to_player(self, game: GameState, player: AuthenticatedPlayer):
-        """Deal a new white card to a player"""
+        """Deal 3 personalized white cards to a player from pre-generated cards"""
         try:
-            if game.prepared_white_cards:
-                new_card = game.prepared_white_cards.pop(0)
-                # Validate and clean the card before dealing
-                new_card = self._validate_and_clean_card(new_card)
-                logger.info(f"Dealt prepared card to {player.username}: {new_card}")
-            else:
-                # Only generate new cards if we don't have prepared ones
-                new_card = await self._generate_white_card(None, player.user_id)
-                if new_card:
-                    new_card = self._validate_and_clean_card(new_card)
-                    logger.info(f"Generated and dealt new card to {player.username}: {new_card}")
-                else:
-                    # Fallback to default cards
-                    default_cards = self._get_default_white_cards()
-                    if default_cards:
-                        new_card = random.choice(default_cards)
-                        new_card = self._validate_and_clean_card(new_card)
-                        logger.info(f"Dealt fallback card to {player.username}: {new_card}")
+            logger.info(f"🎯 _deal_card_to_player CALLED for player {player.username} in game {game.game_id}")
+            logger.info(f"🎯 _deal_card_to_player CALLED from: {self._get_calling_function()}")
             
-            if new_card:
-                player.hand.append(new_card)
-                logger.info(f"Player {player.username} now has {len(player.hand)} cards")
+            # Find the player_id key for this player
+            player_id = None
+            for pid, p in game.players.items():
+                if p.user_id == player.user_id:
+                    player_id = pid
+                    break
+            
+            logger.info(f"🎯 Found player_id: {player_id} for player {player.username}")
+            
+            # Check if we have pre-generated personalized cards for this player
+            if player_id and hasattr(game, 'player_personalized_cards') and player_id in game.player_personalized_cards:
+                personalized_cards = game.player_personalized_cards[player_id]
+                logger.info(f"🎯 Found {len(personalized_cards)} pre-generated cards for player {player.username}")
+                
+                # Deal up to 3 cards from the personalized deck (don't force exactly 3)
+                cards_dealt = 0
+                cards_to_deal = min(3, len(personalized_cards))
+                
+                for i in range(cards_to_deal):
+                    if personalized_cards and len(personalized_cards) > 0:
+                        card = personalized_cards.pop(0)  # Take from the top
+                        if card not in player.hand:
+                            player.hand.append(card)
+                            cards_dealt += 1
+                            logger.info(f"✅ Dealt personalized card {cards_dealt} for {player.username}: {card}")
+                
+                logger.info(f"✅ Dealt {cards_dealt} personalized cards to {player.username} from {cards_to_deal} available")
+                
+                # Only add fallback cards if we have NO personalized cards at all AND player has less than 3 cards
+                if cards_dealt == 0 and len(player.hand) < 3:
+                    logger.warning(f"⚠️ No personalized cards available for {player.username}, using minimal fallback")
+                    self._give_fallback_cards(player, 3 - len(player.hand))
+                
             else:
-                logger.warning(f"Failed to deal card to {player.username}")
+                # Fallback to default cards if no personalized cards available
+                logger.warning(f"No personalized cards found for {player.username}, using fallback cards")
+                logger.warning(f"player_id: {player_id}, hasattr: {hasattr(game, 'player_personalized_cards')}")
+                if hasattr(game, 'player_personalized_cards'):
+                    logger.warning(f"Available player IDs: {list(game.player_personalized_cards.keys())}")
+                
+                # Only add fallback cards if player has less than 3 cards
+                if len(player.hand) < 3:
+                    self._give_fallback_cards(player, 3 - len(player.hand))
+                logger.info(f"Added fallback cards to {player.username}")
                 
         except Exception as e:
-            logger.error(f"Error dealing card to {player.username}: {e}")
-            # Add a default card as fallback
-            fallback_card = "A disappointing birthday party"
-            player.hand.append(fallback_card)
-            logger.info(f"Added fallback card to {player.username}: {fallback_card}")
+            logger.error(f"Error dealing cards for {player.username}: {e}")
+            # Ultimate fallback - only add cards if player has less than 3
+            if len(player.hand) < 3:
+                self._give_emergency_cards(player, 3 - len(player.hand))
+            logger.info(f"Added emergency fallback cards to {player.username}")
+    
+    def _get_calling_function(self):
+        """Get the name of the function that called this method"""
+        try:
+            frame = inspect.currentframe()
+            caller_frame = frame.f_back
+            if caller_frame:
+                return caller_frame.f_code.co_name
+            return "unknown"
+        except:
+            return "unknown"
     
     async def _prepare_cards_for_game(self, db: Session, game: GameState):
-        """Prepare white and black cards based on player preferences - prioritize game start over AI generation"""
+        """Prepare initial 2 rounds of cards quickly, then generate remaining cards in background"""
         try:
+            logger.info(f"🎯 _prepare_cards_for_game CALLED for game {game.game_id} with {len(game.players)} players")
+            
             # Prepare black cards
             game.prepared_black_cards = self.default_black_cards.copy()
             random.shuffle(game.prepared_black_cards)
             
-            # Start with fallback cards to ensure game can start immediately
-            game.prepared_white_cards = []
-            fallback_cards = [
-                "My crippling anxiety", "Student loan debt", "The void that stares back",
-                "Emotional baggage", "My terrible life choices", "Existential dread",
-                "Millennial burnout", "A disappointing birthday party", "The crushing weight of responsibility",
-                "My collection of participation trophies", "The awkward silence", "Unexpected emotional baggage",
-                "A disappointing revelation", "My secret shame", "Questionable life choices",
-                "The printer's existential crisis", "Accidentally sending 'love you' to the entire company",
-                "The coffee machine's passive-aggressive messages", "My child's elaborate excuses for bedtime",
-                "The toy that only works when I'm not looking", "My kid's negotiation skills are better than mine",
-                "Accidentally speedrunning my morning routine", "Lag in real life", "Achievement unlocked: Adulting",
-                "My browser history", "What I found in my browser history", "My secret guilty pleasure",
-                "The worst part about adult life", "My most embarrassing moment", "The real reason I can't sleep at night",
-                "My questionable decisions", "The thing I regret most", "My biggest fear", "What keeps me up at night",
-                "My greatest weakness", "What I brought to the potluck", "My secret talent", "The thing I'm most ashamed of",
-                "My biggest mistake", "What I learned the hard way", "My most embarrassing purchase",
-                "The thing I can't live without", "My biggest pet peeve", "What I'm most afraid of",
-                "My greatest achievement", "The thing I'm most proud of", "My biggest regret",
-                "What I wish I knew earlier", "My most embarrassing moment", "The thing I can't stop thinking about"
-            ]
+            # Generate initial 2 rounds worth of cards (6 cards per player)
+            # Since generate_and_evaluate_humor returns 3 cards per call, we call it 2 times to get 6 cards
+            logger.info(f"🎯 Generating initial 2 rounds of cards for {len(game.players)} players...")
             
-            # Add fallback cards to prepared cards
-            for card in fallback_cards:
-                cleaned_card = self._validate_and_clean_card(card)
-                if cleaned_card:
-                    game.prepared_white_cards.append(cleaned_card)
+            for player_id, player in game.players.items():
+                try:
+                    logger.info(f"🎯 Generating 6 cards for player {player.username} (ID: {player_id}) - calling generateand_evaluate_humor 2 times")
+                    
+                    # TEST: First test the AI generation to see what's happening
+                    logger.info(f"🧪 Testing AI generation for {player.username}")
+                    test_result = await self.test_ai_generation(db, player)
+                    logger.info(f"🧪 Test result: {test_result}")
+                    
+                    # Generate only 6 cards initially (2 calls × 3 cards = 6 cards)
+                    initial_cards = await self._generate_personalized_cards_for_player(player, 2)  # 2 calls, not 6
+                    
+                    # Store personalized cards for this player
+                    if not hasattr(game, 'player_personalized_cards'):
+                        game.player_personalized_cards = {}
+                    
+                    game.player_personalized_cards[player_id] = initial_cards
+                    logger.info(f"✅ Generated {len(initial_cards)} initial cards for {player.username}")
+                    logger.info(f"✅ Cards content: {initial_cards}")
+                    
+                except Exception as e:
+                    logger.error(f"❌ Failed to generate initial cards for {player.username}: {e}")
+                    # Fallback to default cards for this player
+                    fallback_cards = self._get_default_white_cards()[:6]
+                    if not hasattr(game, 'player_personalized_cards'):
+                        game.player_personalized_cards = {}
+                    game.player_personalized_cards[player_id] = fallback_cards
             
+            # Also prepare some general fallback cards
+            game.prepared_white_cards = self._get_default_white_cards().copy()
             random.shuffle(game.prepared_white_cards)
-            logger.info(f"✅ Prepared {len(game.prepared_white_cards)} fallback white cards for immediate game start")
-
-            # Start background task to generate AI cards (non-blocking)
-            asyncio.create_task(self._generate_ai_cards_in_background(db, game))
-            logger.info(f"🚀 Started background task to generate AI white cards for game {game.game_id}")
+            
+            logger.info(f"🎯 Initial 2 rounds of cards ready! Starting background generation...")
+            logger.info(f"🎯 Total personalized cards generated: {sum(len(cards) for cards in game.player_personalized_cards.values())}")
+            
+            # Start background task to generate remaining cards (non-blocking)
+            asyncio.create_task(self._generate_remaining_cards_in_background(db, game))
             
         except Exception as e:
-            logger.error(f"❌ Failed to prepare cards: {e}")
-            # Critical fallback to ensure game can still start
-            game.prepared_white_cards = []
+            logger.error(f"❌ Failed to prepare initial cards: {e}")
+            # Critical fallback - use default cards for everyone
+            game.prepared_white_cards = self._get_default_white_cards().copy()
             game.prepared_black_cards = self.default_black_cards.copy()
-            logger.info(f"🔄 Critical fallback: prepared {len(game.prepared_white_cards)} white cards (AI generation failed)")
+            logger.info(f"🔄 Critical fallback: using default cards for all players")
+    
+    async def _generate_remaining_cards_in_background(self, db: Session, game: GameState):
+        """Generate remaining 3 rounds worth of cards in background while game is running"""
+        try:
+            logger.info(f"🔄 Background task: generating remaining 3 rounds of cards...")
+            
+            for player_id, player in game.players.items():
+                try:
+                    # Generate 9 more cards (3 rounds × 3 cards = 3 generation calls)
+                    additional_cards = await self._generate_personalized_cards_for_player(player, 3)  # 3 calls = 9 cards
+                    
+                    # Add to existing cards
+                    if hasattr(game, 'player_personalized_cards') and player_id in game.player_personalized_cards:
+                        game.player_personalized_cards[player_id].extend(additional_cards)
+                        logger.info(f"✅ Added {len(additional_cards)} background cards for {player.username}")
+                    else:
+                        logger.warning(f"⚠️ No existing cards found for {player.username} in background task")
+                        
+                except Exception as e:
+                    logger.error(f"❌ Background generation failed for {player.username}: {e}")
+            
+            logger.info(f"🎯 Background card generation completed! All 5 rounds ready.")
+            
+        except Exception as e:
+            logger.error(f"❌ Background card generation failed: {e}")
+    
+    async def _generate_personalized_cards_for_player(self, player: AuthenticatedPlayer, num_calls: int) -> List[str]:
+        """Generate personalized cards for a specific player - num_calls is number of times to call generate_and_evaluate_humor"""
+        try:
+            logger.info(f"🎯 _generate_personalized_cards_for_player CALLED for {player.username} - making {num_calls} generation calls (each returns 3 cards)")
+            personalized_cards = []
+            
+            for i in range(num_calls):
+                try:
+                    logger.info(f"🎯 Making generation call {i+1}/{num_calls} for {player.username}")
+                    
+                    # Create humor request for personalized card generation
+                    request = HumorRequest(
+                        context="Generate a short, funny phrase for Cards Against Humanity white card. Make it edgy and humorous, suitable for adult audiences.",
+                        audience="adults",
+                        topic="general",
+                        user_id=str(player.user_id),
+                        humor_type="edgy",
+                        card_type="white"
+                    )
+                    
+                    # Generate personalized cards using CrewAI - this returns 3 cards (one per persona)
+                    generated_cards = await self.humor_orchestrator.generate_and_evaluate_humor(request)
+                    
+                    logger.info(f"🎯 AI Generation returned: {generated_cards}")
+                    logger.info(f"🎯 AI Generation type: {type(generated_cards)}")
+                    logger.info(f"🎯 AI Generation length: {len(generated_cards) if isinstance(generated_cards, list) else 'N/A'}")
+                    
+                    # Handle both list and dictionary response formats
+                    if generated_cards and isinstance(generated_cards, list) and len(generated_cards) > 0:
+                        logger.info(f"🎯 Processing {len(generated_cards)} AI-generated cards (list format)")
+                        
+                        # Add ALL generated cards from this call (typically 3 cards)
+                        for j, card_result in enumerate(generated_cards):
+                            logger.info(f"🎯 Processing card result {j+1}: {card_result}")
+                            logger.info(f"🎯 Card result type: {type(card_result)}")
+                            logger.info(f"🎯 Card result has text attr: {hasattr(card_result, 'text')}")
+                            
+                            card_text = card_result.text if hasattr(card_result, 'text') else str(card_result)
+                            logger.info(f"🎯 Extracted card text: '{card_text}'")
+                            
+                            cleaned_card = self._validate_and_clean_card(card_text)
+                            logger.info(f"🎯 After cleaning: '{cleaned_card}'")
+                            
+                            if cleaned_card and cleaned_card not in personalized_cards:
+                                personalized_cards.append(cleaned_card)
+                                logger.info(f"✅ Generated card {len(personalized_cards)} for {player.username}: {cleaned_card}")
+                            else:
+                                if not cleaned_card:
+                                    logger.warning(f"⚠️ Card was cleaned to empty/None: '{card_text}' -> '{cleaned_card}'")
+                                else:
+                                    logger.warning(f"⚠️ Card already exists (duplicate): '{cleaned_card}'")
+                        
+                        logger.info(f"✅ Generation call {i+1} returned {len(generated_cards)} cards for {player.username}")
+                        logger.info(f"✅ Total cards so far: {len(personalized_cards)}")
+                        
+                    elif generated_cards and isinstance(generated_cards, dict) and generated_cards.get('success') and generated_cards.get('results'):
+                        logger.info(f"🎯 Processing {len(generated_cards['results'])} AI-generated cards (dict format)")
+                        
+                        # Handle dictionary response format
+                        for j, result in enumerate(generated_cards['results']):
+                            logger.info(f"🎯 Processing result {j+1}: {result}")
+                            
+                            if 'generation' in result and hasattr(result['generation'], 'text'):
+                                card_text = result['generation'].text
+                                logger.info(f"🎯 Extracted card text: '{card_text}'")
+                                
+                                cleaned_card = self._validate_and_clean_card(card_text)
+                                logger.info(f"🎯 After cleaning: '{cleaned_card}'")
+                                
+                                if cleaned_card and cleaned_card not in personalized_cards:
+                                    personalized_cards.append(cleaned_card)
+                                    logger.info(f"✅ Generated card {len(personalized_cards)} for {player.username}: {cleaned_card}")
+                                else:
+                                    if not cleaned_card:
+                                        logger.warning(f"⚠️ Card was cleaned to empty/None: '{card_text}' -> '{cleaned_card}'")
+                                    else:
+                                        logger.warning(f"⚠️ Card already exists (duplicate): '{cleaned_card}'")
+                            else:
+                                logger.warning(f"⚠️ Result {j+1} missing 'generation' or 'text' attribute: {result}")
+                        
+                        logger.info(f"✅ Generation call {i+1} returned {len(generated_cards['results'])} cards for {player.username}")
+                        logger.info(f"✅ Total cards so far: {len(personalized_cards)}")
+                        
+                    else:
+                        logger.warning(f"⚠️ AI generation failed or returned empty for call {i+1}")
+                        logger.warning(f"⚠️ Generated cards: {generated_cards}")
+                        # Fallback - add 3 simple personalized cards for this call
+                        for j in range(3):
+                            fallback_card = f"{player.username}'s secret talent #{len(personalized_cards)+1}"
+                            if fallback_card not in personalized_cards:
+                                personalized_cards.append(fallback_card)
+                                logger.info(f"🔄 Used fallback card {len(personalized_cards)} for {player.username}: {fallback_card}")
+                            
+                except Exception as e:
+                    logger.error(f"Error in generation call {i+1} for {player.username}: {e}")
+                    # Simple fallback - add 3 cards for this failed call
+                    for j in range(3):
+                        fallback_card = f"{player.username}'s hidden power #{len(personalized_cards)+1}"
+                        if fallback_card not in personalized_cards:
+                            personalized_cards.append(fallback_card)
+                            logger.info(f"🔄 Used error fallback card {len(personalized_cards)} for {player.username}: {fallback_card}")
+            
+            logger.info(f"🎯 Generated {len(personalized_cards)} total cards for {player.username} from {num_calls} generation calls")
+            logger.info(f"🎯 Final cards: {personalized_cards}")
+            return personalized_cards
+            
+        except Exception as e:
+            logger.error(f"Error generating personalized cards for {player.username}: {e}")
+            # Ultimate fallback - return default cards
+            return self._get_default_white_cards()
     
     def _get_best_persona_for_player(self, db: Session, player: AuthenticatedPlayer) -> str:
         """Get the best persona for a player based on their preferences"""
@@ -603,19 +825,9 @@ class AuthenticatedMultiplayerCAHGame:
             # Deal cards to players
             for player in game.players.values():
                 if player.user_id != judge_id:
-                    # Ensure player has enough cards for the round
-                    if len(player.hand) < 5:
-                        # Replenish hand to at least 5 cards
-                        await self.replenish_player_hand(None, game.game_id, player.user_id, 5)
-                    
-                    # Give player 5 white cards for this round
-                    if len(player.hand) >= 5:
-                        player.hand = random.sample(player.hand, 5)
-                        logger.info(f"🎯 Player {player.user_id} ({player.username}) got 5 cards: {len(player.hand)}")
-                    else:
-                        # If still not enough cards, use what's available
-                        player.hand = player.hand.copy()
-                        logger.info(f"🎯 Player {player.user_id} ({player.username}) got {len(player.hand)} cards (not enough for 5)")
+                    # Deal 3 new personalized cards to each player for this round
+                    await self._deal_card_to_player(game, player)
+                    logger.info(f"🎯 Player {player.user_id} ({player.username}) got {len(player.hand)} cards for round {round_number}")
             
             logger.info(f"Round {round_number} started in game {game.game_id}")
             
@@ -1305,53 +1517,58 @@ class AuthenticatedMultiplayerCAHGame:
     async def _generate_ai_cards_in_background(self, db: Session, game: GameState):
         """Generate AI white cards in the background for better gameplay (non-blocking)"""
         try:
-            if game.game_id in self.background_generation_running:
-                logger.info(f"Background generation already running for game {game.game_id}")
-                return
+            # DISABLED: This method is causing timeouts and conflicts with our optimized system
+            logger.info(f"🚫 Background AI card generation DISABLED for game {game.game_id} - using optimized system instead")
+            return
             
-            self.background_generation_running[game.game_id] = True
-            logger.info(f"🚀 Starting background AI card generation for game {game.game_id}")
+            # OLD CODE - DISABLED
+            # if game.game_id in self.background_generation_running:
+            #     logger.info(f"Background generation already running for game {game.game_id}")
+            #     return
             
-            # Generate personalized cards for each player
-            for player in game.players.values():
-                try:
-                    # Generate personalized white cards using player's preferences
-                    request = HumorRequest(
-                        context="Generate a short, funny phrase for Cards Against Humanity white card. Make it edgy and humorous, suitable for adult audiences.",
-                        audience="adults",
-                        topic="general",
-                        user_id=str(player.user_id),
-                        humor_type="edgy",
-                        card_type="white"
-                    )
+            # self.background_generation_running[game.game_id] = True
+            # logger.info(f"🚀 Starting background AI card generation for game {game.game_id}")
+            
+            # # Generate personalized cards for each player
+            # for player in game.players.values():
+            #     try:
+            #         # Generate personalized white cards using player's preferences
+            #         request = HumorRequest(
+            #             context="Generate a short, funny phrase for Cards Against Humanity white card. Make it edgy and humorous, suitable for adult audiences.",
+            #             audience="adults",
+            #             topic="general",
+            #             user_id=str(player.user_id),
+            #             humor_type="edgy",
+            #             card_type="white"
+            #         )
                     
-                    # Generate cards using player's preferences
-                    generated_cards = await self.humor_orchestrator.generate_and_evaluate_humor(request)
-                    if generated_cards and generated_cards.get('success') and generated_cards.get('results'):
-                        # Add generated cards to prepared white cards
-                        for result in generated_cards['results']:
-                            if result.get('generation') and result['generation'].text:
-                                cleaned_card = self._validate_and_clean_card(result['generation'].text)
-                                if cleaned_card and cleaned_card not in game.prepared_white_cards:
-                                    game.prepared_white_cards.append(cleaned_card)
-                        logger.info(f"✅ Generated {len(generated_cards['results'])} personalized cards for player {player.user_id}")
-                    else:
-                        logger.warning(f"⚠️ No generated cards received for player {player.user_id}: {generated_cards}")
-                        
-                    # Small delay to avoid overwhelming the system
-                    await asyncio.sleep(0.5)
+            #         # Generate cards using player's preferences
+            #         generated_cards = await self.humor_orchestrator.generate_and_evaluate_humor(request)
+            #         if generated_cards and generated_cards.get('success') and generated_cards.get('results'):
+            #             # Add generated cards to prepared white cards
+            #             for result in generated_cards['results']:
+            #                 if result.get('generation') and result['generation'].text:
+            #                     cleaned_card = self._validate_and_clean_card(result['generation'].text)
+            #                     if cleaned_card and cleaned_card not in game.prepared_white_cards:
+            #                         game.prepared_white_cards.append(cleaned_card)
+            #             logger.info(f"✅ Generated {len(generated_cards['results'])} personalized cards for player {player.user_id}")
+            #         else:
+            #             logger.warning(f"⚠️ No generated cards received for player {player.user_id}: {generated_cards}")
+                            
+            #         # Small delay to avoid overwhelming the system
+            #         await asyncio.sleep(0.5)
                     
-                except Exception as gen_error:
-                    logger.error(f"❌ Failed to generate cards for player {player.user_id}: {gen_error}")
-                    # Continue with other players
+            #     except Exception as gen_error:
+            #         logger.error(f"❌ Failed to generate cards for player {player.user_id}: {gen_error}")
+            #         # Continue with other players
             
-            # Shuffle all cards together
-            random.shuffle(game.prepared_white_cards)
-            logger.info(f"🎯 Total prepared white cards after background generation: {len(game.prepared_white_cards)}")
+            # # Shuffle all cards together
+            # random.shuffle(game.prepared_white_cards)
+            # logger.info(f"🎯 Total prepared white cards after background generation: {len(game.prepared_white_cards)}")
             
-            # Start additional background task to generate more cards
-            asyncio.create_task(self._generate_additional_white_cards(db, game))
-            logger.info(f"🚀 Started additional background task for game {game.game_id}")
+            # # Start additional background task to generate more cards
+            # asyncio.create_task(self._generate_additional_white_cards(db, game))
+            # logger.info(f"🚀 Started additional background task for game {game.game_id}")
             
         except Exception as e:
             logger.error(f"❌ Background AI card generation failed for game {game.game_id}: {e}")
@@ -1362,47 +1579,52 @@ class AuthenticatedMultiplayerCAHGame:
     async def _generate_additional_white_cards(self, db: Session, game: GameState):
         """Generate additional white cards in the background for better gameplay"""
         try:
-            if game.game_id in self.background_generation_running:
-                logger.info(f"Additional background generation already running for game {game.game_id}")
-                return
+            # DISABLED: This method is causing timeouts and conflicts with our optimized system
+            logger.info(f"🚫 Additional white card generation DISABLED for game {game.game_id} - using optimized system instead")
+            return
             
-            self.background_generation_running[game.game_id] = True
+            # OLD CODE - DISABLED
+            # if game.game_id in self.background_generation_running:
+            #     logger.info(f"Additional background generation already running for game {game.game_id}")
+            #     return
             
-            # Generate additional cards for each player
-            for player in game.players.values():
-                try:
-                    # Generate 3 more personalized cards
-                    request = HumorRequest(
-                        context="Cards Against Humanity game - generate additional short, funny phrases for white cards",
-                        audience="friends",
-                        topic="general",
-                        user_id=str(player.user_id),
-                        humor_type="edgy",
-                        card_type="white"
-                    )
+            # self.background_generation_running[game.game_id] = True
+            
+            # # Generate additional cards for each player
+            # for player in game.players.values():
+            #     try:
+            #         # Generate 3 more personalized cards
+            #         request = HumorRequest(
+            #             context="Cards Against Humanity game - generate additional short, funny phrases for white cards",
+            #             audience="friends",
+            #             topic="general",
+            #             user_id=str(player.user_id),
+            #             humor_type="edgy",
+            #             card_type="white"
+            #         )
                     
-                    generated_cards = await self.humor_orchestrator.generate_and_evaluate_humor(request)
-                    if generated_cards and generated_cards.get('success') and generated_cards.get('results'):
-                        # Add new cards to player's hand
-                        new_cards = []
-                        for result in generated_cards['results']:
-                            if result.get('generation') and result['generation'].text:
-                                new_cards.append(result['generation'].text)
+            #         generated_cards = await self.humor_orchestrator.generate_and_evaluate_humor(request)
+            #         if generated_cards and generated_cards.get('success') and generated_cards.get('results'):
+            #             # Add new cards to player's hand
+            #             new_cards = []
+            #             for result in generated_cards['results']:
+            #                 if result.get('generation') and result['generation'].text:
+            #                     new_cards.append(result['generation'].text)
                         
-                        player.hand.extend(new_cards)
-                        logger.info(f"Generated {len(new_cards)} additional cards for player {player.user_id}")
-                        
-                        # Shuffle the hand
-                        random.shuffle(player.hand)
-                        
-                        # Keep hand size manageable (max 20 cards)
-                        if len(player.hand) > 20:
-                            player.hand = random.sample(player.hand, 20)
+            #             player.hand.extend(new_cards)
+            #             logger.info(f"Generated {len(new_cards)} additional cards for player {player.user_id}")
                             
-                except Exception as player_error:
-                    logger.error(f"Failed to generate additional cards for player {player.user_id}: {player_error}")
+            #             # Shuffle the hand
+            #             random.shuffle(player.hand)
+                            
+            #             # Keep hand size manageable (max 20 cards)
+            #             if len(player.hand) > 20:
+            #                 player.hand = random.sample(player.hand, 20)
+                                
+            #     except Exception as player_error:
+            #         logger.error(f"Failed to generate additional cards for player {player.user_id}: {player_error}")
             
-            logger.info(f"Background card generation completed for game {game.game_id}")
+            # logger.info(f"Background card generation completed for game {game.game_id}")
             
         except Exception as e:
             logger.error(f"Background card generation failed for game {game.game_id}: {e}")
@@ -1413,41 +1635,46 @@ class AuthenticatedMultiplayerCAHGame:
     async def _generate_white_card(self, db: Session, user_id: str) -> str:
         """Generate a single white card using the personalized humor system"""
         try:
-            # Create a humor request for card generation with personalized context
-            request = HumorRequest(
-                context="Generate a short, funny phrase for Cards Against Humanity white card. Make it edgy and humorous, suitable for adult audiences.",
-                audience="adults",
-                topic="general",
-                user_id=str(user_id),
-                humor_type="edgy",
-                card_type="white"
-            )
+            # DISABLED: This method is causing conflicts with our optimized system
+            logger.info(f"🚫 Single white card generation DISABLED for user {user_id} - using optimized system instead")
+            return "Something unexpectedly funny"  # Return fallback card
             
-            # Generate using humor orchestrator with personalized personas
-            result = await self.humor_orchestrator.generate_and_evaluate_humor(request)
+            # OLD CODE - DISABLED
+            # # Create a humor request for card generation with personalized context
+            # request = HumorRequest(
+            #     context="Generate a short, funny phrase for Cards Against Humanity white card. Make it edgy and humorous, suitable for adult audiences.",
+            #     audience="adults",
+            #     topic="general",
+            #     user_id=str(user_id),
+            #     humor_type="edgy",
+            #     card_type="white"
+            # )
             
-            if result and result.get('success') and result.get('results') and result['results']:
-                generated_card = result['results'][0]['generation'].text
+            # # Generate using humor orchestrator with personalized personas
+            # result = await self.humor_orchestrator.generate_and_evaluate_humor(request)
+            
+            # if result and result.get('success') and result.get('results') and result['results']:
+            #     generated_card = result['results'][0]['generation'].text
                 
-                # Clean the generated card
-                generated_card = self._clean_generated_card(generated_card)
+            #     # Clean the generated card
+            #     generated_card = self._clean_generated_card(generated_card)
                 
-                # Ensure it's appropriate length for a white card
-                if len(generated_card) > 100:
-                    generated_card = generated_card[:97] + "..."
+            #     # Ensure it's appropriate length for a white card
+            #     if len(generated_card) > 100:
+            #         generated_card = generated_card[:97] + "..."
                 
-                logger.info(f"Generated personalized white card for user {user_id}: {generated_card}")
-                return generated_card
-            else:
-                # Fallback to sample cards
-                fallback_cards = [
-                    "My questionable life choices",
-                    "The awkward silence",
-                    "Unexpected emotional baggage",
-                    "A disappointing revelation",
-                    "My secret shame"
-                ]
-                return random.choice(fallback_cards)
+            #     logger.info(f"Generated personalized white card for user {user_id}: {generated_card}")
+            #     return generated_card
+            # else:
+            #     # Fallback to sample cards
+            #     fallback_cards = [
+            #         "My questionable life choices",
+            #         "The awkward silence",
+            #         "Unexpected emotional baggage",
+            #         "A disappointing revelation",
+            #         "My secret shame"
+            #     ]
+            #     return random.choice(fallback_cards)
                 
         except Exception as e:
             logger.warning(f"Error generating white card for user {user_id}: {e}")
@@ -1511,7 +1738,7 @@ class AuthenticatedMultiplayerCAHGame:
         return cleaned
 
     async def replenish_player_hand(self, db: Session, game_id: str, user_id: str, min_cards: int = 5):
-        """Replenish a player's hand when they run low on cards"""
+        """Replenish a player's hand when they run low on cards using pre-generated personalized cards"""
         try:
             if game_id not in self.games:
                 return False
@@ -1526,51 +1753,37 @@ class AuthenticatedMultiplayerCAHGame:
             if len(player.hand) >= min_cards:
                 return True
             
-            # Generate new cards to reach minimum
-            cards_needed = min_cards - len(player.hand)
-            logger.info(f"Player {user_id} needs {cards_needed} more cards")
-            
-            try:
-                # Generate personalized cards
-                request = HumorRequest(
-                    context="Cards Against Humanity game - generate short, funny phrases for white cards",
-                    audience="friends",
-                    topic="general",
-                    user_id=str(user_id),
-                    humor_type="edgy",
-                    card_type="white"
-                )
+            # Check if we have pre-generated personalized cards for this player
+            if hasattr(game, 'player_personalized_cards') and user_id in game.player_personalized_cards:
+                personalized_cards = game.player_personalized_cards[user_id]
+                cards_needed = min_cards - len(player.hand)
                 
-                generated_cards = await self.humor_orchestrator.generate_and_evaluate_humor(request)
-                if generated_cards and generated_cards.get('success') and generated_cards.get('results'):
-                    # Add new cards to player's hand
-                    new_cards = []
-                    for result in generated_cards['results'][:cards_needed]:
-                        if result.get('generation') and result['generation'].text:
-                            new_cards.append(result['generation'].text)
-                    
-                    cleaned_cards = [self._validate_and_clean_card(card) for card in new_cards]
-                    player.hand.extend(cleaned_cards)
-                    logger.info(f"Replenished {len(cleaned_cards)} cards for player {user_id}")
-                    
-                    # Shuffle the hand
-                    random.shuffle(player.hand)
-                    
-                    return True
-                else:
-                    # Fallback to default cards
-                    default_cards = self._get_default_white_cards()[:cards_needed]
-                    player.hand.extend(default_cards)
-                    random.shuffle(player.hand)
-                    logger.info(f"Replenished {len(default_cards)} default cards for player {user_id}")
-                    return True
-                    
-            except Exception as gen_error:
-                logger.error(f"Failed to generate cards for player {user_id}: {gen_error}")
-                # Fallback to default cards
+                # Add cards from personalized deck
+                cards_added = 0
+                while cards_added < cards_needed and personalized_cards:
+                    card = personalized_cards.pop(0)  # Take from the top
+                    if card not in player.hand:
+                        player.hand.append(card)
+                        cards_added += 1
+                
+                logger.info(f"Replenished {cards_added} personalized cards for player {user_id}")
+                
+                # If we still need more cards, add fallback cards
+                while len(player.hand) < min_cards:
+                    fallback_card = f"{player.username}'s hidden talent #{len(player.hand) + 1}"
+                    if fallback_card not in player.hand:
+                        player.hand.append(fallback_card)
+                
+                random.shuffle(player.hand)
+                return True
+                
+            else:
+                # Fallback to default cards if no personalized cards available
+                cards_needed = min_cards - len(player.hand)
                 default_cards = self._get_default_white_cards()[:cards_needed]
                 player.hand.extend(default_cards)
                 random.shuffle(player.hand)
+                logger.info(f"Replenished {len(default_cards)} default cards for player {user_id}")
                 return True
                 
         except Exception as e:
@@ -1797,7 +2010,7 @@ class AuthenticatedMultiplayerCAHGame:
                 "game_id": game.game_id,
                 "status": game.status.value,
                 "max_score": game.max_score,
-                "max_players": game.max_players,
+                "max_players": getattr(game, 'max_players', 6),
                 "created_at": game.created_at.isoformat() if game.created_at else None,
                 "players": [],
                 "current_round": None,
@@ -1974,4 +2187,42 @@ class AuthenticatedMultiplayerCAHGame:
             
         except Exception as e:
             logger.error(f"Failed to get game state for user {user_id}: {e}")
+            return None
+
+    async def test_ai_generation(self, db: Session, player: AuthenticatedPlayer):
+        """Test method to debug AI card generation"""
+        try:
+            logger.info(f"🧪 TESTING AI Generation for {player.username}")
+            
+            # Test single generation call
+            request = HumorRequest(
+                context="Generate a short, funny phrase for Cards Against Humanity white card. Make it edgy and humorous, suitable for adult audiences.",
+                audience="adults",
+                topic="general",
+                user_id=str(player.user_id),
+                humor_type="edgy",
+                card_type="white"
+            )
+            
+            logger.info(f"🧪 Sending request: {request}")
+            generated_cards = await self.humor_orchestrator.generate_and_evaluate_humor(request)
+            
+            logger.info(f"🧪 Raw response: {generated_cards}")
+            logger.info(f"🧪 Response type: {type(generated_cards)}")
+            logger.info(f"🧪 Response length: {len(generated_cards) if isinstance(generated_cards, list) else 'N/A'}")
+            
+            if generated_cards and isinstance(generated_cards, list):
+                for i, card_result in enumerate(generated_cards):
+                    logger.info(f"🧪 Card {i+1}: {card_result}")
+                    logger.info(f"🧪 Card {i+1} type: {type(card_result)}")
+                    logger.info(f"🧪 Card {i+1} has text: {hasattr(card_result, 'text')}")
+                    if hasattr(card_result, 'text'):
+                        logger.info(f"🧪 Card {i+1} text: '{card_result.text}'")
+                        cleaned = self._validate_and_clean_card(card_result.text)
+                        logger.info(f"🧪 Card {i+1} cleaned: '{cleaned}'")
+            
+            return generated_cards
+            
+        except Exception as e:
+            logger.error(f"🧪 AI Generation test failed: {e}")
             return None
