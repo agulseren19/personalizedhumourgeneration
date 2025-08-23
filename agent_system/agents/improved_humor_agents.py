@@ -1107,7 +1107,8 @@ class ImprovedHumorEvaluator:
             surprise_index * 0.1  # Include surprise in overall score
         )
         
-        reasoning = f"Humor: {humor_score:.1f}, Creativity: {creativity_score:.1f}, Appropriateness: {appropriateness_score:.1f}, Relevance: {context_relevance_score:.1f}, Surprise: {surprise_index:.1f}"
+        # Provide brief reasoning without duplicating score information
+        reasoning = f"Overall quality: {overall_score:.1f}/10 "
         
         return EvaluationResult(
             humor_score=humor_score,

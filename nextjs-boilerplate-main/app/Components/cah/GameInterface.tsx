@@ -1101,15 +1101,38 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                       <div>
                         <h4 className="text-white font-medium mb-2">Your Cards:</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {gameState.my_hand?.map((card, index) => (
-                            <button
-                              key={index}
-                              onClick={() => submitCard(card)}
-                              className="p-3 rounded-lg transition-all text-left bg-white text-black hover:bg-gray-100"
-                            >
-                              {card}
-                            </button>
-                          ))}
+                          {gameState.my_hand?.map((card, index) => {
+                            // Get persona info if available
+                            const personaInfo = gameState.my_hand_with_personas?.[index];
+                            const personaName = personaInfo?.persona_name || "Generated Persona";
+                            const personaType = personaInfo?.persona_type || "general";
+                            const isSafe = personaInfo?.is_safe !== false;
+                            
+                            return (
+                              <button
+                                key={index}
+                                onClick={() => submitCard(card)}
+                                className="p-3 rounded-lg transition-all text-left bg-white text-black hover:bg-gray-100 relative"
+                              >
+                                <div className="text-sm text-gray-600 mb-1 flex items-center justify-between">
+                                  <span className="font-medium">{personaName}</span>
+                                  <span className={`text-xs px-2 py-1 rounded ${
+                                    personaType === 'favorite' ? 'bg-blue-100 text-blue-800' :
+                                    personaType === 'exploration' ? 'bg-green-100 text-green-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {personaType}
+                                  </span>
+                                </div>
+                                <div className="text-black font-medium">{card}</div>
+                                {!isSafe && (
+                                  <div className="absolute top-1 right-1 text-xs bg-red-100 text-red-800 px-1 rounded">
+                                    ⚠️
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     )}

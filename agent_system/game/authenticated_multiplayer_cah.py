@@ -77,6 +77,15 @@ class GameRound:
             self.start_time = datetime.now()
 
 @dataclass
+class PersonalizedCard:
+    """A personalized card with persona information"""
+    text: str
+    persona_name: str
+    persona_type: str  # "favorite", "exploration", etc.
+    generated_for_round: int
+    is_safe: bool = True  # Safety flag from detoxify
+
+@dataclass
 class GameState:
     """Game state for multiplayer CAH"""
     game_id: str
@@ -90,12 +99,16 @@ class GameState:
     max_players: int = 6
     prepared_white_cards: List[str] = None
     prepared_black_cards: List[str] = None
+    # Round-specific card storage
+    current_round_cards: Dict[str, List[PersonalizedCard]] = None  # player_id -> [PersonalizedCard]
     
     def __post_init__(self):
         if self.prepared_white_cards is None:
             self.prepared_white_cards = []
         if self.prepared_black_cards is None:
             self.prepared_black_cards = []
+        if self.current_round_cards is None:
+            self.current_round_cards = {}
 
 class AuthenticatedMultiplayerCAHGame:
     """Multiplayer Cards Against Humanity game manager with authentication"""
@@ -471,7 +484,7 @@ class AuthenticatedMultiplayerCAHGame:
                 logger.debug(f"🔄 Used emergency fallback card {i+1}: {emergency_card}")
         
         logger.info(f"✅ Dealt {len(player.hand)} fallback cards to player {player.user_id} ({player.username})")
-    
+        
     def _give_emergency_cards(self, player: AuthenticatedPlayer, num_cards: int):
         """Give emergency fallback cards to a player"""
         emergency_cards = [
@@ -552,7 +565,7 @@ class AuthenticatedMultiplayerCAHGame:
             return "unknown"
     
     async def _prepare_cards_for_game(self, db: Session, game: GameState):
-        """Prepare initial 2 rounds of cards quickly, then generate remaining cards in background"""
+        """Prepare initial game setup - cards will be generated round-by-round"""
         try:
             logger.info(f"🎯 _prepare_cards_for_game CALLED for game {game.game_id} with {len(game.players)} players")
             
@@ -560,47 +573,12 @@ class AuthenticatedMultiplayerCAHGame:
             game.prepared_black_cards = self.default_black_cards.copy()
             random.shuffle(game.prepared_black_cards)
             
-            # Generate initial 2 rounds worth of cards (6 cards per player)
-            # Since generate_and_evaluate_humor returns 3 cards per call, we call it 2 times to get 6 cards
-            logger.info(f"🎯 Generating initial 2 rounds of cards for {len(game.players)} players...")
-            
-            for player_id, player in game.players.items():
-                try:
-                    logger.info(f"🎯 Generating 6 cards for player {player.username} (ID: {player_id}) - calling generateand_evaluate_humor 2 times")
-                    
-                    # TEST: First test the AI generation to see what's happening
-                    logger.info(f"🧪 Testing AI generation for {player.username}")
-                    test_result = await self.test_ai_generation(db, player)
-                    logger.info(f"🧪 Test result: {test_result}")
-                    
-                    # Generate only 6 cards initially (2 calls × 3 cards = 6 cards)
-                    initial_cards = await self._generate_personalized_cards_for_player(player, 2)  # 2 calls, not 6
-                    
-                    # Store personalized cards for this player
-                    if not hasattr(game, 'player_personalized_cards'):
-                        game.player_personalized_cards = {}
-                    
-                    game.player_personalized_cards[player_id] = initial_cards
-                    logger.info(f"✅ Generated {len(initial_cards)} initial cards for {player.username}")
-                    logger.info(f"✅ Cards content: {initial_cards}")
-                    
-                except Exception as e:
-                    logger.error(f"❌ Failed to generate initial cards for {player.username}: {e}")
-                    # Fallback to default cards for this player
-                    fallback_cards = self._get_default_white_cards()[:6]
-                    if not hasattr(game, 'player_personalized_cards'):
-                        game.player_personalized_cards = {}
-                    game.player_personalized_cards[player_id] = fallback_cards
-            
             # Also prepare some general fallback cards
             game.prepared_white_cards = self._get_default_white_cards().copy()
             random.shuffle(game.prepared_white_cards)
-            
-            logger.info(f"🎯 Initial 2 rounds of cards ready! Starting background generation...")
-            logger.info(f"🎯 Total personalized cards generated: {sum(len(cards) for cards in game.player_personalized_cards.values())}")
-            
-            # Start background task to generate remaining cards (non-blocking)
-            asyncio.create_task(self._generate_remaining_cards_in_background(db, game))
+
+            logger.info(f"🎯 Game setup complete! Cards will be generated round-by-round for context.")
+            logger.info(f"🎯 Total black cards prepared: {len(game.prepared_black_cards)}")
             
         except Exception as e:
             logger.error(f"❌ Failed to prepare initial cards: {e}")
@@ -634,19 +612,20 @@ class AuthenticatedMultiplayerCAHGame:
         except Exception as e:
             logger.error(f"❌ Background card generation failed: {e}")
     
-    async def _generate_personalized_cards_for_player(self, player: AuthenticatedPlayer, num_calls: int) -> List[str]:
-        """Generate personalized cards for a specific player - num_calls is number of times to call generate_and_evaluate_humor"""
+    async def _generate_personalized_cards_for_player(self, player: AuthenticatedPlayer, num_calls: int, black_card: str = None, round_number: int = None) -> List[PersonalizedCard]:
+        """Generate personalized cards for a specific player - now returns PersonalizedCard objects with safety info"""
         try:
-            logger.info(f"🎯 _generate_personalized_cards_for_player CALLED for {player.username} - making {num_calls} generation calls (each returns 3 cards)")
+            context = f"Generate a funny white card response to this black card: '{black_card}'" if black_card else "Generate a short, funny phrase for Cards Against Humanity white card"
+            logger.info(f"🎯 Generating {num_calls * 3} cards for {player.username} for round {round_number} with context: {black_card}")
             personalized_cards = []
             
             for i in range(num_calls):
                 try:
                     logger.info(f"🎯 Making generation call {i+1}/{num_calls} for {player.username}")
                     
-                    # Create humor request for personalized card generation
+                    # Create humor request with black card context
                     request = HumorRequest(
-                        context="Generate a short, funny phrase for Cards Against Humanity white card. Make it edgy and humorous, suitable for adult audiences.",
+                        context=f"{context}. Make it edgy and humorous, suitable for adult audiences.",
                         audience="adults",
                         topic="general",
                         user_id=str(player.user_id),
@@ -658,8 +637,6 @@ class AuthenticatedMultiplayerCAHGame:
                     generated_cards = await self.humor_orchestrator.generate_and_evaluate_humor(request)
                     
                     logger.info(f"🎯 AI Generation returned: {generated_cards}")
-                    logger.info(f"🎯 AI Generation type: {type(generated_cards)}")
-                    logger.info(f"🎯 AI Generation length: {len(generated_cards) if isinstance(generated_cards, list) else 'N/A'}")
                     
                     # Handle both list and dictionary response formats
                     if generated_cards and isinstance(generated_cards, list) and len(generated_cards) > 0:
@@ -668,18 +645,36 @@ class AuthenticatedMultiplayerCAHGame:
                         # Add ALL generated cards from this call (typically 3 cards)
                         for j, card_result in enumerate(generated_cards):
                             logger.info(f"🎯 Processing card result {j+1}: {card_result}")
-                            logger.info(f"🎯 Card result type: {type(card_result)}")
-                            logger.info(f"🎯 Card result has text attr: {hasattr(card_result, 'text')}")
                             
                             card_text = card_result.text if hasattr(card_result, 'text') else str(card_result)
                             logger.info(f"🎯 Extracted card text: '{card_text}'")
                             
-                            cleaned_card = self._validate_and_clean_card(card_text)
-                            logger.info(f"🎯 After cleaning: '{cleaned_card}'")
+                            # Get persona name and safety info
+                            persona_name = "Unknown Persona"
+                            is_safe = True
                             
-                            if cleaned_card and cleaned_card not in personalized_cards:
-                                personalized_cards.append(cleaned_card)
-                                logger.info(f"✅ Generated card {len(personalized_cards)} for {player.username}: {cleaned_card}")
+                            if hasattr(card_result, 'persona_name'):
+                                persona_name = card_result.persona_name
+                            if hasattr(card_result, 'is_safe'):
+                                is_safe = card_result.is_safe
+                            if hasattr(card_result, 'toxicity_score'):
+                                # Consider card safe if toxicity score is low
+                                is_safe = getattr(card_result, 'toxicity_score', 0.1) < 0.5
+                            
+                            cleaned_card = self._validate_and_clean_card(card_text)
+                            logger.info(f"🎯 After cleaning: '{cleaned_card}' (safe: {is_safe})")
+                            
+                            if cleaned_card and cleaned_card not in [card.text for card in personalized_cards]:
+                                # Create PersonalizedCard with safety info
+                                personalized_card = PersonalizedCard(
+                                    text=cleaned_card,
+                                    persona_name=persona_name,
+                                    persona_type="favorite" if j < 2 else "exploration",
+                                    generated_for_round=round_number or 1,
+                                    is_safe=is_safe
+                                )
+                                personalized_cards.append(personalized_card)
+                                logger.info(f"✅ Generated card {len(personalized_cards)} for {player.username}: {cleaned_card} (by {persona_name}, safe: {is_safe})")
                             else:
                                 if not cleaned_card:
                                     logger.warning(f"⚠️ Card was cleaned to empty/None: '{card_text}' -> '{cleaned_card}'")
@@ -703,8 +698,16 @@ class AuthenticatedMultiplayerCAHGame:
                                 cleaned_card = self._validate_and_clean_card(card_text)
                                 logger.info(f"🎯 After cleaning: '{cleaned_card}'")
                                 
-                                if cleaned_card and cleaned_card not in personalized_cards:
-                                    personalized_cards.append(cleaned_card)
+                                if cleaned_card and cleaned_card not in [card.text for card in personalized_cards]:
+                                    # Create PersonalizedCard with safety info
+                                    personalized_card = PersonalizedCard(
+                                        text=cleaned_card,
+                                        persona_name="Generated Persona",
+                                        persona_type="favorite" if j < 2 else "exploration",
+                                        generated_for_round=round_number or 1,
+                                        is_safe=True  # Assume safe for dict format
+                                    )
+                                    personalized_cards.append(personalized_card)
                                     logger.info(f"✅ Generated card {len(personalized_cards)} for {player.username}: {cleaned_card}")
                                 else:
                                     if not cleaned_card:
@@ -722,28 +725,50 @@ class AuthenticatedMultiplayerCAHGame:
                         logger.warning(f"⚠️ Generated cards: {generated_cards}")
                         # Fallback - add 3 simple personalized cards for this call
                         for j in range(3):
-                            fallback_card = f"{player.username}'s secret talent #{len(personalized_cards)+1}"
-                            if fallback_card not in personalized_cards:
+                            fallback_card = PersonalizedCard(
+                                text=f"{player.username}'s secret talent #{len(personalized_cards)+1}",
+                                persona_name="Fallback Persona",
+                                persona_type="fallback",
+                                generated_for_round=round_number or 1,
+                                is_safe=True
+                            )
+                            if fallback_card.text not in [card.text for card in personalized_cards]:
                                 personalized_cards.append(fallback_card)
-                                logger.info(f"🔄 Used fallback card {len(personalized_cards)} for {player.username}: {fallback_card}")
+                                logger.info(f"🔄 Used fallback card {len(personalized_cards)} for {player.username}: {fallback_card.text}")
                             
                 except Exception as e:
                     logger.error(f"Error in generation call {i+1} for {player.username}: {e}")
                     # Simple fallback - add 3 cards for this failed call
                     for j in range(3):
-                        fallback_card = f"{player.username}'s hidden power #{len(personalized_cards)+1}"
-                        if fallback_card not in personalized_cards:
+                        fallback_card = PersonalizedCard(
+                            text=f"{player.username}'s hidden power #{len(personalized_cards)+1}",
+                            persona_name="Emergency Persona",
+                            persona_type="fallback",
+                            generated_for_round=round_number or 1,
+                            is_safe=True
+                        )
+                        if fallback_card.text not in [card.text for card in personalized_cards]:
                             personalized_cards.append(fallback_card)
-                            logger.info(f"🔄 Used error fallback card {len(personalized_cards)} for {player.username}: {fallback_card}")
+                            logger.info(f"🔄 Used error fallback card {len(personalized_cards)} for {player.username}: {fallback_card.text}")
             
             logger.info(f"🎯 Generated {len(personalized_cards)} total cards for {player.username} from {num_calls} generation calls")
-            logger.info(f"🎯 Final cards: {personalized_cards}")
+            logger.info(f"🎯 Final cards: {[card.text for card in personalized_cards]}")
             return personalized_cards
             
         except Exception as e:
             logger.error(f"Error generating personalized cards for {player.username}: {e}")
-            # Ultimate fallback - return default cards
-            return self._get_default_white_cards()
+            # Ultimate fallback - return fallback PersonalizedCards
+            fallback_cards = []
+            for i in range(3):
+                fallback_card = PersonalizedCard(
+                    text=f"{player.username}'s backup plan #{i+1}",
+                    persona_name="Emergency Persona",
+                    persona_type="fallback",
+                    generated_for_round=round_number or 1,
+                    is_safe=True
+                )
+                fallback_cards.append(fallback_card)
+            return fallback_cards
     
     def _get_best_persona_for_player(self, db: Session, player: AuthenticatedPlayer) -> str:
         """Get the best persona for a player based on their preferences"""
@@ -780,7 +805,7 @@ class AuthenticatedMultiplayerCAHGame:
         ]
     
     async def _start_new_round(self, game: GameState):
-        """Start a new round in the game"""
+        """Start a new round in the game with round-specific card generation"""
         try:
             # Select judge (rotate through players)
             round_number = len(game.round_history) + 1
@@ -819,15 +844,36 @@ class AuthenticatedMultiplayerCAHGame:
             for player in game.players.values():
                 player.is_judge = (player.user_id == judge_id)
                 player.submitted_card = None  # Reset submission status
-                logger.info(f"🎯 Player {player.user_id} ({player.username}): is_judge={player.is_judge}, judge_id={judge_id}, types: player.user_id={type(player.user_id)}, judge_id={type(judge_id)}")
-                logger.info(f"🎯 Player {player.user_id} is_judge: {player.is_judge}")
+                logger.info(f"🎯 Player {player.user_id} ({player.username}): is_judge={player.is_judge}, judge_id={judge_id}")
             
-            # Deal cards to players
+            # Generate round-specific cards for each player (excluding judge)
+            logger.info(f"🎯 Generating round-specific cards for round {round_number} with black card: '{black_card}'")
+            
             for player in game.players.values():
                 if player.user_id != judge_id:
-                    # Deal 3 new personalized cards to each player for this round
-                    await self._deal_card_to_player(game, player)
-                    logger.info(f"🎯 Player {player.user_id} ({player.username}) got {len(player.hand)} cards for round {round_number}")
+                    try:
+                        # Generate 3 personalized cards for this specific round and black card
+                        personalized_cards = await self._generate_personalized_cards_for_player(
+                            player, 1, black_card, round_number  # 1 call = 3 cards, with black card context
+                        )
+                        
+                        # Store round-specific cards
+                        game.current_round_cards[player.user_id] = personalized_cards
+                        logger.info(f"🎯 Generated {len(personalized_cards)} round-specific cards for {player.username}")
+                        
+                        # Deal cards to player's hand
+                        player.hand = [card.text for card in personalized_cards if card.is_safe]  # Only safe cards
+                        logger.info(f"🎯 Player {player.user_id} ({player.username}) got {len(player.hand)} safe cards for round {round_number}")
+                        
+                    except Exception as e:
+                        logger.error(f"❌ Failed to generate round-specific cards for {player.username}: {e}")
+                        # Fallback: give 3 simple cards
+                        player.hand = [
+                            f"{player.username}'s creative response #1",
+                            f"{player.username}'s creative response #2", 
+                            f"{player.username}'s creative response #3"
+                        ]
+                        logger.info(f"🔄 Used fallback cards for {player.username}")
             
             logger.info(f"Round {round_number} started in game {game.game_id}")
             
@@ -2028,6 +2074,40 @@ class AuthenticatedMultiplayerCAHGame:
             if current_player:
                 game_dict["my_hand"] = current_player.hand.copy()
                 
+                # Add persona information for current user's cards
+                game_dict["my_hand_with_personas"] = []
+                if user_id in game.current_round_cards:
+                    round_cards = game.current_round_cards[user_id]
+                    for card_text in current_player.hand:
+                        # Find matching PersonalizedCard
+                        card_with_persona = {
+                            "text": card_text,
+                            "persona_name": "Unknown Persona",
+                            "persona_type": "unknown",
+                            "is_safe": True
+                        }
+                        
+                        for personalized_card in round_cards:
+                            if personalized_card.text == card_text:
+                                card_with_persona = {
+                                    "text": card_text,
+                                    "persona_name": personalized_card.persona_name,
+                                    "persona_type": personalized_card.persona_type,
+                                    "is_safe": personalized_card.is_safe
+                                }
+                                break
+                        
+                        game_dict["my_hand_with_personas"].append(card_with_persona)
+                else:
+                    # Fallback: just card text without persona info
+                    for card_text in current_player.hand:
+                        game_dict["my_hand_with_personas"].append({
+                            "text": card_text,
+                            "persona_name": "Generated Persona",
+                            "persona_type": "general",
+                            "is_safe": True
+                        })
+                
                 # Determine if it's the current user's turn
                 if game.current_round:
                     if game.current_round.phase.value == "card_submission":
@@ -2044,6 +2124,7 @@ class AuthenticatedMultiplayerCAHGame:
                 
                 logger.info(f"🎯 Player {user_id} ({current_player.username}): is_judge={current_player.is_judge}, is_my_turn={game_dict['is_my_turn']}")
                 logger.info(f"🎯 Round phase: {game.current_round.phase.value if game.current_round else 'None'}")
+                logger.info(f"🎯 Hand with personas: {len(game_dict['my_hand_with_personas'])} cards")
             
             # Add players (hide hands for other players)
             logger.info(f"🎯 PLAYERS DEBUG: game.players type: {type(game.players)}, content: {game.players}")

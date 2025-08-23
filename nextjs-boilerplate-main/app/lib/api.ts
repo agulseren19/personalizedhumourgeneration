@@ -160,6 +160,12 @@ export interface GameState {
   status: 'waiting' | 'starting' | 'in_progress' | 'judging' | 'finished';
   players: Player[];
   my_hand?: string[];
+  my_hand_with_personas?: Array<{
+    text: string;
+    persona_name: string;
+    persona_type: string;
+    is_safe: boolean;
+  }>;
   is_my_turn?: boolean;
   current_round?: GameRound;
   round_history?: Array<{
