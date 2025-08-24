@@ -56,6 +56,7 @@ class GenerateHumorRequest(BaseModel):
     topic: str = "general"
     user_id: str
     card_type: str = "white"  # "white" or "black"
+    favorite_personas: Optional[List[str]] = None  # Add support for favorite personas
 
 class FeedbackRequest(BaseModel):
     user_id: str
@@ -193,7 +194,8 @@ async def generate_humor(request: GenerateHumorRequest):
             audience=request.audience,
             topic=request.topic,
             user_id=request.user_id,
-            card_type=request.card_type
+            card_type=request.card_type,
+            favorite_personas=request.favorite_personas  # Pass favorite personas
         )
         
         # Generate humor

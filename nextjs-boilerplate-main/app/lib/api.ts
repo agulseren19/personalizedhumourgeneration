@@ -63,11 +63,29 @@ export interface Generation {
   persona_name?: string;
   model_used?: string;
   score?: number;
+  
+  // Legacy metrics (for backward compatibility)
   humor_score?: number;
   creativity_score?: number;
   appropriateness_score?: number;
   context_relevance_score?: number;
   surprise_index?: number;
+  
+  // New literature-based metrics
+  surprisal_score?: number;
+  ambiguity_score?: number;
+  distinctiveness_ratio?: number;
+  entropy_score?: number;
+  perplexity_score?: number;
+  semantic_coherence?: number;
+  distinct_1?: number;
+  distinct_2?: number;
+  vocabulary_richness?: number;
+  overall_semantic_diversity?: number;
+  overall_humor_score?: number;
+  pacs_score?: number;
+  f1_score?: number;
+  safety_score?: number;
   is_safe?: boolean;
   toxicity_score?: number;
   reasoning?: string;
@@ -84,12 +102,29 @@ export interface Generation {
     surprise_index: number;
   };
   evaluation?: {
+    // Legacy metrics
     humor_score: number;
     creativity_score: number;
     appropriateness_score: number;
     context_relevance_score: number;
     surprise_index: number;
     overall_score: number;
+    
+    // New literature-based metrics
+    surprisal_score: number;
+    ambiguity_score: number;
+    distinctiveness_ratio: number;
+    entropy_score: number;
+    perplexity_score: number;
+    semantic_coherence: number;
+    distinct_1: number;
+    distinct_2: number;
+    vocabulary_richness: number;
+    overall_semantic_diversity: number;
+    overall_humor_score: number;
+    pacs_score: number;
+    f1_score: number;
+    
     reasoning: string;
     evaluator_name: string;
     model_used: string;
@@ -191,6 +226,7 @@ export interface GenerateHumorRequest {
   topic: string;
   user_id: string;  // Keep as string for now to avoid breaking changes
   card_type: 'white' | 'black' | 'game' | 'multiplayer';
+  favorite_personas?: string[];  // Optional field for favorite personas
 }
 
 export interface FeedbackRequest {

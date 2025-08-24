@@ -28,6 +28,10 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
   const [gameCardRatings, setGameCardRatings] = useState<Record<string, number>>({});
   const [whiteCardRatings, setWhiteCardRatings] = useState<Record<string, number>>({});
   
+  // User analytics state for favorite personas
+  const [userAnalytics, setUserAnalytics] = useState<any>(null);
+  const [favoritePersonas, setFavoritePersonas] = useState<string[]>([]);
+  
   // Multiplayer game state
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [gameId, setGameId] = useState('');
@@ -72,6 +76,31 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Load user analytics and favorite personas when component mounts
+  useEffect(() => {
+    const loadUserAnalytics = async () => {
+      try {
+        const effectiveUserId = user?.id || userId;
+        if (effectiveUserId) {
+          const result = await cahApi.getUserAnalytics(effectiveUserId);
+          if (result.success && result.analytics) {
+            setUserAnalytics(result.analytics);
+            // Extract favorite personas (liked personas)
+            const favorites = result.analytics.liked_personas || [];
+            setFavoritePersonas(favorites);
+            console.log('🎭 Loaded favorite personas:', favorites);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user analytics:', error);
+      }
+    };
+
+    if (isClient) {
+      loadUserAnalytics();
+    }
+  }, [user, userId, isClient]);
 
   // Cleanup effect for intervals and WebSocket
   useEffect(() => {
@@ -193,7 +222,8 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
         audience,
         topic,
         user_id: consistentUserId,
-        card_type: effectiveCardType
+        card_type: effectiveCardType,
+        favorite_personas: favoritePersonas  // Include favorite personas for generation
       };
       
 
@@ -369,7 +399,8 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
         setBlackCardWhiteCards(whiteResult.results.slice(0, 3).map((g: any) => ({
           id: g.id || 'unknown',
           text: g.text || 'No text available',
-          persona: g.persona_name || 'Unknown Persona'
+          persona: g.persona_name || 'Unknown Persona',
+          evaluation: g.evaluation || null
         })));
       }
       setRound(r => r + 1);
@@ -1361,13 +1392,13 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       </div>
 
       {/* Recommendations */}
-      {recommendations && recommendations.length > 0 && (
+      {favoritePersonas && favoritePersonas.length > 0 && (
         <div className="bg-gradient-to-r from-purple-600/20 to-indigo-600/20 rounded-xl p-6 border border-purple-400/30">
           <h3 className="text-lg font-semibold text-white mb-3">
-            🎭 Recommended AI Comedians for You
+            🎭 Your Favorite AI Comedians
           </h3>
           <div className="flex flex-wrap gap-2">
-            {recommendations.map((persona, index) => (
+            {favoritePersonas.map((persona, index) => (
               <span
                 key={index}
                 className="px-3 py-1 bg-purple-600/40 text-purple-100 rounded-full text-sm font-medium"
@@ -1422,19 +1453,51 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                         {gameCardRatings[card.id] || 5}/10
                       </span>
                     </div>
+                    {/* Literature-Based Evaluation Metrics for Game Mode */}
                     <div className="grid grid-cols-2 gap-1 text-xs mb-2">
-                      <div>
+                      {/* Real Literature-Based Metrics for Game Mode */}
+                      <div title="Overall humor quality based on multiple academic metrics">
                         <span className="text-gray-400">Humor:</span>
-                        <span className="text-black ml-1">8.5/10</span>
+                        <span className="text-black ml-1">
+                          {card.evaluation?.overall_humor_score?.toFixed(1) || 'N/A'}/10
+                        </span>
                       </div>
-                      <div>
-                        <span className="text-gray-400">Creativity:</span>
-                        <span className="text-black ml-1">8.2/10</span>
+                      <div title="How unexpected/incongruous the joke is (Tian et al. 2022)">
+                        <span className="text-gray-400">Surprisal:</span>
+                        <span className="text-black ml-1">
+                          {card.evaluation?.surprisal_score?.toFixed(1) || 'N/A'}/10
+                        </span>
                       </div>
-                      {/* Add Surprise Index for game mode */}
-                      <div>
-                        <span className="text-gray-400">Surprise:</span>
-                        <span className="text-black ml-1">7.8/10</span>
+                      <div title="How well the response fits the context (Garimella et al. 2020)">
+                        <span className="text-gray-400">Coherence:</span>
+                        <span className="text-black ml-1">
+                          {card.evaluation?.semantic_coherence?.toFixed(1) || 'N/A'}/10
+                        </span>
+                      </div>
+                      <div title="Lexical diversity and word variety (Li et al. 2016)">
+                        <span className="text-gray-400">Distinct-1:</span>
+                        <span className="text-black ml-1">
+                          {((card.evaluation?.distinct_1 ?? 0) * 10).toFixed(1)}/10
+                        </span>
+                      </div>
+                      <div title="Vocabulary sophistication and richness">
+                        <span className="text-gray-400">Vocabulary:</span>
+                        <span className="text-black ml-1">
+                          {((card.evaluation?.vocabulary_richness ?? 0) * 10).toFixed(1)}/10
+                        </span>
+                      </div>
+                      <div title="Personalization score based on user preferences (Deep-SHEEP 2022)">
+                        <span className="text-gray-400">Personalization:</span>
+                        <span className="text-black ml-1">
+                          {((card.evaluation?.pacs_score ?? 0.5) * 10).toFixed(1)}/10
+                        </span>
+                      </div>
+
+                      <div title="Content safety score from Detoxify (higher = safer)">
+                        <span className="text-gray-400">Safety:</span>
+                        <span className="text-black ml-1">
+                          {(card.safety_score ?? 0.9).toFixed(1)}/1
+                        </span>
                       </div>
                     </div>
                     <div className="w-full mb-2">
@@ -1510,36 +1573,50 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                       {whiteCardRatings[generation.id || 'unknown'] || 5}/10
                     </span>
                   </div>
+                  {/* Literature-Based Evaluation Metrics */}
                   <div className="grid grid-cols-2 gap-1 text-xs mb-2">
-                    <div>
+                    {/* New Literature-Based Metrics */}
+                    <div title="Overall humor quality based on multiple academic metrics">
                       <span className="text-gray-400">Humor:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {(generation.humor_score ?? generation.evaluation?.humor_score)?.toFixed(1) || 'N/A'}/10
+                        {(generation.overall_humor_score ?? generation.evaluation?.overall_humor_score)?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
-                    <div>
-                      <span className="text-gray-400">Creativity:</span>
+                    <div title="How unexpected/incongruous the joke is (Tian et al. 2022)">
+                      <span className="text-gray-400">Surprisal:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {(generation.creativity_score ?? generation.evaluation?.creativity_score)?.toFixed(1) || 'N/A'}/10
+                        {(generation.surprisal_score ?? generation.evaluation?.surprisal_score)?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
-                    <div>
-                      <span className="text-gray-400">Appropriate:</span>
+                    <div title="How well the response fits the context (Garimella et al. 2020)">
+                      <span className="text-gray-400">Coherence:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {(generation.appropriateness_score ?? generation.evaluation?.appropriateness_score)?.toFixed(1) || 'N/A'}/10
+                        {(generation.semantic_coherence ?? generation.evaluation?.semantic_coherence)?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
-                    <div>
-                      <span className="text-gray-400">Context:</span>
+                    <div title="Lexical diversity and word variety (Li et al. 2016)">
+                      <span className="text-gray-400">Distinct-1:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {(generation.context_relevance_score ?? generation.evaluation?.context_relevance_score)?.toFixed(1) || 'N/A'}/10
+                        {((generation.distinct_1 ?? generation.evaluation?.distinct_1 ?? 0) * 10).toFixed(1)}/10
                       </span>
                     </div>
-                    {/* Add Surprise Index display */}
-                    <div>
-                      <span className="text-gray-400">Surprise:</span>
+                    <div title="Vocabulary sophistication and richness">
+                      <span className="text-gray-400">Vocabulary:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {(generation.surprise_index ?? generation.evaluation?.surprise_index)?.toFixed(1) || 'N/A'}/10
+                        {((generation.vocabulary_richness ?? generation.evaluation?.vocabulary_richness ?? 0) * 10).toFixed(1)}/10
+                      </span>
+                    </div>
+                    <div title="Personalization score based on user preferences (Deep-SHEEP 2022)">
+                      <span className="text-gray-400">Personalization:</span>
+                      <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
+                        {((generation.pacs_score ?? generation.evaluation?.pacs_score ?? 0.5) * 10).toFixed(1)}/10
+                      </span>
+                    </div>
+
+                    <div title="Content safety score from Detoxify (higher = safer)">
+                      <span className="text-gray-400">Safety:</span>
+                      <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
+                        {(generation.safety_score ?? 0.9).toFixed(1)}/1
                       </span>
                     </div>
                   </div>
@@ -1563,7 +1640,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                       </div>
                     </div>
                   )}
-                  <div className="text-xs text-gray-500 mt-1 line-clamp-1">{generation.reasoning || generation.evaluation?.reasoning || 'No reasoning available'}</div>
+                  <div className="text-xs text-gray-500 mt-1 line-clamp-1">{}</div>
                 </div>
               </div>
             ))}

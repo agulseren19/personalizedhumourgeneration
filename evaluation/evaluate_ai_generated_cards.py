@@ -90,17 +90,46 @@ def evaluate_ai_cards(cards: Dict[str, List[str]]) -> Dict[str, Any]:
         if i < len(white_cards):
             white_card = white_cards[i]
             
+            # Clean up the white card (remove quotes, extra punctuation, keep lowercase)
+            clean_white_card = white_card.strip()
+            if clean_white_card.startswith('"') and clean_white_card.endswith('"'):
+                clean_white_card = clean_white_card[1:-1].strip()
+            if clean_white_card.startswith("'") and clean_white_card.endswith("'"):
+                clean_white_card = clean_white_card[1:-1].strip()
+            
+            # Convert white card to lowercase for natural sentence flow
+            clean_white_card = clean_white_card.lower()
+            
             # Fill in the blank with white card
-            complete_sentence = black_card.replace('_____', white_card)
+            complete_sentence = black_card.replace('_____', clean_white_card)
+            
+            # Clean up the complete sentence
+            # Remove any remaining blanks
+            complete_sentence = complete_sentence.replace('____', clean_white_card)
+            complete_sentence = complete_sentence.replace('___', clean_white_card)
+            complete_sentence = complete_sentence.replace('__', clean_white_card)
+            complete_sentence = complete_sentence.replace('_', clean_white_card)
+            
+            # Fix double periods and ensure proper sentence ending
+            complete_sentence = complete_sentence.replace('..', '.')
+            complete_sentence = complete_sentence.replace('..', '.')  # Handle multiple dots
+            if not complete_sentence.endswith('.') and not complete_sentence.endswith('!') and not complete_sentence.endswith('?'):
+                complete_sentence += '.'
+            
+            # Remove any extra spaces
+            complete_sentence = ' '.join(complete_sentence.split())
+            
             complete_sentences.append({
                 'black_card': black_card,
                 'white_card': white_card,
+                'clean_white_card': clean_white_card,
                 'complete_sentence': complete_sentence,
                 'combination_id': i + 1
             })
             
             print(f"{i+1:2d}. Black: '{black_card[:50]}{'...' if len(black_card) > 50 else ''}'")
             print(f"    White: '{white_card[:50]}{'...' if len(white_card) > 50 else ''}'")
+            print(f"    Clean White: '{clean_white_card[:50]}{'...' if len(clean_white_card) > 50 else ''}'")
             print(f"    Complete: '{complete_sentence[:80]}{'...' if len(complete_sentence) > 80 else ''}'")
             print()
     
@@ -116,30 +145,52 @@ def evaluate_ai_cards(cards: Dict[str, List[str]]) -> Dict[str, Any]:
         context = combo['black_card']
         
         # Evaluate the complete sentence
-        scores = evaluator.evaluate_humor_statistically(complete_sentence, context)
+        scores = evaluator.evaluate_humor_statistically(complete_sentence, context, user_profile=[])
+        
+        # Convert scores to dictionary immediately
+        scores_dict = {
+            'surprisal_score': scores.surprisal_score,
+            'ambiguity_score': scores.ambiguity_score,
+            'distinctiveness_ratio': scores.distinctiveness_ratio,
+            'entropy_score': scores.entropy_score,
+            'perplexity_score': scores.perplexity_score,
+            'semantic_coherence': scores.semantic_coherence,
+            'distinct_1': scores.distinct_1,
+            'distinct_2': scores.distinct_2,
+            'self_bleu': scores.self_bleu,
+            'mauve_score': scores.mauve_score,
+            'vocabulary_richness': scores.vocabulary_richness,
+            'overall_semantic_diversity': scores.overall_semantic_diversity,
+            'intra_cluster_diversity': scores.intra_cluster_diversity,
+            'inter_cluster_diversity': scores.inter_cluster_diversity,
+            'semantic_spread': scores.semantic_spread,
+            'cluster_coherence': scores.cluster_coherence,
+            'overall_humor_score': scores.overall_humor_score
+        }
         
         result = {
             'combination_id': combo['combination_id'],
             'black_card': combo['black_card'],
             'white_card': combo['white_card'],
+            'clean_white_card': combo['clean_white_card'],
             'complete_sentence': complete_sentence,
-            'scores': scores
+            'scores': scores_dict
         }
         results['complete_sentences'].append(result)
         sentence_scores.append(scores.overall_humor_score)
         
         print(f"{i+1:2d}. Complete: '{complete_sentence[:70]}{'...' if len(complete_sentence) > 70 else ''}'")
-        print(f"    Surprisal: {scores.surprisal_score:.2f}, Creativity: {scores.distinct_1:.3f}, Overall: {scores.overall_humor_score:.2f}")
+        print(f"    Surprisal: {scores_dict['surprisal_score']:.2f}, Creativity: {scores_dict['distinct_1']:.3f}, Overall: {scores_dict['overall_humor_score']:.2f}")
     
     # Calculate summary statistics for complete sentences
     if sentence_scores:
         results['summary']['complete_sentences'] = {
             'count': len(sentence_scores),
             'avg_overall': sum(sentence_scores) / len(sentence_scores),
-            'avg_surprisal': sum(r['scores'].surprisal_score for r in results['complete_sentences']) / len(results['complete_sentences']),
-            'avg_creativity': sum(r['scores'].distinct_1 for r in results['complete_sentences']) / len(results['complete_sentences']),
-            'best_sentence': max(results['complete_sentences'], key=lambda x: x['scores'].overall_humor_score),
-            'worst_sentence': min(results['complete_sentences'], key=lambda x: x['scores'].overall_humor_score)
+            'avg_surprisal': sum(r['scores']['surprisal_score'] for r in results['complete_sentences']) / len(results['complete_sentences']),
+            'avg_creativity': sum(r['scores']['distinct_1'] for r in results['complete_sentences']) / len(results['complete_sentences']),
+            'best_sentence': max(results['complete_sentences'], key=lambda x: x['scores']['overall_humor_score']),
+            'worst_sentence': min(results['complete_sentences'], key=lambda x: x['scores']['overall_humor_score'])
         }
     
     return results
@@ -158,8 +209,8 @@ def print_evaluation_summary(results: Dict[str, Any]):
         print(f"   Average Overall Score: {summary['avg_overall']:.2f}/10")
         print(f"   Average Surprisal: {summary['avg_surprisal']:.2f}/10")
         print(f"   Average Creativity: {summary['avg_creativity']:.3f}")
-        print(f"   Best Sentence: '{summary['best_sentence']['complete_sentence'][:60]}...' ({summary['best_sentence']['scores'].overall_humor_score:.2f}/10)")
-        print(f"   Worst Sentence: '{summary['worst_sentence']['complete_sentence'][:60]}...' ({summary['worst_sentence']['scores'].overall_humor_score:.2f}/10)")
+        print(f"   Best Sentence: '{summary['best_sentence']['complete_sentence'][:60]}...' ({summary['best_sentence']['scores']['overall_humor_score']:.2f}/10)")
+        print(f"   Worst Sentence: '{summary['worst_sentence']['complete_sentence'][:60]}...' ({summary['worst_sentence']['scores']['overall_humor_score']:.2f}/10)")
     
     # Overall assessment
     print(f"\n🎯 OVERALL ASSESSMENT:")
@@ -184,30 +235,40 @@ def save_evaluation_results(results: Dict[str, Any], output_file: str = "complet
         
         # Convert complete sentences
         for result in results['complete_sentences']:
+            # Handle both StatisticalHumorScores objects and dictionaries
+            scores = result['scores']
+            if hasattr(scores, '__dict__'):
+                # It's a dataclass object, convert to dict
+                scores_dict = {
+                    'surprisal_score': getattr(scores, 'surprisal_score', 0.0),
+                    'ambiguity_score': getattr(scores, 'ambiguity_score', 0.0),
+                    'distinctiveness_ratio': getattr(scores, 'distinctiveness_ratio', 0.0),
+                    'entropy_score': getattr(scores, 'entropy_score', 0.0),
+                    'perplexity_score': getattr(scores, 'perplexity_score', 0.0),
+                    'semantic_coherence': getattr(scores, 'semantic_coherence', 0.0),
+                    'distinct_1': getattr(scores, 'distinct_1', 0.0),
+                    'distinct_2': getattr(scores, 'distinct_2', 0.0),
+                    'self_bleu': getattr(scores, 'self_bleu', 0.0),
+                    'mauve_score': getattr(scores, 'mauve_score', 0.0),
+                    'vocabulary_richness': getattr(scores, 'vocabulary_richness', 0.0),
+                    'overall_semantic_diversity': getattr(scores, 'overall_semantic_diversity', 0.0),
+                    'intra_cluster_diversity': getattr(scores, 'intra_cluster_diversity', 0.0),
+                    'inter_cluster_diversity': getattr(scores, 'inter_cluster_diversity', 0.0),
+                    'semantic_spread': getattr(scores, 'semantic_spread', 0.0),
+                    'cluster_coherence': getattr(scores, 'cluster_coherence', 0.0),
+                    'overall_humor_score': getattr(scores, 'overall_humor_score', 0.0)
+                }
+            else:
+                # It's already a dictionary
+                scores_dict = scores
+            
             serializable_results['complete_sentences'].append({
                 'combination_id': result['combination_id'],
                 'black_card': result['black_card'],
                 'white_card': result['white_card'],
+                'clean_white_card': result['clean_white_card'],
                 'complete_sentence': result['complete_sentence'],
-                'scores': {
-                    'surprisal_score': result['scores'].surprisal_score,
-                    'ambiguity_score': result['scores'].ambiguity_score,
-                    'distinctiveness_ratio': result['scores'].distinctiveness_ratio,
-                    'entropy_score': result['scores'].entropy_score,
-                    'perplexity_score': result['scores'].perplexity_score,
-                    'semantic_coherence': result['scores'].semantic_coherence,
-                    'distinct_1': result['scores'].distinct_1,
-                    'distinct_2': result['scores'].distinct_2,
-                    'self_bleu': result['scores'].self_bleu,
-                    'mauve_score': result['scores'].mauve_score,
-                    'vocabulary_richness': result['scores'].vocabulary_richness,
-                    'overall_semantic_diversity': result['scores'].overall_semantic_diversity,
-                    'intra_cluster_diversity': result['scores'].intra_cluster_diversity,
-                    'inter_cluster_diversity': result['scores'].inter_cluster_diversity,
-                    'semantic_spread': result['scores'].semantic_spread,
-                    'cluster_coherence': result['scores'].cluster_coherence,
-                    'overall_humor_score': result['scores'].overall_humor_score
-                }
+                'scores': scores_dict
             })
         
         with open(output_file, 'w', encoding='utf-8') as f:
@@ -287,11 +348,39 @@ def evaluate_personalization(cards: Dict[str, List[str]], user_profiles: Dict[st
     white_cards = cards['white_cards'][:5]  # First 5 white cards
     
     for i, (black_card, white_card) in enumerate(zip(black_cards, white_cards)):
-        complete_sentence = black_card.replace('_____', white_card)
+        # Clean up the white card (same logic as in evaluate_ai_cards)
+        clean_white_card = white_card.strip()
+        if clean_white_card.startswith('"') and clean_white_card.endswith('"'):
+            clean_white_card = clean_white_card[1:-1].strip()
+        if clean_white_card.startswith("'") and clean_white_card.endswith("'"):
+            clean_white_card = clean_white_card[1:-1].strip()
+        
+        # Convert white card to lowercase for natural sentence flow
+        clean_white_card = clean_white_card.lower()
+        
+        # Fill in the blank with white card
+        complete_sentence = black_card.replace('_____', clean_white_card)
+        
+        # Clean up the complete sentence
+        complete_sentence = complete_sentence.replace('____', clean_white_card)
+        complete_sentence = complete_sentence.replace('___', clean_white_card)
+        complete_sentence = complete_sentence.replace('__', clean_white_card)
+        complete_sentence = complete_sentence.replace('_', clean_white_card)
+        
+        # Fix double periods and ensure proper sentence ending
+        complete_sentence = complete_sentence.replace('..', '.')
+        complete_sentence = complete_sentence.replace('..', '.')
+        if not complete_sentence.endswith('.') and not complete_sentence.endswith('!') and not complete_sentence.endswith('?'):
+            complete_sentence += '.'
+        
+        # Remove any extra spaces
+        complete_sentence = ' '.join(complete_sentence.split())
+        
         complete_sentences.append({
             'combination_id': i + 1,
             'black_card': black_card,
             'white_card': white_card,
+            'clean_white_card': clean_white_card,
             'complete_sentence': complete_sentence
         })
     

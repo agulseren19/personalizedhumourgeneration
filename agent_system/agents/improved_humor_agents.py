@@ -119,11 +119,12 @@ except ImportError:
 @dataclass
 class HumorRequest:
     context: str
-    audience: str
-    topic: str
-    user_id: Optional[str] = None
-    humor_type: Optional[str] = None
-    card_type: str = "white"  # "white" or "black"
+    audience: str = "friends"
+    topic: str = "general"
+    user_id: str = ""
+    humor_type: str = "general"
+    card_type: str = "white"
+    favorite_personas: Optional[List[str]] = None  # Add support for favorite personas
 
 @dataclass
 class GenerationResult:
@@ -132,9 +133,11 @@ class GenerationResult:
     model_used: str
     generation_time: float
     toxicity_score: float
+    safety_score: float  # Add safety score field
     is_safe: bool
     confidence_score: float
     surprise_index: float = 5.0  # Add surprise index with default value
+    evaluation: Optional[Any] = None  # Add evaluation field for complete sentence metrics
     
     def __post_init__(self):
         # Ensure all float values are Python floats, not numpy types
@@ -149,50 +152,127 @@ class GenerationResult:
 
 @dataclass
 class EvaluationResult:
-    humor_score: float
-    creativity_score: float
-    appropriateness_score: float
-    context_relevance_score: float
-    surprise_index: float  # Add surprise index
-    overall_score: float
+    # Core literature-based metrics (replacing old ad-hoc metrics)
+    surprisal_score: float          # Token-level surprisal (Tian et al. 2022)
+    ambiguity_score: float          # Statistical ambiguity (Kao 2016)
+    distinctiveness_ratio: float    # Semantic distance ratio
+    entropy_score: float            # Information-theoretic entropy
+    perplexity_score: float         # Language model perplexity
+    semantic_coherence: float       # Cosine similarity-based coherence
+    
+    # Creativity/Diversity metrics (filtered for non-zero values)
+    distinct_1: float               # Distinct-1 ratio (Li et al. 2016)
+    distinct_2: float               # Distinct-2 ratio (Li et al. 2016)
+    vocabulary_richness: float      # Type-Token Ratio
+    overall_semantic_diversity: float  # Overall semantic diversity
+    
+    # Overall scores
+    overall_humor_score: float      # Weighted statistical combination
+    pacs_score: float               # Personalization score (PaCS)
+    
+    # Metadata
     reasoning: str
     evaluator_name: str
     model_used: str
     
     def __post_init__(self):
         # Ensure all float values are Python floats, not numpy types
-        if hasattr(self.humor_score, 'item'):
-            self.humor_score = float(self.humor_score)
-        if hasattr(self.creativity_score, 'item'):
-            self.creativity_score = float(self.creativity_score)
-        if hasattr(self.appropriateness_score, 'item'):
-            self.appropriateness_score = float(self.appropriateness_score)
-        if hasattr(self.context_relevance_score, 'item'):
-            self.context_relevance_score = float(self.context_relevance_score)
-        if hasattr(self.surprise_index, 'item'):
-            self.surprise_index = float(self.surprise_index)
-        if hasattr(self.overall_score, 'item'):
-            self.overall_score = float(self.overall_score)
+        for field_name in ['surprisal_score', 'ambiguity_score', 'distinctiveness_ratio', 
+                          'entropy_score', 'perplexity_score', 'semantic_coherence',
+                          'distinct_1', 'distinct_2', 'vocabulary_richness', 
+                          'overall_semantic_diversity', 'overall_humor_score', 'pacs_score']:
+            if hasattr(self, field_name):
+                value = getattr(self, field_name)
+                if hasattr(value, 'item'):
+                    setattr(self, field_name, float(value))
+    
+    def get_frontend_metrics(self) -> Dict[str, float]:
+        """
+        Get metrics suitable for frontend display, filtering out zero values
+        and providing meaningful labels
+        """
+        metrics = {}
+        
+        # Core metrics (always show)
+        if self.surprisal_score > 0:
+            metrics['surprisal'] = self.surprisal_score
+        if self.ambiguity_score > 0:
+            metrics['ambiguity'] = self.ambiguity_score
+        if self.distinctiveness_ratio > 0:
+            metrics['distinctiveness'] = self.distinctiveness_ratio
+        if self.semantic_coherence > 0:
+            metrics['coherence'] = self.semantic_coherence
+        
+        # Creativity metrics (only show if > 0)
+        if self.distinct_1 > 0:
+            metrics['creativity'] = self.distinct_1
+        if self.vocabulary_richness > 0:
+            metrics['vocabulary_richness'] = self.vocabulary_richness
+        if self.overall_semantic_diversity > 0:
+            metrics['semantic_diversity'] = self.overall_semantic_diversity
+        
+        # Overall score (always show)
+        metrics['overall'] = self.overall_humor_score
+        
+        # Personalization (only show if > 0)
+        if self.pacs_score > 0:
+            metrics['personalization'] = self.pacs_score
+        
+        return metrics
+    
+    def get_legacy_metrics(self) -> Dict[str, float]:
+        """
+        Get legacy metric names for backward compatibility
+        Maps new metrics to old names used by existing frontend
+        """
+        return {
+            'humor_score': self.overall_humor_score,
+            'creativity_score': self.distinct_1 if self.distinct_1 > 0 else 5.0,
+            'appropriateness_score': self.semantic_coherence,
+            'context_relevance_score': self.semantic_coherence,
+            'surprise_index': self.surprisal_score,
+            'overall_score': self.overall_humor_score
+        }
 
 class ContentFilter:
     """Advanced content filtering using detoxify"""
     
     def __init__(self):
-        self.detoxify = Detoxify('original')
+        """Initialize content filter with detoxify"""
+        try:
+            self.detoxify = Detoxify('original')
+            print("✅ Detoxify content filter initialized successfully")
+        except Exception as e:
+            print(f"⚠️ Detoxify initialization failed: {e}")
+            self.detoxify = None
         
         # Thresholds for different toxicity types
-        self.toxicity_thresholds = {
+        self.thresholds = {
             'toxicity': 0.7,
             'severe_toxicity': 0.5,
-            'obscene': 0.8,
-            'threat': 0.3,
-            'insult': 0.7,
+            'obscene': 0.6,
+            'threat': 0.5,
+            'insult': 0.6,
             'identity_attack': 0.5
         }
     
     def is_content_safe(self, text: str) -> Tuple[bool, float, Dict[str, float]]:
         """Check if content is safe using detoxify"""
         try:
+            if not self.detoxify:
+                print("⚠️ Detoxify not available, using fallback safety assessment")
+                # Fallback: basic word-based toxicity check
+                toxic_words = ['hate', 'stupid', 'idiot', 'kill', 'die', 'stupid']
+                text_lower = text.lower()
+                toxic_count = sum(1 for word in toxic_words if word in text_lower)
+                
+                if toxic_count == 0:
+                    return True, 0.8, {'toxicity': 0.2, 'safety_score': 0.8}
+                else:
+                    toxicity_level = min(toxic_count * 0.3, 0.8)
+                    safety_score = 1.0 - toxicity_level
+                    return False, safety_score, {'toxicity': toxicity_level, 'safety_score': safety_score}
+            
             scores = self.detoxify.predict(text)
             
             # Convert numpy types to Python types
@@ -207,7 +287,7 @@ class ContentFilter:
             violations = []
             max_score = 0.0
             
-            for toxicity_type, threshold in self.toxicity_thresholds.items():
+            for toxicity_type, threshold in self.thresholds.items():
                 if toxicity_type in converted_scores:
                     score = float(converted_scores[toxicity_type])
                     max_score = max(max_score, score)
@@ -217,12 +297,28 @@ class ContentFilter:
             
             is_safe = len(violations) == 0
             
-            return is_safe, max_score, converted_scores
+            # IMPROVED: Calculate a meaningful safety score (0-1, higher = safer)
+            # Invert the toxicity score and apply a curve to make it more meaningful
+            if max_score == 0:
+                safety_score = 1.0  # Perfect safety
+            else:
+                # Invert: 1 - toxicity, then apply curve to boost scores
+                inverted_score = 1.0 - max_score
+                # Apply curve: x^0.5 makes scores higher (more generous)
+                safety_score = inverted_score ** 0.5
+            
+            # DEBUG: Log the safety calculation
+            print(f"🛡️ Safety calculation: max_toxicity={max_score:.3f}, inverted={inverted_score:.3f}, final={safety_score:.3f}")
+            
+            # Store the safety score in the scores dict for frontend use
+            converted_scores['safety_score'] = safety_score
+            
+            return is_safe, safety_score, converted_scores
             
         except Exception as e:
             print(f"Content filtering error: {e}")
             # If filtering fails, be conservative
-            return False, 1.0, {}
+            return False, 0.5, {'safety_score': 0.5}
     
     def sanitize_content(self, text: str) -> str:
         """Attempt to sanitize content while preserving humor"""
@@ -249,6 +345,23 @@ class ImprovedHumorAgent:
     def __init__(self):
         self.content_filter = ContentFilter()
         self.surprise_calculator = SurpriseCalculator()
+        # Initialize statistical evaluator for literature-based metrics
+        try:
+            import sys
+            from pathlib import Path
+            
+            # Add evaluation directory to path
+            current_dir = Path(__file__).parent
+            evaluation_dir = current_dir.parent.parent / 'evaluation'
+            sys.path.insert(0, str(evaluation_dir))
+            
+            from statistical_humor_evaluator import StatisticalHumorEvaluator
+            self.statistical_evaluator = StatisticalHumorEvaluator()
+            print("✅ Statistical evaluator initialized for literature-based metrics")
+        except ImportError as e:
+            print(f"⚠️ Statistical evaluator not available: {e}")
+            print("Using fallback evaluation")
+            self.statistical_evaluator = None
     
     async def generate_humor(self, request: HumorRequest, personas: List[str]) -> List[GenerationResult]:
         """Generate humor using dynamic personas based on user preferences"""
@@ -331,20 +444,148 @@ Response:"""
             response = await llm_manager.generate_response(llm_request)
             
             if response and response.content:
-                # Calculate surprise index
-                surprise_index = await self.surprise_calculator.calculate_surprise_index(response.content.strip(), request.context)
+                white_card_text = response.content.strip()
                 
-                # Create generation result
-                generation_result = GenerationResult(
-                    text=response.content.strip(),
-                    persona_name=persona_name,
-                    model_used=model,
-                    generation_time=1.0,  # Estimated time
-                    toxicity_score=0.1,  # Low toxicity for white cards
-                    is_safe=True,
-                    confidence_score=0.8,
-                    surprise_index=surprise_index
-                )
+                # For white cards, create complete sentence and evaluate it
+                if request.card_type == "white":
+                    # Convert white card to lowercase for natural sentence flow
+                    clean_white_card = white_card_text.lower()
+                    
+                    # Create complete sentence by filling in the blank
+                    complete_sentence = request.context.replace('_____', clean_white_card)
+                    
+                    # Clean up the complete sentence
+                    complete_sentence = complete_sentence.replace('____', clean_white_card)
+                    complete_sentence = complete_sentence.replace('___', clean_white_card)
+                    complete_sentence = complete_sentence.replace('__', clean_white_card)
+                    complete_sentence = complete_sentence.replace('_', clean_white_card)
+                    
+                    # Fix double periods and ensure proper sentence ending
+                    complete_sentence = complete_sentence.replace('..', '.')
+                    if not complete_sentence.endswith('.') and not complete_sentence.endswith('!') and not complete_sentence.endswith('?'):
+                        complete_sentence += '.'
+                    
+                    # Remove extra spaces
+                    complete_sentence = ' '.join(complete_sentence.split())
+                    
+                    # Log complete sentence creation for debugging
+                    print(f"      🔍 Complete sentence created: '{complete_sentence[:80]}{'...' if len(complete_sentence) > 80 else ''}'")
+                    
+                    # Evaluate the complete sentence using literature-based metrics
+                    try:
+                        if hasattr(self, 'statistical_evaluator') and self.statistical_evaluator:
+                            # Get user humor profile for personalization (PaCS score)
+                            user_profile = []
+                            if request.user_id:
+                                try:
+                                    # Get user's liked cards from feedback history
+                                    from agent_system.models.database import get_session_local, UserFeedback
+                                    from agent_system.config.settings import settings
+                                    
+                                    SessionLocal = get_session_local(settings.database_url)
+                                    db = SessionLocal()
+                                    try:
+                                        # Get cards the user rated highly (7+ out of 10)
+                                        high_rated_feedback = db.query(UserFeedback).filter(
+                                            UserFeedback.user_id == request.user_id,
+                                            UserFeedback.feedback_score >= 7.0
+                                        ).limit(20).all()  # Get up to 20 high-rated cards
+                                        
+                                        # Extract the response texts as user humor profile
+                                        user_profile = [fb.response_text for fb in high_rated_feedback if fb.response_text]
+                                        
+                                        if user_profile:
+                                            print(f"      🎭 Using user humor profile with {len(user_profile)} high-rated cards for PaCS calculation")
+                                        else:
+                                            print(f"      🎭 No high-rated cards found for user {request.user_id}, using empty profile")
+                                            
+                                    finally:
+                                        db.close()
+                                        
+                                except Exception as e:
+                                    print(f"      ⚠️ Could not get user profile for PaCS calculation: {e}")
+                                    user_profile = []
+                            
+                            # Use the new literature-based evaluation with user profile
+                            evaluation_result = self.statistical_evaluator.evaluate_humor_statistically(
+                                complete_sentence, request.context, user_profile
+                            )
+                            
+                            # Calculate actual safety score using content filter
+                            is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(white_card_text)
+                            
+                            # DEBUG: Log the safety score calculation
+                            print(f"      🛡️ Generated safety: is_safe={is_safe}, safety_score={safety_score:.3f}, toxicity_details={toxicity_details}")
+                            
+                            # Create generation result with evaluation
+                            generation_result = GenerationResult(
+                                text=white_card_text,
+                                persona_name=persona_name,
+                                model_used=model,
+                                generation_time=1.0,
+                                toxicity_score=toxicity_details.get('toxicity', 0.1),
+                                safety_score=safety_score,
+                                is_safe=is_safe,
+                                confidence_score=0.8,
+                                surprise_index=evaluation_result.surprisal_score,
+                                # Add evaluation data
+                                evaluation=evaluation_result
+                            )
+                        else:
+                            # Fallback to basic evaluation
+                            surprise_index = await self.surprise_calculator.calculate_surprise_index(white_card_text, request.context)
+                            
+                            # Calculate actual safety score using content filter
+                            is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(white_card_text)
+                            
+                            generation_result = GenerationResult(
+                                text=white_card_text,
+                                persona_name=persona_name,
+                                model_used=model,
+                                generation_time=1.0,
+                                toxicity_score=toxicity_details.get('toxicity', 0.1),
+                                safety_score=safety_score,
+                                is_safe=is_safe,
+                                confidence_score=0.8,
+                                surprise_index=surprise_index
+                            )
+                    except Exception as e:
+                        print(f"⚠️ Evaluation failed, using fallback: {e}")
+                        # Fallback to basic evaluation
+                        surprise_index = await self.surprise_calculator.calculate_surprise_index(white_card_text, request.context)
+                        
+                        # Calculate actual safety score using content filter
+                        is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(white_card_text)
+                        
+                        generation_result = GenerationResult(
+                            text=white_card_text,
+                            persona_name=persona_name,
+                            model_used=model,
+                            generation_time=1.0,
+                            toxicity_score=toxicity_details.get('toxicity', 0.1),
+                            safety_score=safety_score,
+                            is_safe=is_safe,
+                            confidence_score=0.8,
+                            surprise_index=surprise_index
+                        )
+                else:
+                    # For black cards, use basic evaluation
+                    surprise_index = await self.surprise_calculator.calculate_surprise_index(white_card_text, request.context)
+                    
+                    # Calculate actual safety score using content filter
+                    is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(white_card_text)
+                    
+                    generation_result = GenerationResult(
+                        text=white_card_text,
+                        persona_name=persona_name,
+                        model_used=model,
+                        generation_time=1.0,
+                        toxicity_score=toxicity_details.get('toxicity', 0.1),
+                        safety_score=safety_score,
+                        is_safe=is_safe,
+                        confidence_score=0.8,
+                        surprise_index=surprise_index
+                    )
                 
                 print(f"      ✅ Generated: {response.content.strip()[:50]}...")
                 return generation_result
@@ -392,14 +633,18 @@ Response:"""
                 # Calculate surprise index
                 surprise_index = await self.surprise_calculator.calculate_surprise_index(response.content.strip(), request.context)
                 
+                # Calculate actual safety score using content filter
+                is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(response.content.strip())
+                
                 # Create generation result
                 generation_result = GenerationResult(
                     text=response.content.strip(),
                     persona_name=custom_persona.name,
                     model_used=model,
                     generation_time=1.0,  # Estimated time
-                    toxicity_score=0.1,  # Low toxicity for white cards
-                    is_safe=True,
+                    toxicity_score=toxicity_details.get('toxicity', 0.1),
+                    safety_score=safety_score,
+                    is_safe=is_safe,
                     confidence_score=0.9,  # Higher confidence for custom personas
                     surprise_index=surprise_index
                 )
@@ -551,6 +796,7 @@ White Card:"""
                 model_used=getattr(response, 'model', model) if hasattr(response, 'model') else str(model),
                 generation_time=generation_time,
                 toxicity_score=toxicity_score,
+                safety_score=1.0 - toxicity_score,  # Calculate safety score from toxicity
                 is_safe=is_safe,
                 confidence_score=self._calculate_confidence(humor_text, request.context),
                 surprise_index=surprise_index
@@ -739,13 +985,18 @@ Black Card:""",
                 
                 # Create generation result with dynamic persona name
                 persona_name = comedian_name if comedian_name else "Professional Comedy Writer"
+                
+                # Calculate safety score for black cards
+                is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(result.strip())
+                
                 generation_result = GenerationResult(
                     text=result.strip(),
                     persona_name=persona_name,
                     model_used="crewai",
                     generation_time=1.0,  # Estimated time
-                    toxicity_score=0.3,  # Moderate for black cards
-                    is_safe=True,
+                    toxicity_score=toxicity_details.get('toxicity', 0.3),
+                    safety_score=safety_score,
+                    is_safe=is_safe,
                     confidence_score=0.9,
                     surprise_index=surprise_index
                 )
@@ -885,13 +1136,17 @@ Black Card:""",
                     print(f"⚠️ CrewAI surprise calculation failed: {e}")
                 
                 # Create generation result
+                # Calculate safety score for black cards
+                is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(black_card_text)
+                
                 return GenerationResult(
                     text=black_card_text,
                     persona_name=comedian_name,
                     model_used="crewai",
                     generation_time=0.0,  # Will be set by caller
-                    toxicity_score=0.0,   # Will be filtered by caller
-                    is_safe=True,         # Will be checked by caller
+                    toxicity_score=toxicity_details.get('toxicity', 0.0),
+                    safety_score=safety_score,
+                    is_safe=is_safe,
                     confidence_score=self._calculate_confidence(black_card_text, request.context),
                     surprise_index=surprise_index
                 )
@@ -1082,47 +1337,184 @@ Black Card:"""
         return min(score, 1.0)
 
 class ImprovedHumorEvaluator:
-    """Improved evaluation system with meaningful scores"""
+    """Literature-based evaluation system with academically rigorous metrics"""
     
     def __init__(self):
         self.content_filter = ContentFilter()
-        self.surprise_calculator = SurpriseCalculator()
+        self.surprise_calculator = SurpriseCalculator()  # Keep for basic evaluation fallback
+        
+        # Import the new literature-based evaluator
+        try:
+            import sys
+            from pathlib import Path
+            
+            # Add evaluation directory to path
+            current_dir = Path(__file__).parent
+            evaluation_dir = current_dir.parent.parent / 'evaluation'
+            sys.path.insert(0, str(evaluation_dir))
+            
+            from statistical_humor_evaluator import StatisticalHumorEvaluator
+            self.statistical_evaluator = StatisticalHumorEvaluator()
+            print("✅ Loaded literature-based statistical evaluator")
+            
+        except ImportError as e:
+            print(f"⚠️ Could not import statistical_humor_evaluator: {e}")
+            print("Falling back to basic evaluation")
+            self.statistical_evaluator = None
     
     async def evaluate_humor(self, humor_text: str, request: HumorRequest) -> EvaluationResult:
-        """Evaluate humor with meaningful, varied scores"""
+        """Evaluate humor using literature-based metrics"""
         
-        # Multi-dimensional evaluation
+        if self.statistical_evaluator:
+            # Use the new literature-based evaluation
+            return await self._evaluate_with_literature_metrics(humor_text, request)
+        else:
+            # Fallback to basic evaluation
+            return await self._evaluate_basic(humor_text, request)
+    
+    async def _evaluate_with_literature_metrics(self, humor_text: str, request: HumorRequest) -> EvaluationResult:
+        """Evaluate using literature-based statistical metrics"""
+        
+        try:
+            # Use the black card context for evaluation
+            context = request.context
+            
+            # Get user humor profile for personalization (PaCS score)
+            user_profile = []
+            if request.user_id:
+                try:
+                    # Get user's liked cards from feedback history
+                    from agent_system.models.database import get_session_local, UserFeedback
+                    from agent_system.config.settings import settings
+                    
+                    SessionLocal = get_session_local(settings.database_url)
+                    db = SessionLocal()
+                    try:
+                        # Get cards the user rated highly (7+ out of 10)
+                        high_rated_feedback = db.query(UserFeedback).filter(
+                            UserFeedback.user_id == request.user_id,
+                            UserFeedback.feedback_score >= 7.0
+                        ).limit(20).all()  # Get up to 20 high-rated cards
+                        
+                        # Extract the response texts as user humor profile
+                        user_profile = [fb.response_text for fb in high_rated_feedback if fb.response_text]
+                        
+                        if user_profile:
+                            print(f"🎭 Using user humor profile with {len(user_profile)} high-rated cards for PaCS calculation")
+                        else:
+                            print(f"🎭 No high-rated cards found for user {request.user_id}, using empty profile")
+                            
+                    finally:
+                        db.close()
+                        
+                except Exception as e:
+                    print(f"⚠️ Could not get user profile for PaCS calculation: {e}")
+                    user_profile = []
+            
+            # Get statistical evaluation scores with user profile
+            scores = self.statistical_evaluator.evaluate_humor_statistically(humor_text, context, user_profile)
+            
+            # Create reasoning based on key metrics
+            reasoning = self._create_literature_based_reasoning(scores)
+            
+            return EvaluationResult(
+                surprisal_score=scores.surprisal_score,
+                ambiguity_score=scores.ambiguity_score,
+                distinctiveness_ratio=scores.distinctiveness_ratio,
+                entropy_score=scores.entropy_score,
+                perplexity_score=scores.perplexity_score,
+                semantic_coherence=scores.semantic_coherence,
+                distinct_1=scores.distinct_1,
+                distinct_2=scores.distinct_2,
+                vocabulary_richness=scores.vocabulary_richness,
+                overall_semantic_diversity=scores.overall_semantic_diversity,
+                overall_humor_score=scores.overall_humor_score,
+                pacs_score=scores.pacs_score,
+                reasoning=reasoning,
+                evaluator_name="LiteratureBasedEvaluator",
+                model_used="statistical_humor_evaluator"
+            )
+            
+        except Exception as e:
+            print(f"⚠️ Literature-based evaluation failed: {e}")
+            print("Falling back to basic evaluation")
+            return await self._evaluate_basic(humor_text, request)
+    
+    def _create_literature_based_reasoning(self, scores) -> str:
+        """Create meaningful reasoning based on literature-based metrics"""
+        
+        reasoning_parts = []
+        
+        # Surprisal analysis (Tian et al. 2022)
+        if scores.surprisal_score >= 7.0:
+            reasoning_parts.append("High surprisal indicates strong incongruity")
+        elif scores.surprisal_score >= 4.0:
+            reasoning_parts.append("Moderate surprisal suggests some unexpectedness")
+        else:
+            reasoning_parts.append("Low surprisal indicates predictable content")
+        
+        # Creativity analysis (Li et al. 2016)
+        if scores.distinct_1 >= 0.8:
+            reasoning_parts.append("Excellent lexical diversity")
+        elif scores.distinct_1 >= 0.6:
+            reasoning_parts.append("Good lexical diversity")
+        
+        # Semantic coherence (Garimella et al. 2020)
+        if scores.semantic_coherence >= 7.0:
+            reasoning_parts.append("Strong semantic coherence with context")
+        elif scores.semantic_coherence >= 5.0:
+            reasoning_parts.append("Moderate semantic coherence")
+        
+        # Overall assessment
+        if scores.overall_humor_score >= 7.0:
+            reasoning_parts.append("High-quality humor based on literature metrics")
+        elif scores.overall_humor_score >= 5.0:
+            reasoning_parts.append("Moderate-quality humor with room for improvement")
+        else:
+            reasoning_parts.append("Lower-quality humor, consider refinement")
+        
+        return " | ".join(reasoning_parts)
+    
+    async def _evaluate_basic(self, humor_text: str, request: HumorRequest) -> EvaluationResult:
+        """Fallback basic evaluation when literature-based evaluator unavailable"""
+        
+        # Basic heuristic evaluation (old method)
         humor_score = await self._evaluate_humor_quality(humor_text, request)
         creativity_score = self._evaluate_creativity(humor_text, request)
         appropriateness_score = self._evaluate_appropriateness(humor_text, request)
         context_relevance_score = self._evaluate_context_relevance(humor_text, request)
         surprise_index = await self.surprise_calculator.calculate_surprise_index(humor_text, request.context)
         
-        # Calculate overall score (weighted average including surprise)
+        # Calculate overall score
         overall_score = (
             humor_score * 0.35 +
             creativity_score * 0.25 +
             appropriateness_score * 0.2 +
             context_relevance_score * 0.1 +
-            surprise_index * 0.1  # Include surprise in overall score
+            surprise_index * 0.1
         )
         
-        # Provide brief reasoning without duplicating score information
-        reasoning = f"Overall quality: {overall_score:.1f}/10 "
+        reasoning = f"Basic evaluation: Overall quality {overall_score:.1f}/10"
         
         return EvaluationResult(
-            humor_score=humor_score,
-            creativity_score=creativity_score,
-            appropriateness_score=appropriateness_score,
-            context_relevance_score=context_relevance_score,
-            surprise_index=surprise_index,
-            overall_score=overall_score,
+            surprisal_score=surprise_index,
+            ambiguity_score=5.0,  # Default neutral
+            distinctiveness_ratio=5.0,  # Default neutral
+            entropy_score=5.0,  # Default neutral
+            perplexity_score=5.0,  # Default neutral
+            semantic_coherence=context_relevance_score,
+            distinct_1=creativity_score / 10.0,  # Scale creativity to 0-1
+            distinct_2=0.5,  # Default neutral
+            vocabulary_richness=0.5,  # Default neutral
+            overall_semantic_diversity=0.5,  # Default neutral
+            overall_humor_score=overall_score,
+            pacs_score=0.0,  # No personalization in basic mode
             reasoning=reasoning,
-            evaluator_name="ImprovedEvaluator",
+            evaluator_name="BasicEvaluator",
             model_used="rule_based"
         )
     
-    async def _evaluate_humor_quality(self, text: str, request: HumorRequest) -> float:
+    def _evaluate_humor_quality(self, text: str, request: HumorRequest) -> float:
         """Evaluate humor quality using multiple factors"""
         score = 5.0  # Base score
         
@@ -1273,7 +1665,7 @@ class ImprovedHumorOrchestrator:
             evaluated_results.append({
                 'generation': generation,
                 'evaluation': evaluation,
-                'combined_score': evaluation.overall_score + generation.confidence_score
+                'combined_score': evaluation.overall_humor_score + generation.confidence_score
             })
         
         # Sort by combined score
@@ -1370,6 +1762,7 @@ Response:"""
                             model_used=model,
                             generation_time=0.5,
                             toxicity_score=0.1,
+                            safety_score=0.9,  # High safety for fallback
                             is_safe=True,
                             confidence_score=0.8,
                             surprise_index=surprise_index
@@ -1390,7 +1783,13 @@ Response:"""
             return []
     
     async def _get_persona_recommendations(self, request: HumorRequest) -> List[str]:
-        """SMART STRATEGY: 2 favorites + 1 dynamic/random for exploration"""
+        """SMART STRATEGY: Use favorite personas when available, otherwise fallback to smart strategy"""
+        
+        # If favorite personas are provided in the request, use them directly
+        if hasattr(request, 'favorite_personas') and request.favorite_personas:
+            print(f"🎭 Using provided favorite personas: {request.favorite_personas}")
+            # Return up to 3 favorite personas
+            return request.favorite_personas[:3]
         
         # Get context-based recommendations
         context_personas = recommend_personas_for_context(
