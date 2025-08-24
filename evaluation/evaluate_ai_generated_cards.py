@@ -219,6 +219,177 @@ def save_evaluation_results(results: Dict[str, Any], output_file: str = "complet
         print(f"❌ Error saving results: {e}")
 
 
+def create_mock_user_profiles() -> Dict[str, List[str]]:
+    """Create mock user humor profiles for personalization testing"""
+    
+    # Mock user profiles based on different humor styles
+    user_profiles = {
+        'dark_humor_user': [
+            "Existential dread and coffee",
+            "My therapist's secret addiction",
+            "The art of passive-aggressive gift-giving",
+            "Why I'm banned from family gatherings",
+            "My cat's elaborate revenge schemes"
+        ],
+        'dad_jokes_user': [
+            "Why did the scarecrow win an award?",
+            "What do you call a fake noodle?",
+            "How does a penguin build its house?",
+            "Why don't eggs tell jokes?",
+            "What's the best time to go to the dentist?"
+        ],
+        'sarcastic_user': [
+            "Oh great, another meeting that could have been an email",
+            "My life is like a romantic comedy, except there's no romance and it's just me crying",
+            "I'm not lazy, I'm just conserving energy",
+            "I'm not arguing, I'm just explaining why I'm right",
+            "I'm not procrastinating, I'm prioritizing my mental health"
+        ],
+        'pop_culture_user': [
+            "Game of Thrones season 8 plot holes",
+            "Marvel movie timeline confusion",
+            "Star Wars prequel memes",
+            "The Office quotes in real life",
+            "Breaking Bad cooking lessons"
+        ],
+        'random_user': [
+            "A penguin wearing a tuxedo",
+            "The secret life of socks",
+            "Why do we park in driveways?",
+            "The existential crisis of a potato",
+            "My neighbor's suspicious garden gnomes"
+        ]
+    }
+    
+    return user_profiles
+
+
+def evaluate_personalization(cards: Dict[str, List[str]], user_profiles: Dict[str, List[str]]) -> Dict[str, Any]:
+    """Evaluate personalization effectiveness using PaCS metric"""
+    
+    print("\n🎭 PERSONALIZATION EVALUATION (PaCS Metric):")
+    print("=" * 60)
+    print("Based on Deep-SHEEP (Bielaniewicz et al., 2022)")
+    print("PaCS = cos(user_profile, card_embedding) ∈ [-1, 1]")
+    print("=" * 60)
+    
+    from evaluation.statistical_humor_evaluator import PersonalizationEvaluator
+    
+    personalization_evaluator = PersonalizationEvaluator()
+    results = {
+        'user_profiles': {},
+        'overall_personalization': {}
+    }
+    
+    # First, we need to create complete sentences from the cards
+    complete_sentences = []
+    black_cards = cards['black_cards'][:5]  # First 5 black cards
+    white_cards = cards['white_cards'][:5]  # First 5 white cards
+    
+    for i, (black_card, white_card) in enumerate(zip(black_cards, white_cards)):
+        complete_sentence = black_card.replace('_____', white_card)
+        complete_sentences.append({
+            'combination_id': i + 1,
+            'black_card': black_card,
+            'white_card': white_card,
+            'complete_sentence': complete_sentence
+        })
+    
+    # Evaluate each user profile
+    for user_type, profile_cards in user_profiles.items():
+        print(f"\n👤 {user_type.upper().replace('_', ' ')}:")
+        print("-" * 40)
+        
+        user_results = {
+            'profile_cards': profile_cards,
+            'card_evaluations': [],
+            'avg_pacs_score': 0.0,
+            'personalization_effectiveness': 'Unknown'
+        }
+        
+        # Evaluate each generated card against this user profile
+        card_scores = []
+        for combo in complete_sentences:
+            complete_sentence = combo['complete_sentence']
+            
+            # Calculate PaCS score
+            pacs_score = personalization_evaluator.calculate_pacs_score(complete_sentence, profile_cards)
+            normalized_score = personalization_evaluator.normalize_pacs_score(pacs_score)
+            insights = personalization_evaluator.get_personalization_insights(pacs_score)
+            
+            card_eval = {
+                'card_text': complete_sentence,
+                'pacs_score': pacs_score,
+                'normalized_score': normalized_score,
+                'effectiveness': insights['effectiveness'],
+                'interpretation': insights['interpretation']
+            }
+            
+            user_results['card_evaluations'].append(card_eval)
+            card_scores.append(pacs_score)
+            
+            print(f"  Card {combo['combination_id']}: {complete_sentence[:60]}{'...' if len(complete_sentence) > 60 else ''}")
+            print(f"    PaCS: {pacs_score:.3f} | Effectiveness: {insights['effectiveness']}")
+            print(f"    {insights['interpretation']}")
+        
+        # Calculate average PaCS for this user
+        if card_scores:
+            avg_pacs = sum(card_scores) / len(card_scores)
+            user_results['avg_pacs_score'] = avg_pacs
+            
+            # Determine overall effectiveness
+            if avg_pacs >= 0.7:
+                effectiveness = "Excellent"
+            elif avg_pacs >= 0.3:
+                effectiveness = "Good"
+            elif avg_pacs >= -0.1:
+                effectiveness = "Neutral"
+            elif avg_pacs >= -0.5:
+                effectiveness = "Poor"
+            else:
+                effectiveness = "Very Poor"
+            
+            user_results['personalization_effectiveness'] = effectiveness
+            
+            print(f"\n  📊 Overall Personalization: {effectiveness}")
+            print(f"  📈 Average PaCS: {avg_pacs:.3f}")
+        
+        results['user_profiles'][user_type] = user_results
+    
+    # Calculate overall personalization statistics
+    all_pacs_scores = []
+    for user_data in results['user_profiles'].values():
+        if user_data['card_evaluations']:
+            all_pacs_scores.extend([card['pacs_score'] for card in user_data['card_evaluations']])
+    
+    if all_pacs_scores:
+        results['overall_personalization'] = {
+            'total_evaluations': len(all_pacs_scores),
+            'avg_pacs_score': sum(all_pacs_scores) / len(all_pacs_scores),
+            'min_pacs_score': min(all_pacs_scores),
+            'max_pacs_score': max(all_pacs_scores),
+            'personalization_distribution': {
+                'excellent': len([s for s in all_pacs_scores if s >= 0.7]),
+                'good': len([s for s in all_pacs_scores if 0.3 <= s < 0.7]),
+                'neutral': len([s for s in all_pacs_scores if -0.1 <= s < 0.3]),
+                'poor': len([s for s in all_pacs_scores if -0.5 <= s < -0.1]),
+                'very_poor': len([s for s in all_pacs_scores if s < -0.5])
+            }
+        }
+        
+        print(f"\n🎯 OVERALL PERSONALIZATION SUMMARY:")
+        print(f"   Total Evaluations: {results['overall_personalization']['total_evaluations']}")
+        print(f"   Average PaCS: {results['overall_personalization']['avg_pacs_score']:.3f}")
+        print(f"   PaCS Range: {results['overall_personalization']['min_pacs_score']:.3f} to {results['overall_personalization']['max_pacs_score']:.3f}")
+        print(f"   Distribution: Excellent({results['overall_personalization']['personalization_distribution']['excellent']}) | "
+              f"Good({results['overall_personalization']['personalization_distribution']['good']}) | "
+              f"Neutral({results['overall_personalization']['personalization_distribution']['neutral']}) | "
+              f"Poor({results['overall_personalization']['personalization_distribution']['poor']}) | "
+              f"Very Poor({results['overall_personalization']['personalization_distribution']['very_poor']})")
+    
+    return results
+
+
 def main():
     """Main evaluation function - evaluates complete sentences (black + white cards)"""
     
@@ -238,6 +409,15 @@ def main():
     # Evaluate complete sentences
     results = evaluate_ai_cards(cards)
     
+    # Create mock user profiles for personalization testing
+    user_profiles = create_mock_user_profiles()
+    
+    # Evaluate personalization effectiveness
+    personalization_results = evaluate_personalization(cards, user_profiles)
+    
+    # Add personalization results to main results
+    results['personalization'] = personalization_results
+    
     # Print summary
     print_evaluation_summary(results)
     
@@ -250,8 +430,10 @@ def main():
     print("✅ Ambiguity (Kao & Witbrock 2016)")
     print("✅ Creativity/Diversity (Li et al. 2016, Zhu et al. 2018)")
     print("✅ Linguistic Quality (Information Theory)")
+    print("✅ Personalization (PaCS - Deep-SHEEP 2022)")
     print("\n💡 This approach evaluates the final humor of complete sentences,")
     print("   not individual cards, providing more realistic humor assessment.")
+    print("   Plus personalization effectiveness using BERT-based embeddings!")
 
 
 if __name__ == "__main__":

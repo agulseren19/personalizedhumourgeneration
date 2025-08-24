@@ -13,7 +13,7 @@ NO hardcoded dictionaries - uses statistical analysis and corpus-based methods
 import re
 import math
 import random
-from typing import Dict, List, Optional, Tuple, Set
+from typing import Dict, List, Optional, Tuple, Set, Any
 from dataclasses import dataclass
 from collections import Counter, defaultdict
 
@@ -21,6 +21,22 @@ from collections import Counter, defaultdict
 import sys
 from pathlib import Path
 import pickle # Added for loading trained models
+
+# Import torch for personalization evaluation
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("WARNING: PyTorch not available. Personalization evaluation will use CPU fallback.")
+
+# Import numpy for numerical operations
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    NUMPY_AVAILABLE = False
+    print("WARNING: NumPy not available. Some operations may fail.")
 
 current_dir = Path(__file__).parent
 agent_system_dir = current_dir.parent
@@ -57,6 +73,7 @@ class StatisticalHumorScores:
     semantic_spread: float             # Semantic spread in embedding space
     cluster_coherence: float           # Cluster quality measure
     overall_humor_score: float  # Weighted statistical combination
+    pacs_score: float          # Personalization score (PaCS)
 
 
 class StatisticalLanguageModel:
@@ -635,6 +652,169 @@ class StatisticalInformationAnalyzer:
         return min(avg_info / 2, 10.0)
 
 
+class PersonalizationEvaluator:
+    """
+    Evaluates personalization effectiveness using PaCS (Persona–Card Similarity)
+    Based on Deep-SHEEP (Bielaniewicz et al., 2022): cosine distance between user vector and joke vector
+    
+    PaCS = cos(user_profile, card_embedding) ∈ [-1, 1]
+    Higher PaCS = closer alignment to user's humor style
+    """
+    
+    def __init__(self, model_name: str = 'all-MiniLM-L6-v2'):
+        """
+        Initialize personalization evaluator with SBERT model
+        
+        Args:
+            model_name: SentenceTransformer model to use
+        """
+        try:
+            from sentence_transformers import SentenceTransformer
+            import torch
+            
+            # Check GPU availability
+            if TORCH_AVAILABLE and torch.cuda.is_available():
+                self.device = 'cuda'
+            else:
+                self.device = 'cpu'
+            
+            # Load sentence transformer model
+            self.model = SentenceTransformer(model_name, device=self.device)
+            self.model_name = model_name
+            self.available = True
+            
+            print(f"✅ Loaded personalization model: {model_name}")
+            
+        except ImportError:
+            print("❌ SentenceTransformers not available. Install with: pip install sentence-transformers")
+            self.available = False
+            self.model = None
+        except Exception as e:
+            print(f"❌ Error loading personalization model: {e}")
+            self.available = False
+            self.model = None
+    
+    def calculate_pacs_score(self, card_text: str, user_humor_profile: List[str]) -> float:
+        """
+        Calculate Persona–Card Similarity (PaCS) score
+        
+        Args:
+            card_text: The generated card text to evaluate
+            user_humor_profile: List of cards the user laughed at (humor profile)
+            
+        Returns:
+            PaCS score ∈ [-1, 1], higher = more personalized
+        """
+        if not self.available or not self.model:
+            print("⚠️ Personalization model not available, returning neutral score")
+            return 0.0
+        
+        if not user_humor_profile:
+            print("⚠️ No user humor profile provided, returning neutral score")
+            return 0.0
+        
+        try:
+            # Step 1: Build SBERT embedding c for the generated card
+            card_embedding = self.model.encode([card_text])
+            
+            # Step 2: Build user prototype vector u by averaging embeddings of humor profile
+            profile_embeddings = self.model.encode(user_humor_profile)
+            
+            # Handle both torch tensors and numpy arrays
+            if hasattr(card_embedding, 'cpu'):
+                # Torch tensor
+                card_embedding_np = card_embedding.cpu().numpy()
+            else:
+                # Already numpy array
+                card_embedding_np = card_embedding
+            
+            if hasattr(profile_embeddings, 'cpu'):
+                # Torch tensor
+                profile_embeddings_np = profile_embeddings.cpu().numpy()
+            else:
+                # Already numpy array
+                profile_embeddings_np = profile_embeddings
+            
+            # Calculate user prototype by averaging
+            user_prototype = np.mean(profile_embeddings_np, axis=0).reshape(1, -1)
+            
+            # Step 3: Calculate cosine similarity: PaCS = cos(u, c)
+            from sklearn.metrics.pairwise import cosine_similarity
+            pacs_score = cosine_similarity(user_prototype, card_embedding_np)[0][0]
+            
+            # Ensure score is in [-1, 1] range
+            pacs_score = max(-1.0, min(1.0, pacs_score))
+            
+            return float(pacs_score)
+            
+        except Exception as e:
+            print(f"⚠️ PaCS calculation failed: {e}")
+            return 0.0
+    
+    def normalize_pacs_score(self, pacs_score: float) -> float:
+        """
+        Normalize PaCS score from [-1, 1] to [0, 1] for weighted scoring
+        
+        Args:
+            pacs_score: Raw PaCS score ∈ [-1, 1]
+            
+        Returns:
+            Normalized score ∈ [0, 1]
+        """
+        # Convert from [-1, 1] to [0, 1]
+        normalized = (pacs_score + 1) / 2
+        return max(0.0, min(1.0, normalized))
+    
+    def get_personalization_insights(self, pacs_score: float) -> Dict[str, Any]:
+        """
+        Get insights about personalization effectiveness
+        
+        Args:
+            pacs_score: PaCS score ∈ [-1, 1]
+            
+        Returns:
+            Dictionary with personalization insights
+        """
+        normalized_score = self.normalize_pacs_score(pacs_score)
+        
+        if pacs_score >= 0.7:
+            effectiveness = "Excellent"
+            interpretation = "Card strongly matches user's humor style"
+        elif pacs_score >= 0.3:
+            effectiveness = "Good"
+            interpretation = "Card moderately matches user's humor style"
+        elif pacs_score >= -0.1:
+            effectiveness = "Neutral"
+            interpretation = "Card has neutral alignment with user's style"
+        elif pacs_score >= -0.5:
+            effectiveness = "Poor"
+            interpretation = "Card poorly matches user's humor style"
+        else:
+            effectiveness = "Very Poor"
+            interpretation = "Card strongly misaligned with user's style"
+        
+        return {
+            'pacs_score': pacs_score,
+            'normalized_score': normalized_score,
+            'effectiveness': effectiveness,
+            'interpretation': interpretation,
+            'recommendation': self._get_recommendation(pacs_score)
+        }
+    
+    def _get_recommendation(self, pacs_score: float) -> str:
+        """Get recommendation based on PaCS score"""
+        if pacs_score >= 0.7:
+            return "Excellent personalization - maintain current approach"
+        elif pacs_score >= 0.3:
+            return "Good personalization - minor improvements possible"
+        elif pacs_score >= -0.1:
+            return "Neutral - consider enhancing persona selection"
+        elif pacs_score >= -0.5:
+            return "Poor - review persona generation strategy"
+        else:
+            return "Very poor - significant persona system improvements needed"
+
+
 class StatisticalHumorEvaluator:
     """
     Complete statistical humor evaluator
@@ -650,6 +830,8 @@ class StatisticalHumorEvaluator:
             self.creativity_evaluator = CreativityDiversityEvaluator()
         else:
             self.creativity_evaluator = None
+        # Add personalization evaluator
+        self.personalization_evaluator = PersonalizationEvaluator()
     
     def evaluate_humor_statistically(self, text: str, context: str, 
                                    audience: str = 'adults') -> StatisticalHumorScores:
@@ -705,6 +887,9 @@ class StatisticalHumorEvaluator:
             distinct_1, distinct_2, self_bleu, vocabulary_richness, overall_semantic_diversity
         )
         
+        # 6. Calculate PaCS score
+        pacs_score = self.personalization_evaluator.calculate_pacs_score(text, []) # Placeholder for user profile
+        
         return StatisticalHumorScores(
             surprisal_score=surprisal_score,
             ambiguity_score=ambiguity_score,
@@ -722,7 +907,8 @@ class StatisticalHumorEvaluator:
             inter_cluster_diversity=inter_cluster_diversity,
             semantic_spread=semantic_spread,
             cluster_coherence=cluster_coherence,
-            overall_humor_score=overall_score
+            overall_humor_score=overall_score,
+            pacs_score=pacs_score
         )
     
     def _calculate_statistical_overall_score(self, surprisal: float, ambiguity: float,
@@ -808,6 +994,9 @@ class StatisticalHumorEvaluator:
                 distinct_1, distinct_2, self_bleu, vocabulary_richness, overall_semantic_diversity
             )
             
+            # Calculate PaCS score for the batch
+            pacs_score = self.personalization_evaluator.calculate_pacs_score(text, []) # Placeholder for user profile
+            
             result = StatisticalHumorScores(
                 surprisal_score=surprisal_score,
                 ambiguity_score=ambiguity_score,
@@ -825,7 +1014,8 @@ class StatisticalHumorEvaluator:
                 inter_cluster_diversity=batch_creativity_scores.inter_cluster_diversity if batch_creativity_scores else 0.0,
                 semantic_spread=batch_creativity_scores.semantic_spread if batch_creativity_scores else 0.0,
                 cluster_coherence=batch_creativity_scores.cluster_coherence if batch_creativity_scores else 0.0,
-                overall_humor_score=overall_score
+                overall_humor_score=overall_score,
+                pacs_score=pacs_score
             )
             results.append(result)
         
@@ -886,6 +1076,7 @@ def test_statistical_evaluator():
         print(f"    Semantic Spread: {scores.semantic_spread:.3f}")
         print(f"    Cluster Coherence: {scores.cluster_coherence:.3f}")
         print(f"  OVERALL: {scores.overall_humor_score:.2f}")
+        print(f"  PaCS Score: {scores.pacs_score:.2f}")
 
 
 if __name__ == "__main__":
