@@ -38,13 +38,18 @@ try:
     print("✅ Core humor agents imported successfully")
 except ImportError as e:
     print(f"❌ Core humor agents import failed: {e}")
-    deployment_errors.append(f"Core humor agents: {str(e)}")
+    try:
+        deployment_errors.append(f"Core humor agents: {str(e)}")
+    except NameError:
+        print(f"⚠️ deployment_errors not defined yet: {e}")
     # Create fallback classes
     class ImprovedHumorOrchestrator:
-        def __init__(self):
-            pass
-        async def generate_humor(self, *args, **kwargs):
-            return {"error": "Humor system not available"}
+        def __init__(self, use_crewai_agents: bool = False, personas = None):
+            self.use_crewai_agents = use_crewai_agents
+            self.personas = personas or []
+            self.is_crewai_native = False
+        async def generate_and_evaluate_humor(self, *args, **kwargs):
+            return {"error": "Humor system not available", "success": False, "results": []}
     
     class ContentFilter:
         def __init__(self):
@@ -57,7 +62,10 @@ try:
     print("✅ PostgreSQL knowledge base imported successfully")
 except ImportError as e:
     print(f"⚠️  PostgreSQL knowledge base import failed: {e}")
-    deployment_errors.append(f"PostgreSQL knowledge base: {str(e)}")
+    try:
+        deployment_errors.append(f"PostgreSQL knowledge base: {str(e)}")
+    except NameError:
+        print(f"⚠️ deployment_errors not defined yet: {e}")
     print("⚠️  Using fallback knowledge base functionality")
     improved_aws_knowledge_base = None
 
@@ -254,44 +262,118 @@ async def initialize_humor_system():
     global humor_system, content_filter, persona_manager
     
     if humor_system is not None:
-        return  # Already initialized
+        print("✅ Humor system already initialized")
+        return True
     
     print("🚀 Initializing CAH CrewAI humor system...")
     
     try:
         # Initialize database session
+        print("🔧 Setting up database connection...")
         from agent_system.models.database import get_session_local, create_database
         from agent_system.config.settings import settings
         
         # Ensure database exists
+        print("🔧 Creating database if needed...")
         create_database(settings.database_url)
+        print("✅ Database setup complete")
         
         SessionLocal = get_session_local(settings.database_url)
         db = SessionLocal()
+        print("✅ Database session created")
         
-        # Initialize CrewAI orchestrator
+        # Initialize persona manager
+        print("🔧 Initializing persona manager...")
         from agent_system.personas.persona_manager import PersonaManager
         persona_manager = PersonaManager(db)
-        humor_system = ImprovedHumorOrchestrator()
+        print("✅ Persona manager initialized")
+        
+        # Check for environment variable to enable CrewAI agents
+        use_crewai_agents = os.getenv('USE_CREWAI_AGENTS', 'false').lower() == 'true'
+        print(f"🔧 CrewAI agents setting: {use_crewai_agents}")
+        
+        # Create orchestrator with CrewAI agents if requested
+        print("🔧 Creating humor orchestrator...")
+        from agent_system.agents.improved_humor_agents import ImprovedHumorOrchestrator
+        
+        # Get default personas from persona manager for agent initialization
+        default_personas = ["Comedy Expert", "Edgy Comedian", "Witty Critic"]  # fallback
+        try:
+            # Get available personas from persona manager
+            available_personas = persona_manager.get_available_personas()
+            if available_personas and len(available_personas) >= 3:
+                default_personas = available_personas[:3]  # Use first 3 available personas
+                print(f"🎭 Using personas from persona manager: {default_personas}")
+            else:
+                print(f"🎭 Using fallback personas: {default_personas}")
+        except Exception as e:
+            print(f"⚠️ Could not get personas from persona manager: {e}, using fallback")
+        
+        humor_system = ImprovedHumorOrchestrator(
+            use_crewai_agents=use_crewai_agents,
+            personas=default_personas
+        )
+        print("✅ Humor orchestrator created")
+        
+        print("🔧 Creating content filter...")
+        from agent_system.agents.improved_humor_agents import ContentFilter
         content_filter = ContentFilter()
+        print("✅ Content filter created")
+        
+        if use_crewai_agents:
+            print("🤖 CrewAI-NATIVE agents ENABLED via environment variable")
+        else:
+            print("🎭 Using standard agents (CrewAI agents disabled)")
         
         # Ensure global variables are properly set
+        globals()['humor_system'] = humor_system
+        globals()['content_filter'] = content_filter
         globals()['persona_manager'] = persona_manager
         
+        # Verify globals are set
+        print(f"🔍 Verification - humor_system: {humor_system is not None}")
+        print(f"🔍 Verification - content_filter: {content_filter is not None}")
+        print(f"🔍 Verification - persona_manager: {persona_manager is not None}")
+        
+        db.close()
         print("✅ CAH CrewAI humor system ready!")
         return True
     except Exception as e:
         print(f"❌ Failed to initialize humor system: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        
+        # Create minimal fallback system
+        try:
+            print("🔧 Creating minimal fallback system...")
+            from agent_system.agents.improved_humor_agents import ImprovedHumorOrchestrator, ContentFilter
+            humor_system = ImprovedHumorOrchestrator(use_crewai_agents=False)
+            content_filter = ContentFilter()
+            globals()['humor_system'] = humor_system
+            globals()['content_filter'] = content_filter
+            print("✅ Fallback system created")
+            return True
+        except Exception as fallback_error:
+            print(f"❌ Even fallback system failed: {fallback_error}")
+            return False
 
 @app.on_event("startup")
 async def startup_event():
     """Initialize the CrewAI humor system on startup"""
     print("🚀 Starting CAH CrewAI API Server...")
-    await initialize_humor_system()
-    print("✅ CAH CrewAI API Server ready!")
+    success = await initialize_humor_system()
+    if success:
+        print("✅ CAH CrewAI API Server ready!")
+    else:
+        print("❌ CAH CrewAI API Server failed to initialize properly!")
+        # Set fallback humor system to prevent crashes
+        global humor_system, content_filter
+        if humor_system is None:
+            print("🔧 Creating fallback humor system...")
+            from agent_system.agents.improved_humor_agents import ImprovedHumorOrchestrator, ContentFilter
+            humor_system = ImprovedHumorOrchestrator(use_crewai_agents=False)
+            content_filter = ContentFilter()
+            print("✅ Fallback humor system created!")
 
 async def create_sample_dynamic_personas():
     """Create sample dynamic personas for immediate availability"""
@@ -477,6 +559,76 @@ async def test_humor():
             "traceback": traceback.format_exc()
         }
 
+@app.get("/crewai-status")
+async def get_crewai_status():
+    """Get current CrewAI agent status"""
+    global humor_system
+    
+    if humor_system is None:
+        return {"crewai_agents_enabled": False, "status": "Humor system not initialized"}
+    
+    # Check if using CrewAI-native agents
+    is_crewai_native = getattr(humor_system, 'is_crewai_native', False)
+    
+    if is_crewai_native:
+        return {
+            "architecture": "crewai-native-agents",
+            "crewai_agents_enabled": True,
+            "status": "CrewAI-native ImprovedHumorAgent, ImprovedHumorEvaluator, ImprovedHumorOrchestrator",
+            "description": "All main classes converted to proper CrewAI Agents",
+            "personas": getattr(humor_system, 'personas', [])
+        }
+    else:
+        return {
+            "architecture": "standard-agents-with-crewai-black-cards",
+            "crewai_agents_enabled": False,
+            "status": "Standard generation with CrewAI for black cards only",
+            "description": "Standard classes with CrewAI used only for black card generation"
+        }
+
+@app.post("/toggle-crewai-agents")
+async def toggle_crewai_agents(enable: bool = True):
+    """Toggle between CrewAI-native agents and standard agents"""
+    global humor_system
+    
+    try:
+        from agent_system.personas.persona_manager import PersonaManager
+        from agent_system.models.database import get_session_local
+        from agent_system.config.settings import settings
+        
+        SessionLocal = get_session_local(settings.database_url)
+        db = SessionLocal()
+        
+        try:
+            persona_manager = PersonaManager(db)
+            
+            # Create orchestrator with or without CrewAI agents
+            humor_system = ImprovedHumorOrchestrator(use_crewai_agents=enable)
+            
+            # Update global variable
+            globals()['humor_system'] = humor_system
+            
+            if enable:
+                message = "🤖 CrewAI-NATIVE agents ENABLED"
+                architecture = "crewai-native-agents"
+            else:
+                message = "🎭 Standard agents ENABLED"
+                architecture = "standard-agents"
+            
+            print(message)
+            
+            return {
+                "success": True,
+                "message": message,
+                "architecture": architecture,
+                "crewai_agents_enabled": enable
+            }
+        finally:
+            db.close()
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to toggle CrewAI agents: {str(e)}")
+
 @app.get("/personas")
 async def get_personas():
     """Get all available personas from database and dynamic ones"""
@@ -608,11 +760,23 @@ async def generate_humor(request: HumorRequest):
             
             # Check if humor system is available
             if humor_system is None:
-                print("❌ Humor system not initialized")
-                return JSONResponse(
-                    status_code=500,
-                    content={"detail": "Humor system not initialized"}
-                )
+                print("❌ Humor system not initialized, attempting emergency initialization...")
+                try:
+                    success = await initialize_humor_system()
+                    if not success or humor_system is None:
+                        print("❌ Emergency initialization failed")
+                        return JSONResponse(
+                            status_code=500,
+                            content={"detail": "Humor system not initialized and emergency initialization failed"}
+                        )
+                    else:
+                        print("✅ Emergency initialization successful!")
+                except Exception as init_error:
+                    print(f"❌ Emergency initialization error: {init_error}")
+                    return JSONResponse(
+                        status_code=500,
+                        content={"detail": f"Humor system initialization failed: {init_error}"}
+                    )
             
             # Use asyncio.wait_for to prevent infinite hanging
             result = await asyncio.wait_for(

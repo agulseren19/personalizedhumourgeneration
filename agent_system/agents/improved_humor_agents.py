@@ -175,15 +175,18 @@ class EvaluationResult:
     evaluator_name: str
     model_used: str
     
+    # Hybrid evaluation scores (for CrewAI integration) - must be last with defaults
+    humor_score: float = None       # LLM-based subjective humor assessment
+    
     def __post_init__(self):
         # Ensure all float values are Python floats, not numpy types
         for field_name in ['surprisal_score', 'ambiguity_score', 'distinctiveness_ratio', 
                           'entropy_score', 'perplexity_score', 'semantic_coherence',
                           'distinct_1', 'distinct_2', 'vocabulary_richness', 
-                          'overall_semantic_diversity', 'overall_humor_score', 'pacs_score']:
+                          'overall_semantic_diversity', 'overall_humor_score', 'pacs_score', 'humor_score']:
             if hasattr(self, field_name):
                 value = getattr(self, field_name)
-                if hasattr(value, 'item'):
+                if value is not None and hasattr(value, 'item'):
                     setattr(self, field_name, float(value))
     
     def get_frontend_metrics(self) -> Dict[str, float]:
@@ -339,12 +342,44 @@ class ContentFilter:
         
         return sanitized
 
+try:
+    from crewai import Agent as CrewAIAgent
+    CREWAI_AVAILABLE = True
+except ImportError:
+    print("⚠️ CrewAI not available")
+    CREWAI_AVAILABLE = False
+    CrewAIAgent = object
+
 class ImprovedHumorAgent:
-    """Improved humor generation agent with proper persona handling and user embeddings"""
+    """Improved humor generation agent with proper persona handling and user embeddings - CrewAI Compatible"""
     
-    def __init__(self):
+    def __init__(self, persona_name: str = "Comedy Expert", use_crewai: bool = False, **kwargs):
+        # Set instance attributes first
+        self.persona_name = persona_name
         self.content_filter = ContentFilter()
         self.surprise_calculator = SurpriseCalculator()
+        self.use_crewai = use_crewai
+        
+        # Initialize CrewAI Agent if requested and available
+        if use_crewai and CREWAI_AVAILABLE:
+            self.crewai_agent = CrewAIAgent(
+                role=f"Humor Generation Specialist - {persona_name}",
+                goal=f"Generate hilarious Cards Against Humanity responses as {persona_name}",
+                backstory=f"""You are {persona_name}, a comedy expert who specializes in creating 
+                witty, inappropriate, and hilarious Cards Against Humanity cards. You understand 
+                timing, incongruity, and what makes people laugh. Your responses are creative, 
+                unexpected, and perfectly suited for the CAH format.""",
+                verbose=False,
+                allow_delegation=False,
+                **kwargs
+            )
+            print(f"🤖 CrewAI agent initialized for {persona_name}")
+        else:
+            self.crewai_agent = None
+            if use_crewai and not CREWAI_AVAILABLE:
+                print(f"⚠️ CrewAI requested but not available for {persona_name}")
+            else:
+                print(f"🎭 Using standard agent for {persona_name}")
         
         # Initialize user embedding manager for personalization (SHEEP-Medium approach)
         try:
@@ -416,7 +451,7 @@ class ImprovedHumorAgent:
                 print(f"    Generating with DYNAMIC persona: {custom_persona.name}")
                 result = await self._generate_with_custom_persona(request, custom_persona, model)
             else:
-                print(f"    Generating with static persona: {persona_name}")
+                print(f"    Generating with persona: {persona_name}")
                 result = await self._generate_with_persona(request, persona_name, model)
             
             if result:
@@ -424,13 +459,46 @@ class ImprovedHumorAgent:
         
         return results
     
+
+
     async def _generate_with_persona(self, request: HumorRequest, persona_name: str, model: str) -> Optional[GenerationResult]:
-        """Generate humor with a static persona"""
+        """Generate humor with a static persona (with CrewAI integration)"""
         try:
-            print(f"      Generating with persona: {persona_name} using model: {model}")
-            
-            # Simple prompt for white card generation
-            prompt = f"""Generate a funny white card response for Cards Against Humanity.
+            # *** CREWAI INTEGRATION: Check if we should use CrewAI ***
+            if self.use_crewai and CREWAI_AVAILABLE:
+                print(f"🤖 Generating with CrewAI agent for persona: {persona_name}")
+                
+                # Create persona-specific prompt for CrewAI
+                prompt = f"""Generate ONE hilarious Cards Against Humanity white card response.
+                
+Black Card: "{request.context}"
+Audience: {request.audience}
+Topic: {request.topic}
+User ID: {request.user_id}
+
+Generate as {persona_name}. Keep response under 50 characters.
+Make it witty, unexpected, and perfectly inappropriate for CAH.
+
+Return ONLY the white card text, nothing else."""
+                
+                # Use LLM manager with CrewAI-style generation
+                from agent_system.llm_clients.llm_manager import llm_manager, LLMRequest
+                
+                llm_request = LLMRequest(
+                    prompt=prompt,
+                    model="gpt-4",  # Use consistent model for CrewAI
+                    temperature=0.9,
+                    max_tokens=100,
+                    system_prompt=f"You are {persona_name} - a comedy expert. Generate hilarious Cards Against Humanity content."
+                )
+                
+                response = await llm_manager.generate_response(llm_request)
+                
+            else:
+                print(f"      Generating with standard persona: {persona_name} using model: {model}")
+                
+                # Original prompt for standard generation
+                prompt = f"""Generate a funny white card response for Cards Against Humanity.
 
 Black Card: "{request.context}"
 Audience: {request.audience}
@@ -439,22 +507,23 @@ Topic: {request.topic}
 Generate ONE funny response that fits the blank. Keep it under 50 characters and make it hilarious.
 
 Response:"""
+                
+                # Use LLM manager directly
+                from agent_system.llm_clients.llm_manager import llm_manager, LLMRequest
+                
+                llm_request = LLMRequest(
+                    prompt=prompt,
+                    model=model,
+                    temperature=0.9,
+                    max_tokens=100,
+                    system_prompt=f"You are {persona_name} - a comedy expert. Generate hilarious Cards Against Humanity content."
+                )
+                
+                response = await llm_manager.generate_response(llm_request)
             
-            # Use LLM manager directly
-            from agent_system.llm_clients.llm_manager import llm_manager, LLMRequest
-            
-            llm_request = LLMRequest(
-                prompt=prompt,
-                model=model,
-                temperature=0.9,
-                max_tokens=100,
-                system_prompt=f"You are {persona_name} - a comedy expert. Generate hilarious Cards Against Humanity content."
-            )
-            
-            response = await llm_manager.generate_response(llm_request)
-            
-            if response and response.content:
-                white_card_text = response.content.strip()
+            if response:
+                # Handle both direct strings and LLMResponse objects
+                white_card_text = str(response.content if hasattr(response, 'content') else response).strip()
                 
                 # For white cards, create complete sentence and evaluate it
                 if request.card_type == "white":
@@ -597,7 +666,7 @@ Response:"""
                         surprise_index=surprise_index
                     )
                 
-                print(f"      ✅ Generated: {response.content.strip()[:50]}...")
+                print(f"      ✅ Generated: {white_card_text[:50]}...")
                 return generation_result
             else:
                 print(f"      ❌ Empty response from {persona_name}")
@@ -984,6 +1053,33 @@ White Card:"""
             print(f"    ❌ CrewAI setup failed: {e}")
             print("    CrewAI setup failed, falling back to standard generation")
             return None
+
+    def _extract_humor_from_crewai_result(self, result: str) -> str:
+        """Extract humor text from full CrewAI pipeline result"""
+        try:
+            # CrewAI returns results as string, extract the humor text
+            result_text = str(result).strip()
+            
+            # Look for common patterns in CrewAI output
+            lines = result_text.split('\n')
+            for line in lines:
+                line = line.strip()
+                # Skip empty lines and metadata
+                if not line or line.startswith('##') or line.startswith('**') or line.startswith('Agent:'):
+                    continue
+                # Return first substantial line as humor text
+                if len(line) > 3 and len(line) < 100:
+                    return line
+            
+            # Fallback: return the whole result if no pattern matches
+            if len(result_text) > 3 and len(result_text) < 100:
+                return result_text
+                
+            return ""
+            
+        except Exception as e:
+            print(f"Error extracting humor from CrewAI result: {e}")
+            return ""
 
     async def _generate_single_black_card_with_crewai(self, crew: Any, request: HumorRequest, comedian_name: str = None) -> Optional[GenerationResult]:
         """Generate ONE black card using simplified CrewAI - FAST VERSION"""
@@ -1390,13 +1486,44 @@ Black Card:"""
         score += relevance * 0.3
         
         return min(score, 1.0)
+    
+    async def _check_content_safety(self, text: str) -> tuple[bool, float]:
+        """Check if content is safe using the content filter"""
+        try:
+            is_safe, toxicity_score, _ = self.content_filter.is_content_safe(text)
+            return is_safe, toxicity_score
+        except Exception as e:
+            print(f"⚠️ Content safety check failed: {e}")
+            return True, 0.0  # Default to safe if check fails
 
 class ImprovedHumorEvaluator:
-    """Literature-based evaluation system with academically rigorous metrics"""
+    """Literature-based evaluation system with academically rigorous metrics - CrewAI Compatible"""
     
-    def __init__(self):
+    def __init__(self, use_crewai: bool = False, **kwargs):
         self.content_filter = ContentFilter()
         self.surprise_calculator = SurpriseCalculator()  # Keep for basic evaluation fallback
+        self.use_crewai = use_crewai
+        
+        # Initialize CrewAI Agent if requested and available
+        if use_crewai and CREWAI_AVAILABLE:
+            self.crewai_agent = CrewAIAgent(
+                role="Humor Quality Evaluator",
+                goal="Evaluate humor quality, appropriateness, audience fit, and safety",
+                backstory="""You are an expert in computational humor evaluation. You analyze jokes 
+                for humor quality (surprise, incongruity, timing), appropriateness for the audience,
+                context relevance, and safety concerns. You provide detailed scores and reasoning 
+                based on established humor theory and evaluation metrics.""",
+                verbose=False,
+                allow_delegation=False,
+                **kwargs
+            )
+            print("🤖 CrewAI evaluator agent initialized")
+        else:
+            self.crewai_agent = None
+            if use_crewai and not CREWAI_AVAILABLE:
+                print("⚠️ CrewAI requested but not available for evaluator")
+            else:
+                print("🎭 Using standard evaluator")
         
         # Import the new literature-based evaluator
         try:
@@ -1418,14 +1545,126 @@ class ImprovedHumorEvaluator:
             self.statistical_evaluator = None
     
     async def evaluate_humor(self, humor_text: str, request: HumorRequest) -> EvaluationResult:
-        """Evaluate humor using literature-based metrics"""
+        """Evaluate humor using hybrid approach: CrewAI LLM + Statistical metrics"""
         
-        if self.statistical_evaluator:
-            # Use the new literature-based evaluation
+        # *** HYBRID EVALUATION: Use both CrewAI and Statistical when available ***
+        if self.use_crewai and CREWAI_AVAILABLE and self.statistical_evaluator:
+            print(f"🤖 Using hybrid evaluation: CrewAI LLM + Statistical metrics")
+            return await self._evaluate_hybrid(humor_text, request)
+        elif self.statistical_evaluator:
+            # Use statistical evaluation only
+            print(f"📊 Using statistical-only evaluation")
             return await self._evaluate_with_literature_metrics(humor_text, request)
         else:
             # Fallback to basic evaluation
+            print(f"⚠️ Using basic fallback evaluation")
             return await self._evaluate_basic(humor_text, request)
+    
+    async def _evaluate_hybrid(self, humor_text: str, request: HumorRequest) -> EvaluationResult:
+        """Hybrid evaluation: Statistical metrics + LLM humor score only"""
+        
+        try:
+            # Step 1: Get statistical metrics (objective measures)
+            statistical_result = await self._evaluate_with_literature_metrics(humor_text, request)
+            
+            # Step 2: Get ONLY humor score from LLM (subjective humor assessment)
+            llm_humor_score = await self._get_llm_humor_score(humor_text, request)
+            
+            # Step 3: Combine results - Keep all statistical metrics, replace only humor_score
+            combined_result = EvaluationResult(
+                # Keep ALL statistical metrics (objective)
+                surprisal_score=statistical_result.surprisal_score,
+                ambiguity_score=statistical_result.ambiguity_score,
+                distinctiveness_ratio=statistical_result.distinctiveness_ratio,
+                entropy_score=statistical_result.entropy_score,
+                perplexity_score=statistical_result.perplexity_score,
+                semantic_coherence=statistical_result.semantic_coherence,
+                distinct_1=statistical_result.distinct_1,
+                distinct_2=statistical_result.distinct_2,
+                vocabulary_richness=statistical_result.vocabulary_richness,
+                overall_semantic_diversity=statistical_result.overall_semantic_diversity,
+                pacs_score=statistical_result.pacs_score,
+                
+                # Use LLM ONLY for humor score (subjective humor quality)
+                humor_score=llm_humor_score,
+                
+                # Keep statistical overall score (will be shown as "overall score" on frontend)
+                overall_humor_score=statistical_result.overall_humor_score,
+                
+                # Enhanced reasoning
+                reasoning=f"HYBRID: Statistical metrics + LLM humor assessment. LLM Humor: {llm_humor_score:.1f}/10, Statistical Overall: {statistical_result.overall_humor_score:.1f}/10",
+                evaluator_name="HybridEvaluator_Statistical+LLMHumor",
+                model_used="statistical+llm-humor"
+            )
+            
+            print(f"✅ Hybrid evaluation: LLM_humor={llm_humor_score:.1f}, Statistical_overall={statistical_result.overall_humor_score:.1f}")
+            return combined_result
+            
+        except Exception as e:
+            print(f"⚠️ Hybrid evaluation failed: {e}")
+            print("Falling back to statistical evaluation only")
+            return await self._evaluate_with_literature_metrics(humor_text, request)
+    
+    async def _get_llm_humor_score(self, humor_text: str, request: HumorRequest) -> float:
+        """Get ONLY humor score from LLM for hybrid evaluation"""
+        
+        try:
+            # Get user's favorite personas for personalized humor assessment
+            persona_context = ""
+            if hasattr(request, 'favorite_personas') and request.favorite_personas:
+                persona_list = ", ".join(request.favorite_personas)
+                persona_context = f"\nUser's Favorite Personas: {persona_list}\nRate how funny this would be specifically for someone who likes {persona_list} style humor.\n"
+                print(f"🎭 LLM evaluation with favorite personas: {persona_list}")
+            else:
+                print(f"🎭 LLM evaluation without persona context")
+            
+            # Personalized prompt focused only on humor assessment
+            prompt = f"""Rate ONLY the humor quality of this Cards Against Humanity response.
+
+Black Card: "{request.context}"
+White Card: "{humor_text}"
+Audience: {request.audience}{persona_context}
+On a scale of 0-10, how funny is this response? Consider:
+- Cleverness and wit
+- Surprise and unexpectedness  
+- Timing and appropriateness
+- Overall comedic effect
+- How well it matches the user's humor preferences
+
+RESPOND WITH ONLY A NUMBER BETWEEN 0.0 AND 10.0 (e.g., "7.3")
+NO OTHER TEXT OR EXPLANATION."""
+
+            # Use LLM manager to get humor score
+            from agent_system.llm_clients.llm_manager import llm_manager, LLMRequest
+            
+            llm_request = LLMRequest(
+                prompt=prompt,
+                model="gpt-4",
+                temperature=0.2,  # Low temperature for consistent scoring
+                max_tokens=10,    # Very short response
+                system_prompt="You are an expert humor evaluator. Rate humor quality with a single number."
+            )
+            
+            response = await llm_manager.generate_response(llm_request)
+            score_text = str(response.content if hasattr(response, 'content') else response).strip()
+            
+            # Extract numeric score
+            import re
+            match = re.search(r'(\d+\.?\d*)', score_text)
+            if match:
+                score = float(match.group(1))
+                # Clamp between 0-10
+                score = max(0.0, min(10.0, score))
+                print(f"🤖 LLM humor score: {score:.1f}/10")
+                return score
+            else:
+                print(f"⚠️ Could not parse LLM humor score from: '{score_text}', using fallback")
+                return 6.0  # Neutral fallback
+                
+        except Exception as e:
+            print(f"⚠️ LLM humor scoring failed: {e}")
+            return 6.0  # Neutral fallback score
+
     
     async def _evaluate_with_literature_metrics(self, humor_text: str, request: HumorRequest) -> EvaluationResult:
         """Evaluate using literature-based statistical metrics"""
@@ -1485,6 +1724,7 @@ class ImprovedHumorEvaluator:
                 overall_semantic_diversity=scores.overall_semantic_diversity,
                 overall_humor_score=scores.overall_humor_score,
                 pacs_score=scores.pacs_score,
+                humor_score=None,  # No LLM humor score for statistical-only evaluation
                 reasoning=reasoning,
                 evaluator_name="LiteratureBasedEvaluator",
                 model_used="statistical_humor_evaluator"
@@ -1564,6 +1804,7 @@ class ImprovedHumorEvaluator:
             overall_semantic_diversity=0.5,  # Default neutral
             overall_humor_score=overall_score,
             pacs_score=0.0,  # No personalization in basic mode
+            humor_score=None,  # No LLM humor score for basic evaluation
             reasoning=reasoning,
             evaluator_name="BasicEvaluator",
             model_used="rule_based"
@@ -1653,11 +1894,30 @@ class ImprovedHumorEvaluator:
         return max(1.0, min(10.0, score))
 
 class ImprovedHumorOrchestrator:
-    """Orchestrates the improved humor generation and evaluation system"""
+    """Orchestrates the improved humor generation and evaluation system - CrewAI Compatible"""
     
-    def __init__(self):
-        self.agent = ImprovedHumorAgent()
-        self.evaluator = ImprovedHumorEvaluator()
+    def __init__(self, use_crewai_agents: bool = False, personas: List[str] = None):
+        self.use_crewai_agents = use_crewai_agents
+        # Use the actual personas passed in, these should come from persona manager
+        self.personas = personas if personas else ["Comedy Expert", "Edgy Comedian", "Witty Critic"]
+        
+        if use_crewai_agents and CREWAI_AVAILABLE:
+            # Create CrewAI agents
+            print("🤖 Creating CrewAI-native agents")
+            self.generator_agents = [
+                ImprovedHumorAgent(persona_name=persona, use_crewai=True) 
+                for persona in self.personas
+            ]
+            self.evaluator_agent = ImprovedHumorEvaluator(use_crewai=True)
+            self.is_crewai_native = True
+        else:
+            # Use standard agents
+            print("🎭 Using standard agents")
+            self.agent = ImprovedHumorAgent(persona_name="Comedy Expert", use_crewai=False)
+            self.evaluator = ImprovedHumorEvaluator(use_crewai=False)
+            self.is_crewai_native = False
+    
+
     
     async def generate_and_evaluate_humor(self, request: HumorRequest) -> Dict[str, Any]:
         """Generate and evaluate humor with proper persona handling"""
@@ -1672,24 +1932,41 @@ class ImprovedHumorOrchestrator:
         # Get persona recommendations
         recommended_personas = await self._get_persona_recommendations(request)
         
-        # Use CrewAI for black cards (with timeout), standard generation for white cards
+        # Use the appropriate generation method based on card type and CrewAI availability
         if request.card_type == "black":
             print(f"🎭 Using CrewAI for black card generation (with 30s timeout)")
             try:
+                # Use the first generator agent for black card generation
+                agent = self.generator_agents[0] if hasattr(self, 'generator_agents') and self.generator_agents else self.agent
                 # Use asyncio.wait_for to prevent infinite hanging
                 generations = await asyncio.wait_for(
-                    self.agent.generate_black_cards_with_crewai(request),
+                    agent.generate_black_cards_with_crewai(request),
                     timeout=30.0  # 30 second timeout for CrewAI
                 )
                 print("✅ CrewAI black card generation completed successfully")
             except asyncio.TimeoutError:
                 print("⚠️ CrewAI timeout after 30s, falling back to standard generation")
-                generations = await self.agent.generate_humor(request, recommended_personas)
+                # Use the first generator agent for fallback
+                agent = self.generator_agents[0] if hasattr(self, 'generator_agents') and self.generator_agents else self.agent
+                generations = await agent.generate_humor(request, recommended_personas)
         else:
-            print(f"🎭 Using standard generation for white cards")
-            print(f"🎭 DEBUG: Calling self.agent.generate_humor with {len(recommended_personas)} personas")
-            generations = await self.agent.generate_humor(request, recommended_personas)
-            print(f"🎭 DEBUG: Standard generation returned: {generations}")
+            # For white cards, use generate_humor which now has integrated CrewAI support
+            if self.is_crewai_native:
+                print(f"🤖 Using CrewAI-native agents for white card generation")
+                # Use the first generator agent for generation
+                agent = self.generator_agents[0] if self.generator_agents else None
+                if agent:
+                    print(f"🎭 DEBUG: Calling agent.generate_humor with {len(recommended_personas)} personas")
+                    generations = await agent.generate_humor(request, recommended_personas)
+                else:
+                    print("❌ No CrewAI generator agents available")
+                    generations = []
+            else:
+                print(f"🎭 Using standard generation for white cards")
+                print(f"🎭 DEBUG: Calling self.agent.generate_humor with {len(recommended_personas)} personas")
+                generations = await self.agent.generate_humor(request, recommended_personas)
+            
+            print(f"🎭 DEBUG: Generation returned: {len(generations) if generations else 0} results")
             print(f"🎭 DEBUG: Type: {type(generations)}, Length: {len(generations) if generations else 'None'}")
         
         if not generations:
@@ -1714,8 +1991,9 @@ class ImprovedHumorOrchestrator:
         
         # Evaluate each generation
         evaluated_results = []
+        evaluator = self.evaluator_agent if hasattr(self, 'evaluator_agent') else self.evaluator
         for generation in generations:
-            evaluation = await self.evaluator.evaluate_humor(generation.text, request)
+            evaluation = await evaluator.evaluate_humor(generation.text, request)
             
             evaluated_results.append({
                 'generation': generation,

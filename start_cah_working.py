@@ -154,9 +154,19 @@ class CAHWorkingManager:
             time.sleep(2)
             
             # Start the CrewAI API exactly like the bash script
+            # Set up environment to ensure proper Python path
+            env = os.environ.copy()
+            current_pythonpath = env.get('PYTHONPATH', '')
+            additional_paths = [
+                str(project_root),
+                str(project_root / "agent_system")
+            ]
+            new_pythonpath = ':'.join(additional_paths + [current_pythonpath] if current_pythonpath else additional_paths)
+            env['PYTHONPATH'] = new_pythonpath
+            
             self.backend_process = subprocess.Popen([
                 sys.executable, str(project_root / "agent_system" / "api" / "cah_crewai_api.py")
-            ], cwd=project_root)
+            ], cwd=project_root, env=env)
             
             logger.info(f"CrewAI Backend PID: {self.backend_process.pid}")
             

@@ -48,7 +48,7 @@ def get_game_manager(db: Session = Depends(get_db)) -> AuthenticatedMultiplayerC
         if game_manager is None and not _game_manager_created:
             # Initialize components only once
             if humor_orchestrator is None:
-                humor_orchestrator = ImprovedHumorOrchestrator()
+                humor_orchestrator = ImprovedHumorOrchestrator(use_crewai_agents=False)  # Use standard agents for multiplayer
             if persona_manager is None:
                 persona_manager = PersonaManager(db)
             

@@ -113,7 +113,7 @@ async def startup_event():
     global humor_system, content_filter
     print("🚀 Starting CAH API Server...")
     
-    humor_system = ImprovedHumorOrchestrator()
+    humor_system = ImprovedHumorOrchestrator(use_crewai_agents=False)  # Use standard agents for old API
     content_filter = ContentFilter()
     
     print("✅ CAH API Server ready!")

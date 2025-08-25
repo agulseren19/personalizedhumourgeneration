@@ -1454,10 +1454,21 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                       </span>
                     </div>
                     {/* Literature-Based Evaluation Metrics for Game Mode */}
-                    <div className="grid grid-cols-2 gap-1 text-xs mb-2">
-                      {/* Real Literature-Based Metrics for Game Mode */}
-                      <div title="Overall humor quality based on multiple academic metrics">
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs mb-2">
+                      {/* Hybrid Evaluation Metrics for Game Mode */}
+                      <div title="LLM subjective humor assessment">
                         <span className="text-gray-400">Humor:</span>
+                        <span className="text-black ml-1">
+                          {
+                            (() => {
+                              const humorScore = card.evaluation?.humor_score;
+                              return humorScore != null ? humorScore.toFixed(1) : 'N/A';
+                            })()
+                          }/10
+                        </span>
+                      </div>
+                      <div title="Overall statistical score based on academic metrics">
+                        <span className="text-gray-400">Overall:</span>
                         <span className="text-black ml-1">
                           {card.evaluation?.overall_humor_score?.toFixed(1) || 'N/A'}/10
                         </span>
@@ -1480,14 +1491,9 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                           {((card.evaluation?.distinct_1 ?? 0) * 10).toFixed(1)}/10
                         </span>
                       </div>
-                      <div title="Vocabulary sophistication and richness">
-                        <span className="text-gray-400">Vocabulary:</span>
-                        <span className="text-black ml-1">
-                          {((card.evaluation?.vocabulary_richness ?? 0) * 10).toFixed(1)}/10
-                        </span>
-                      </div>
+
                       <div title="Personalization score based on user preferences (Deep-SHEEP 2022)">
-                        <span className="text-gray-400">Personalization:</span>
+                        <span className="text-gray-400">Personal:</span>
                         <span className="text-black ml-1">
                           {((card.evaluation?.pacs_score ?? 0.5) * 10).toFixed(1)}/10
                         </span>
@@ -1544,14 +1550,14 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
             </div>
           )}
 
-          <div className="flex flex-row flex-wrap justify-center gap-6 mt-4">
+          <div className="flex flex-row flex-wrap justify-center gap-4 mt-4">
             {generations.map((generation, index) => (
               <div
                                     key={generation.id || generation.generation?.text || `generation-${index}`}
                 className={`${cardType === 'black' 
                   ? 'bg-black text-white border-4 border-white' 
                   : 'bg-white text-black border-4 border-black'
-                } rounded-2xl shadow-xl w-72 min-h-[180px] flex flex-col justify-between items-center p-4 font-semibold text-base text-center select-none relative mb-4 hover:scale-105 transition-transform`}
+                } rounded-2xl shadow-xl w-64 min-h-[180px] flex flex-col justify-between items-center p-4 font-semibold text-base text-center select-none relative mb-4 hover:scale-105 transition-transform`}
               >
                 <div 
                   className={`flex-grow flex items-center justify-center mb-2 ${cardType === 'white' ? 'cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors' : ''}`}
@@ -1574,10 +1580,21 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                     </span>
                   </div>
                   {/* Literature-Based Evaluation Metrics */}
-                  <div className="grid grid-cols-2 gap-1 text-xs mb-2">
-                    {/* New Literature-Based Metrics */}
-                    <div title="Overall humor quality based on multiple academic metrics">
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs mb-2">
+                    {/* Hybrid Evaluation: LLM Humor + Statistical Overall */}
+                    <div title="LLM subjective humor assessment">
                       <span className="text-gray-400">Humor:</span>
+                      <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
+                        {
+                          (() => {
+                            const humorScore = generation.humor_score ?? generation.evaluation?.humor_score;
+                            return humorScore != null ? humorScore.toFixed(1) : 'N/A';
+                          })()
+                        }/10
+                      </span>
+                    </div>
+                    <div title="Overall statistical score based on academic metrics">
+                      <span className="text-gray-400">Overall:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
                         {(generation.overall_humor_score ?? generation.evaluation?.overall_humor_score)?.toFixed(1) || 'N/A'}/10
                       </span>
@@ -1600,14 +1617,9 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                         {((generation.distinct_1 ?? generation.evaluation?.distinct_1 ?? 0) * 10).toFixed(1)}/10
                       </span>
                     </div>
-                    <div title="Vocabulary sophistication and richness">
-                      <span className="text-gray-400">Vocabulary:</span>
-                      <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
-                        {((generation.vocabulary_richness ?? generation.evaluation?.vocabulary_richness ?? 0) * 10).toFixed(1)}/10
-                      </span>
-                    </div>
+
                     <div title="Personalization score based on user preferences (Deep-SHEEP 2022)">
-                      <span className="text-gray-400">Personalization:</span>
+                      <span className="text-gray-400">Personal:</span>
                       <span className={cardType === 'black' ? 'text-white ml-1' : 'text-black ml-1'}>
                         {((generation.pacs_score ?? generation.evaluation?.pacs_score ?? 0.5) * 10).toFixed(1)}/10
                       </span>
