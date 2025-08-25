@@ -1,0 +1,11 @@
+# User Embedding System Requirements
+# Minimal dependencies for SHEEP-Medium/HuBi-Medium personalization
+
+numpy>=1.21.0
+
+# Optional: For production text embeddings (replace hash-based embeddings)
+# sentence-transformers>=2.2.0
+# torch>=1.9.0
+
+# Core dependencies (should already be in your main requirements.txt)
+# asyncio, datetime, hashlib, random (built-in Python modules)

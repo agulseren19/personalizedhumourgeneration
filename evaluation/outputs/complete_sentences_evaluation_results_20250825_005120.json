@@ -1,0 +1,1602 @@
+{
+  "complete_sentences": [
+    {
+      "combination_id": 1,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "In the dystopian future, our currency isn't Bitcoin, it's _____.",
+      "white_card": "Overdue Blockbuster rental fees.",
+      "clean_white_card": "overdue blockbuster rental fees.",
+      "complete_sentence": "In the dystopian future, our currency isn't Bitcoin, it's overdue blockbuster rental fees.",
+      "scores": {
+        "surprisal_score": 4.7,
+        "ambiguity_score": 7.7,
+        "distinctiveness_ratio": 3.2,
+        "entropy_score": 6.3,
+        "perplexity_score": 7.7,
+        "semantic_coherence": 7.9,
+        "distinct_1": 0.94,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.54,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.7
+      }
+    },
+    {
+      "combination_id": 2,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "During the annual office party, my boss surprisingly announced a team-building exercise involving _____.",
+      "white_card": "Tandem unicycles and clown shoes.",
+      "clean_white_card": "tandem unicycles and clown shoes.",
+      "complete_sentence": "During the annual office party, my boss surprisingly announced a team-building exercise involving tandem unicycles and clown shoes.",
+      "scores": {
+        "surprisal_score": 4.0,
+        "ambiguity_score": 6.6,
+        "distinctiveness_ratio": 2.5,
+        "entropy_score": 6.2,
+        "perplexity_score": 8.8,
+        "semantic_coherence": 6.8,
+        "distinct_1": 0.94,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.45,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.8
+      }
+    },
+    {
+      "combination_id": 3,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "Forget love languages, my partner really communicates through _____.",
+      "white_card": "Aggressive interpretive dance.",
+      "clean_white_card": "aggressive interpretive dance.",
+      "complete_sentence": "Forget love languages, my partner really communicates through aggressive interpretive dance.",
+      "scores": {
+        "surprisal_score": 4.6,
+        "ambiguity_score": 7.9,
+        "distinctiveness_ratio": 3.7,
+        "entropy_score": 5.3,
+        "perplexity_score": 7.6,
+        "semantic_coherence": 6.2,
+        "distinct_1": 0.96,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.64,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.7
+      }
+    },
+    {
+      "combination_id": 4,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "In a shocking turn of events, Gordon Ramsay actually complimented my ____.",
+      "white_card": "Mediocre microwave mac 'n' cheese.",
+      "clean_white_card": "mediocre microwave mac 'n' cheese.",
+      "complete_sentence": "In a shocking turn of events, Gordon Ramsay actually complimented my mediocre microwave mac 'n' cheese.",
+      "scores": {
+        "surprisal_score": 3.7,
+        "ambiguity_score": 8.3,
+        "distinctiveness_ratio": 4.5,
+        "entropy_score": 6.0,
+        "perplexity_score": 8.3,
+        "semantic_coherence": 6.5,
+        "distinct_1": 0.91,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.58,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.4
+      }
+    },
+    {
+      "combination_id": 5,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "In a shocking twist of events, TSA confiscated my ______ before boarding.",
+      "white_card": "autographed Nicolas Cage pillowcase",
+      "clean_white_card": "autographed nicolas cage pillowcase",
+      "complete_sentence": "In a shocking twist of events, TSA confiscated my autographed nicolas cage pillowcaseautographed nicolas cage pillowcase before boarding.",
+      "scores": {
+        "surprisal_score": 4.6,
+        "ambiguity_score": 6.9,
+        "distinctiveness_ratio": 3.7,
+        "entropy_score": 6.5,
+        "perplexity_score": 7.4,
+        "semantic_coherence": 7.9,
+        "distinct_1": 0.9,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.58,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.3
+      }
+    },
+    {
+      "combination_id": 6,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "In a shocking twist, the school board replaced detention with ____.",
+      "white_card": "Competitive yodeling classes.",
+      "clean_white_card": "competitive yodeling classes.",
+      "complete_sentence": "In a shocking twist, the school board replaced detention with competitive yodeling classes.",
+      "scores": {
+        "surprisal_score": 4.6,
+        "ambiguity_score": 7.7,
+        "distinctiveness_ratio": 3.6,
+        "entropy_score": 5.5,
+        "perplexity_score": 7.4,
+        "semantic_coherence": 7.2,
+        "distinct_1": 0.89,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.47,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.6
+      }
+    },
+    {
+      "combination_id": 7,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "In my latest attempt to live forever, I've replaced my morning coffee with _____.",
+      "white_card": "Unicorn tears and crushed hopes.",
+      "clean_white_card": "unicorn tears and crushed hopes.",
+      "complete_sentence": "In my latest attempt to live forever, I've replaced my morning coffee with unicorn tears and crushed hopes.",
+      "scores": {
+        "surprisal_score": 5.4,
+        "ambiguity_score": 7.6,
+        "distinctiveness_ratio": 4.5,
+        "entropy_score": 5.2,
+        "perplexity_score": 9.4,
+        "semantic_coherence": 6.9,
+        "distinct_1": 0.95,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.46,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.4
+      }
+    },
+    {
+      "combination_id": 8,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "In the next episode of Keeping Up with the Kardashians, Kim announces her new career in _____.",
+      "white_card": "Professional influencer for pets.",
+      "clean_white_card": "professional influencer for pets.",
+      "complete_sentence": "In the next episode of Keeping Up with the Kardashians, Kim announces her new career in professional influencer for pets.",
+      "scores": {
+        "surprisal_score": 4.7,
+        "ambiguity_score": 8.1,
+        "distinctiveness_ratio": 4.5,
+        "entropy_score": 5.3,
+        "perplexity_score": 7.2,
+        "semantic_coherence": 7.0,
+        "distinct_1": 0.9,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.51,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.9
+      }
+    },
+    {
+      "combination_id": 9,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "During halftime, the cheerleaders surprised everyone by doing a routine to _____.",
+      "white_card": "Grandma's polka workout DVD.",
+      "clean_white_card": "grandma's polka workout dvd.",
+      "complete_sentence": "During halftime, the cheerleaders surprised everyone by doing a routine to grandma's polka workout dvd.",
+      "scores": {
+        "surprisal_score": 3.7,
+        "ambiguity_score": 8.1,
+        "distinctiveness_ratio": 2.6,
+        "entropy_score": 6.4,
+        "perplexity_score": 7.8,
+        "semantic_coherence": 6.3,
+        "distinct_1": 0.92,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.57,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.4
+      }
+    },
+    {
+      "combination_id": 10,
+      "user_id": "office_gamer_456",
+      "personas": [
+        "Office Worker",
+        "Gaming Guru"
+      ],
+      "black_card": "In a shocking turn of events, the new political party's mascot is _____.",
+      "white_card": "An overcooked spaghetti noodle!",
+      "clean_white_card": "an overcooked spaghetti noodle!",
+      "complete_sentence": "In a shocking turn of events, the new political party's mascot is an overcooked spaghetti noodle!.",
+      "scores": {
+        "surprisal_score": 3.6,
+        "ambiguity_score": 7.4,
+        "distinctiveness_ratio": 4.2,
+        "entropy_score": 5.6,
+        "perplexity_score": 9.0,
+        "semantic_coherence": 6.4,
+        "distinct_1": 0.93,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.59,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.1
+      }
+    },
+    {
+      "combination_id": 11,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "In a shocking twist, Elon Musk's next invention is a machine that turns _____ into cryptocurrency.",
+      "white_card": "Failed New Year's resolutions",
+      "clean_white_card": "failed new year's resolutions",
+      "complete_sentence": "In a shocking twist, Elon Musk's next invention is a machine that turns failed new year's resolutions into cryptocurrency.",
+      "scores": {
+        "surprisal_score": 4.6,
+        "ambiguity_score": 8.4,
+        "distinctiveness_ratio": 2.8,
+        "entropy_score": 5.2,
+        "perplexity_score": 10.0,
+        "semantic_coherence": 7.6,
+        "distinct_1": 0.88,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.61,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.3
+      }
+    },
+    {
+      "combination_id": 12,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "During the office meeting, the boss unexpectedly pulled out _____.",
+      "white_card": "A rubber chicken and started singing Broadway show tunes.",
+      "clean_white_card": "a rubber chicken and started singing broadway show tunes.",
+      "complete_sentence": "During the office meeting, the boss unexpectedly pulled out a rubber chicken and started singing broadway show tunes.",
+      "scores": {
+        "surprisal_score": 5.3,
+        "ambiguity_score": 7.7,
+        "distinctiveness_ratio": 2.5,
+        "entropy_score": 6.3,
+        "perplexity_score": 7.1,
+        "semantic_coherence": 7.1,
+        "distinct_1": 0.95,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.51,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.5
+      }
+    },
+    {
+      "combination_id": 13,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "My therapist says my obsession with _____ is ruining my relationships.",
+      "white_card": "Accidentally forwarding 'Reply-all' emails",
+      "clean_white_card": "accidentally forwarding 'reply-all' emails",
+      "complete_sentence": "My therapist says my obsession with accidentally forwarding 'reply-all' emails is ruining my relationships.",
+      "scores": {
+        "surprisal_score": 5.2,
+        "ambiguity_score": 7.0,
+        "distinctiveness_ratio": 3.5,
+        "entropy_score": 5.1,
+        "perplexity_score": 7.2,
+        "semantic_coherence": 6.9,
+        "distinct_1": 0.86,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.48,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.6
+      }
+    },
+    {
+      "combination_id": 14,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "In a shocking turn of events, Gordon Ramsay proclaimed _____ to be the best thing he's ever tasted.",
+      "white_card": "Unicorn tears seasoned with moon dust",
+      "clean_white_card": "unicorn tears seasoned with moon dust",
+      "complete_sentence": "In a shocking turn of events, Gordon Ramsay proclaimed unicorn tears seasoned with moon dust to be the best thing he's ever tasted.",
+      "scores": {
+        "surprisal_score": 4.9,
+        "ambiguity_score": 8.1,
+        "distinctiveness_ratio": 4.4,
+        "entropy_score": 5.1,
+        "perplexity_score": 7.6,
+        "semantic_coherence": 7.1,
+        "distinct_1": 0.87,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.55,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.6
+      }
+    },
+    {
+      "combination_id": 15,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "Forget about snakes on a plane; the real terror is _____ in your luggage.",
+      "white_card": "Forget about snakes on a plane; the real terror is a clown with a ukulele in your luggage.",
+      "clean_white_card": "forget about snakes on a plane; the real terror is a clown with a ukulele in your luggage.",
+      "complete_sentence": "Forget about snakes on a plane; the real terror is forget about snakes on a plane; the real terror is a clown with a ukulele in your luggage. in your luggage.",
+      "scores": {
+        "surprisal_score": 3.7,
+        "ambiguity_score": 7.7,
+        "distinctiveness_ratio": 4.3,
+        "entropy_score": 6.2,
+        "perplexity_score": 7.4,
+        "semantic_coherence": 6.8,
+        "distinct_1": 0.86,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.58,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.9
+      }
+    },
+    {
+      "combination_id": 16,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "In a shocking twist, the Board of Education has now made _____ mandatory in all schools.",
+      "white_card": "Using algebra to calculate student loans.",
+      "clean_white_card": "using algebra to calculate student loans.",
+      "complete_sentence": "In a shocking twist, the Board of Education has now made using algebra to calculate student loans. mandatory in all schools.",
+      "scores": {
+        "surprisal_score": 3.6,
+        "ambiguity_score": 7.0,
+        "distinctiveness_ratio": 4.3,
+        "entropy_score": 5.8,
+        "perplexity_score": 9.6,
+        "semantic_coherence": 7.5,
+        "distinct_1": 0.87,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.47,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.9
+      }
+    },
+    {
+      "combination_id": 17,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "In a shocking turn of events, the World Health Organization now recommends _____ for optimal health.",
+      "white_card": "Competitive hotdog eating contests.",
+      "clean_white_card": "competitive hotdog eating contests.",
+      "complete_sentence": "In a shocking turn of events, the World Health Organization now recommends competitive hotdog eating contests. for optimal health.",
+      "scores": {
+        "surprisal_score": 4.0,
+        "ambiguity_score": 8.3,
+        "distinctiveness_ratio": 3.4,
+        "entropy_score": 5.4,
+        "perplexity_score": 8.9,
+        "semantic_coherence": 7.5,
+        "distinct_1": 0.87,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.58,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.6
+      }
+    },
+    {
+      "combination_id": 18,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "In the shocking finale of the reality show, the final challenge was to _____.",
+      "white_card": "Enroll in a Zumba class with grizzly bears.",
+      "clean_white_card": "enroll in a zumba class with grizzly bears.",
+      "complete_sentence": "In the shocking finale of the reality show, the final challenge was to enroll in a zumba class with grizzly bears.",
+      "scores": {
+        "surprisal_score": 4.6,
+        "ambiguity_score": 6.9,
+        "distinctiveness_ratio": 4.5,
+        "entropy_score": 5.2,
+        "perplexity_score": 8.5,
+        "semantic_coherence": 7.8,
+        "distinct_1": 0.88,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.54,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.1
+      }
+    },
+    {
+      "combination_id": 19,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "During the Super Bowl halftime show, everyone was shocked to see _____.",
+      "white_card": "Grandma's interpretive dance routine.",
+      "clean_white_card": "grandma's interpretive dance routine.",
+      "complete_sentence": "During the Super Bowl halftime show, everyone was shocked to see grandma's interpretive dance routine.",
+      "scores": {
+        "surprisal_score": 4.5,
+        "ambiguity_score": 7.5,
+        "distinctiveness_ratio": 4.1,
+        "entropy_score": 5.2,
+        "perplexity_score": 8.8,
+        "semantic_coherence": 7.9,
+        "distinct_1": 0.86,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.56,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.7
+      }
+    },
+    {
+      "combination_id": 20,
+      "user_id": "dad_millennial_789",
+      "personas": [
+        "Dad Humor Enthusiast",
+        "Millennial Memer"
+      ],
+      "black_card": "During the political debate, the candidate surprised everyone by promising to replace the national anthem with ____.",
+      "white_card": "An autotuned remix of their own campaign speeches.",
+      "clean_white_card": "an autotuned remix of their own campaign speeches.",
+      "complete_sentence": "During the political debate, the candidate surprised everyone by promising to replace the national anthem with an autotuned remix of their own campaign speeches.",
+      "scores": {
+        "surprisal_score": 4.9,
+        "ambiguity_score": 7.2,
+        "distinctiveness_ratio": 2.6,
+        "entropy_score": 5.9,
+        "perplexity_score": 8.4,
+        "semantic_coherence": 7.1,
+        "distinct_1": 0.91,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.6,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.6
+      }
+    },
+    {
+      "combination_id": 21,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "In a shocking turn of events, Siri's latest update includes _____.",
+      "white_card": "An existential crisis and tequila shots.",
+      "clean_white_card": "an existential crisis and tequila shots.",
+      "complete_sentence": "In a shocking turn of events, Siri's latest update includes an existential crisis and tequila shots.",
+      "scores": {
+        "surprisal_score": 4.9,
+        "ambiguity_score": 7.8,
+        "distinctiveness_ratio": 4.1,
+        "entropy_score": 6.4,
+        "perplexity_score": 7.5,
+        "semantic_coherence": 6.5,
+        "distinct_1": 0.88,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.48,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.0
+      }
+    },
+    {
+      "combination_id": 22,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "In the middle of the board meeting, the CEO suddenly pulled out ____.",
+      "white_card": "A ham sandwich named 'Profit Margin'.",
+      "clean_white_card": "a ham sandwich named 'profit margin'.",
+      "complete_sentence": "In the middle of the board meeting, the CEO suddenly pulled out a ham sandwich named 'profit margin'.",
+      "scores": {
+        "surprisal_score": 5.5,
+        "ambiguity_score": 7.9,
+        "distinctiveness_ratio": 3.8,
+        "entropy_score": 6.4,
+        "perplexity_score": 7.9,
+        "semantic_coherence": 7.4,
+        "distinct_1": 0.93,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.56,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.1
+      }
+    },
+    {
+      "combination_id": 23,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "What's the secret to a successful relationship? _____",
+      "white_card": "Communicating through interpretive dance.",
+      "clean_white_card": "communicating through interpretive dance.",
+      "complete_sentence": "What's the secret to a successful relationship? communicating through interpretive dance.",
+      "scores": {
+        "surprisal_score": 4.8,
+        "ambiguity_score": 7.3,
+        "distinctiveness_ratio": 4.1,
+        "entropy_score": 6.4,
+        "perplexity_score": 7.3,
+        "semantic_coherence": 7.7,
+        "distinct_1": 0.91,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.53,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.2
+      }
+    },
+    {
+      "combination_id": 24,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "In a desperate attempt to impress my date, I served _____ for dinner.",
+      "white_card": "Overcooked spaghetti, served al dante.",
+      "clean_white_card": "overcooked spaghetti, served al dante.",
+      "complete_sentence": "In a desperate attempt to impress my date, I served overcooked spaghetti, served al dante. for dinner.",
+      "scores": {
+        "surprisal_score": 4.6,
+        "ambiguity_score": 7.8,
+        "distinctiveness_ratio": 4.4,
+        "entropy_score": 5.6,
+        "perplexity_score": 7.2,
+        "semantic_coherence": 7.5,
+        "distinct_1": 0.95,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.5,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.1
+      }
+    },
+    {
+      "combination_id": 25,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "TSA confiscated my _____ as a potential weapon of mass hilarity.",
+      "white_card": "Invisible pet squirrel named 'Ricky'",
+      "clean_white_card": "invisible pet squirrel named 'ricky'",
+      "complete_sentence": "TSA confiscated my invisible pet squirrel named 'ricky' as a potential weapon of mass hilarity.",
+      "scores": {
+        "surprisal_score": 4.7,
+        "ambiguity_score": 6.7,
+        "distinctiveness_ratio": 4.4,
+        "entropy_score": 6.2,
+        "perplexity_score": 9.0,
+        "semantic_coherence": 6.8,
+        "distinct_1": 0.94,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.51,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.1
+      }
+    },
+    {
+      "combination_id": 26,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "Why did the teacher get fired from the cucumber school? _____",
+      "white_card": "Constantly playing 'pickle my funny bone' during class.",
+      "clean_white_card": "constantly playing 'pickle my funny bone' during class.",
+      "complete_sentence": "Why did the teacher get fired from the cucumber school? constantly playing 'pickle my funny bone' during class.",
+      "scores": {
+        "surprisal_score": 4.0,
+        "ambiguity_score": 6.6,
+        "distinctiveness_ratio": 3.9,
+        "entropy_score": 5.5,
+        "perplexity_score": 9.5,
+        "semantic_coherence": 7.2,
+        "distinct_1": 0.85,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.64,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.9
+      }
+    },
+    {
+      "combination_id": 27,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "In a surprising turn of events, my doctor prescribed _____ for my wellness routine.",
+      "white_card": "Doctors Without Borders but with more wine.",
+      "clean_white_card": "doctors without borders but with more wine.",
+      "complete_sentence": "In a surprising turn of events, my doctor prescribed doctors without borders but with more wine. for my wellness routine.",
+      "scores": {
+        "surprisal_score": 4.7,
+        "ambiguity_score": 6.9,
+        "distinctiveness_ratio": 3.0,
+        "entropy_score": 6.1,
+        "perplexity_score": 8.9,
+        "semantic_coherence": 7.4,
+        "distinct_1": 0.95,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.56,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.0
+      }
+    },
+    {
+      "combination_id": 28,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "In a shocking plot twist, the next Marvel superhero is powered by ____.",
+      "white_card": "Avocado toast and crippling student debt.",
+      "clean_white_card": "avocado toast and crippling student debt.",
+      "complete_sentence": "In a shocking plot twist, the next Marvel superhero is powered by avocado toast and crippling student debt.",
+      "scores": {
+        "surprisal_score": 3.8,
+        "ambiguity_score": 8.0,
+        "distinctiveness_ratio": 3.5,
+        "entropy_score": 6.4,
+        "perplexity_score": 8.0,
+        "semantic_coherence": 6.3,
+        "distinct_1": 0.97,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.58,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.9
+      }
+    },
+    {
+      "combination_id": 29,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "In a shocking turn of events, the Olympic committee has added _____ as a new sport.",
+      "white_card": "Competitive snacking with judgmental judges.",
+      "clean_white_card": "competitive snacking with judgmental judges.",
+      "complete_sentence": "In a shocking turn of events, the Olympic committee has added competitive snacking with judgmental judges. as a new sport.",
+      "scores": {
+        "surprisal_score": 5.0,
+        "ambiguity_score": 7.7,
+        "distinctiveness_ratio": 3.2,
+        "entropy_score": 5.8,
+        "perplexity_score": 7.7,
+        "semantic_coherence": 7.4,
+        "distinct_1": 0.91,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.64,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.4
+      }
+    },
+    {
+      "combination_id": 30,
+      "user_id": "chaos_dark_321",
+      "personas": [
+        "Gen Z Chaos Agent",
+        "Dark Humor Connoisseur"
+      ],
+      "black_card": "Despite all the controversy, politicians have now agreed to replace the national anthem with _____.",
+      "white_card": "An intoxicated karaoke rendition of 'Baby Shark'.",
+      "clean_white_card": "an intoxicated karaoke rendition of 'baby shark'.",
+      "complete_sentence": "Despite all the controversy, politicians have now agreed to replace the national anthem with an intoxicated karaoke rendition of 'baby shark'.",
+      "scores": {
+        "surprisal_score": 3.7,
+        "ambiguity_score": 7.8,
+        "distinctiveness_ratio": 3.6,
+        "entropy_score": 6.1,
+        "perplexity_score": 9.9,
+        "semantic_coherence": 7.5,
+        "distinct_1": 0.95,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.53,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.3
+      }
+    },
+    {
+      "combination_id": 31,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "In a surprising twist, Apple's latest iPhone feature is actually ____.",
+      "white_card": "Self-destruct mode when you accidentally text your ex.",
+      "clean_white_card": "self-destruct mode when you accidentally text your ex.",
+      "complete_sentence": "In a surprising twist, Apple's latest iPhone feature is actually self-destruct mode when you accidentally text your ex.",
+      "scores": {
+        "surprisal_score": 3.9,
+        "ambiguity_score": 6.7,
+        "distinctiveness_ratio": 3.6,
+        "entropy_score": 5.9,
+        "perplexity_score": 9.2,
+        "semantic_coherence": 6.6,
+        "distinct_1": 0.93,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.45,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.2
+      }
+    },
+    {
+      "combination_id": 32,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "In the office secret Santa, someone received an unexpected gift: _____.",
+      "white_card": "An inflatable unicorn horn for cats.",
+      "clean_white_card": "an inflatable unicorn horn for cats.",
+      "complete_sentence": "In the office secret Santa, someone received an unexpected gift: an inflatable unicorn horn for cats.",
+      "scores": {
+        "surprisal_score": 5.2,
+        "ambiguity_score": 8.1,
+        "distinctiveness_ratio": 3.4,
+        "entropy_score": 5.7,
+        "perplexity_score": 9.1,
+        "semantic_coherence": 7.4,
+        "distinct_1": 0.89,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.57,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.3
+      }
+    },
+    {
+      "combination_id": 33,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "In a surprising turn of events, my therapist suggested spicing up my relationship with _____.",
+      "white_card": "Discount coupons for therapy sessions.",
+      "clean_white_card": "discount coupons for therapy sessions.",
+      "complete_sentence": "In a surprising turn of events, my therapist suggested spicing up my relationship with discount coupons for therapy sessions.",
+      "scores": {
+        "surprisal_score": 3.5,
+        "ambiguity_score": 7.0,
+        "distinctiveness_ratio": 3.3,
+        "entropy_score": 5.2,
+        "perplexity_score": 7.2,
+        "semantic_coherence": 7.4,
+        "distinct_1": 0.86,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.45,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.2
+      }
+    },
+    {
+      "combination_id": 34,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "During the high-stakes cooking showdown, Gordon Ramsay's secret ingredient was _____.",
+      "white_card": "Hot sauce made from his own fiery insults.",
+      "clean_white_card": "hot sauce made from his own fiery insults.",
+      "complete_sentence": "During the high-stakes cooking showdown, Gordon Ramsay's secret ingredient was hot sauce made from his own fiery insults.",
+      "scores": {
+        "surprisal_score": 4.9,
+        "ambiguity_score": 8.3,
+        "distinctiveness_ratio": 3.0,
+        "entropy_score": 5.8,
+        "perplexity_score": 8.9,
+        "semantic_coherence": 7.1,
+        "distinct_1": 0.93,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.56,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.4
+      }
+    },
+    {
+      "combination_id": 35,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "During my trip to Mars, I was shocked to find _____ in my luggage.",
+      "white_card": "Matt Damon trying to steal my potatoes",
+      "clean_white_card": "matt damon trying to steal my potatoes",
+      "complete_sentence": "During my trip to Mars, I was shocked to find matt damon trying to steal my potatoes in my luggage.",
+      "scores": {
+        "surprisal_score": 4.4,
+        "ambiguity_score": 7.2,
+        "distinctiveness_ratio": 3.7,
+        "entropy_score": 5.1,
+        "perplexity_score": 9.7,
+        "semantic_coherence": 6.5,
+        "distinct_1": 0.86,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.63,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.7
+      }
+    },
+    {
+      "combination_id": 36,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "In the future, schools will stop teaching math and start teaching ____.",
+      "white_card": "How to survive an IKEA furniture assembly",
+      "clean_white_card": "how to survive an ikea furniture assembly",
+      "complete_sentence": "In the future, schools will stop teaching math and start teaching how to survive an ikea furniture assembly.",
+      "scores": {
+        "surprisal_score": 4.6,
+        "ambiguity_score": 7.1,
+        "distinctiveness_ratio": 4.5,
+        "entropy_score": 6.1,
+        "perplexity_score": 8.8,
+        "semantic_coherence": 6.9,
+        "distinct_1": 0.93,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.51,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.3
+      }
+    },
+    {
+      "combination_id": 37,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "In a shocking twist, my doctor prescribed _____ as my new form of exercise.",
+      "white_card": "Chasing after my ex's new partner.",
+      "clean_white_card": "chasing after my ex's new partner.",
+      "complete_sentence": "In a shocking twist, my doctor prescribed chasing after my ex's new partner. as my new form of exercise.",
+      "scores": {
+        "surprisal_score": 3.9,
+        "ambiguity_score": 7.9,
+        "distinctiveness_ratio": 3.4,
+        "entropy_score": 6.4,
+        "perplexity_score": 9.6,
+        "semantic_coherence": 6.9,
+        "distinct_1": 0.92,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.46,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.7
+      }
+    },
+    {
+      "combination_id": 38,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "In a shocking twist, Disney's next princess is inspired by ____.",
+      "white_card": "Kim Kardashian's lost earring.",
+      "clean_white_card": "kim kardashian's lost earring.",
+      "complete_sentence": "In a shocking twist, Disney's next princess is inspired by kim kardashian's lost earring.",
+      "scores": {
+        "surprisal_score": 4.2,
+        "ambiguity_score": 6.6,
+        "distinctiveness_ratio": 3.4,
+        "entropy_score": 5.4,
+        "perplexity_score": 8.4,
+        "semantic_coherence": 7.3,
+        "distinct_1": 0.9,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.46,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.0
+      }
+    },
+    {
+      "combination_id": 39,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "During the halftime show, the mascot unexpectedly started doing ____.",
+      "white_card": "An interpretive dance on tax evasion.",
+      "clean_white_card": "an interpretive dance on tax evasion.",
+      "complete_sentence": "During the halftime show, the mascot unexpectedly started doing an interpretive dance on tax evasion.",
+      "scores": {
+        "surprisal_score": 4.1,
+        "ambiguity_score": 8.4,
+        "distinctiveness_ratio": 4.3,
+        "entropy_score": 5.9,
+        "perplexity_score": 9.2,
+        "semantic_coherence": 6.2,
+        "distinct_1": 0.86,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.47,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.9
+      }
+    },
+    {
+      "combination_id": 40,
+      "user_id": "marvel_foodie_654",
+      "personas": [
+        "Marvel Universe Expert",
+        "Culinary Comedy Expert"
+      ],
+      "black_card": "In a shocking twist, the president's State of the Union address was interrupted by _____.",
+      "white_card": "Snoop Dogg offering him a joint.",
+      "clean_white_card": "snoop dogg offering him a joint.",
+      "complete_sentence": "In a shocking twist, the president's State of the Union address was interrupted by snoop dogg offering him a joint.",
+      "scores": {
+        "surprisal_score": 4.6,
+        "ambiguity_score": 7.7,
+        "distinctiveness_ratio": 3.9,
+        "entropy_score": 5.5,
+        "perplexity_score": 7.5,
+        "semantic_coherence": 7.3,
+        "distinct_1": 0.88,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.53,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.4
+      }
+    },
+    {
+      "combination_id": 41,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "In a shocking turn of events, Elon Musk's next invention is actually _____.",
+      "white_card": "A sentient toaster that roasts your insecurities.",
+      "clean_white_card": "a sentient toaster that roasts your insecurities.",
+      "complete_sentence": "In a shocking turn of events, Elon Musk's next invention is actually a sentient toaster that roasts your insecurities.",
+      "scores": {
+        "surprisal_score": 4.8,
+        "ambiguity_score": 7.2,
+        "distinctiveness_ratio": 3.6,
+        "entropy_score": 6.0,
+        "perplexity_score": 9.5,
+        "semantic_coherence": 7.4,
+        "distinct_1": 0.9,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.48,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.7
+      }
+    },
+    {
+      "combination_id": 42,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "In a surprise twist at the office party, the boss revealed his secret passion for ____.",
+      "white_card": "finger painting with pudding",
+      "clean_white_card": "finger painting with pudding",
+      "complete_sentence": "In a surprise twist at the office party, the boss revealed his secret passion for finger painting with pudding.",
+      "scores": {
+        "surprisal_score": 4.4,
+        "ambiguity_score": 7.3,
+        "distinctiveness_ratio": 4.3,
+        "entropy_score": 6.2,
+        "perplexity_score": 7.4,
+        "semantic_coherence": 7.1,
+        "distinct_1": 0.92,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.55,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.1
+      }
+    },
+    {
+      "combination_id": 43,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "My partner said we need more communication, so I introduced them to _____.",
+      "white_card": "Carrier pigeons with love letters.",
+      "clean_white_card": "carrier pigeons with love letters.",
+      "complete_sentence": "My partner said we need more communication, so I introduced them to carrier pigeons with love letters.",
+      "scores": {
+        "surprisal_score": 3.9,
+        "ambiguity_score": 7.9,
+        "distinctiveness_ratio": 2.8,
+        "entropy_score": 6.1,
+        "perplexity_score": 9.9,
+        "semantic_coherence": 6.9,
+        "distinct_1": 0.88,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.64,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.1
+      }
+    },
+    {
+      "combination_id": 44,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "In the middle of the food fight, I was horrified to find _____ in my sandwich.",
+      "white_card": "My grandma's dentures",
+      "clean_white_card": "my grandma's dentures",
+      "complete_sentence": "In the middle of the food fight, I was horrified to find my grandma's dentures in my sandwich.",
+      "scores": {
+        "surprisal_score": 5.5,
+        "ambiguity_score": 7.7,
+        "distinctiveness_ratio": 2.7,
+        "entropy_score": 5.5,
+        "perplexity_score": 9.3,
+        "semantic_coherence": 7.5,
+        "distinct_1": 0.86,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.53,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.1
+      }
+    },
+    {
+      "combination_id": 45,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "In a shocking turn of events, the airline lost my ____, instead of my luggage.",
+      "white_card": "Invisible pet giraffe.",
+      "clean_white_card": "invisible pet giraffe.",
+      "complete_sentence": "In a shocking turn of events, the airline lost my invisible pet giraffe., instead of my luggage.",
+      "scores": {
+        "surprisal_score": 5.1,
+        "ambiguity_score": 7.8,
+        "distinctiveness_ratio": 2.6,
+        "entropy_score": 5.1,
+        "perplexity_score": 9.5,
+        "semantic_coherence": 7.0,
+        "distinct_1": 0.94,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.59,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.5
+      }
+    },
+    {
+      "combination_id": 46,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "In a desperate attempt to modernize the curriculum, schools are now teaching _____.",
+      "white_card": "How to survive on ramen and regret.",
+      "clean_white_card": "how to survive on ramen and regret.",
+      "complete_sentence": "In a desperate attempt to modernize the curriculum, schools are now teaching how to survive on ramen and regret.",
+      "scores": {
+        "surprisal_score": 5.2,
+        "ambiguity_score": 7.0,
+        "distinctiveness_ratio": 2.7,
+        "entropy_score": 6.3,
+        "perplexity_score": 9.5,
+        "semantic_coherence": 7.3,
+        "distinct_1": 0.96,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.53,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.2
+      }
+    },
+    {
+      "combination_id": 47,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "Forget apple a day, doctors now say _____ keeps the Grim Reaper away.",
+      "white_card": "An awkward dad joke at breakfast.",
+      "clean_white_card": "an awkward dad joke at breakfast.",
+      "complete_sentence": "Forget apple a day, doctors now say an awkward dad joke at breakfast. keeps the Grim Reaper away.",
+      "scores": {
+        "surprisal_score": 4.5,
+        "ambiguity_score": 7.1,
+        "distinctiveness_ratio": 4.0,
+        "entropy_score": 5.0,
+        "perplexity_score": 8.7,
+        "semantic_coherence": 7.1,
+        "distinct_1": 0.89,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.49,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 7.1
+      }
+    },
+    {
+      "combination_id": 48,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "In a shocking twist, the Oscars have added a new category: Best Performance in _____.",
+      "white_card": "An Awkward Family Zoom Call",
+      "clean_white_card": "an awkward family zoom call",
+      "complete_sentence": "In a shocking twist, the Oscars have added a new category: Best Performance in an awkward family zoom call.",
+      "scores": {
+        "surprisal_score": 3.6,
+        "ambiguity_score": 6.8,
+        "distinctiveness_ratio": 3.7,
+        "entropy_score": 6.0,
+        "perplexity_score": 9.9,
+        "semantic_coherence": 6.4,
+        "distinct_1": 0.89,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.49,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.7
+      }
+    },
+    {
+      "combination_id": 49,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "During the Super Bowl halftime show, nobody expected to see _____.",
+      "white_card": "Grandma's moonwalking tutorial",
+      "clean_white_card": "grandma's moonwalking tutorial",
+      "complete_sentence": "During the Super Bowl halftime show, nobody expected to see grandma's moonwalking tutorial.",
+      "scores": {
+        "surprisal_score": 3.7,
+        "ambiguity_score": 7.4,
+        "distinctiveness_ratio": 3.2,
+        "entropy_score": 6.1,
+        "perplexity_score": 8.1,
+        "semantic_coherence": 6.0,
+        "distinct_1": 0.86,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.49,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.0
+      }
+    },
+    {
+      "combination_id": 50,
+      "user_id": "dynamic_duo_987",
+      "personas": [
+        "Tech Bro Philosopher (Dynamic)",
+        "Suburban Chaos Coordinator (Dynamic)"
+      ],
+      "black_card": "In a shocking turn of events, the President has declared _____ as the national pastime.",
+      "white_card": "Competitive belly button lint collecting",
+      "clean_white_card": "competitive belly button lint collecting",
+      "complete_sentence": "In a shocking turn of events, the President has declared competitive belly button lint collecting as the national pastime.",
+      "scores": {
+        "surprisal_score": 4.8,
+        "ambiguity_score": 8.5,
+        "distinctiveness_ratio": 4.0,
+        "entropy_score": 5.1,
+        "perplexity_score": 8.2,
+        "semantic_coherence": 7.4,
+        "distinct_1": 0.95,
+        "distinct_2": 1.0,
+        "self_bleu": 0.0,
+        "mauve_score": 0.0,
+        "vocabulary_richness": 0.46,
+        "overall_semantic_diversity": 0.0,
+        "intra_cluster_diversity": 0.0,
+        "inter_cluster_diversity": 0.0,
+        "semantic_spread": 0.0,
+        "cluster_coherence": 0.0,
+        "overall_humor_score": 6.7
+      }
+    }
+  ],
+  "summary": {
+    "total_combinations": 50,
+    "users": [
+      {
+        "user_id": "office_gamer_456",
+        "personas": [
+          "Office Worker",
+          "Gaming Guru"
+        ],
+        "combinations": 10
+      },
+      {
+        "user_id": "dad_millennial_789",
+        "personas": [
+          "Dad Humor Enthusiast",
+          "Millennial Memer"
+        ],
+        "combinations": 10
+      },
+      {
+        "user_id": "chaos_dark_321",
+        "personas": [
+          "Gen Z Chaos Agent",
+          "Dark Humor Connoisseur"
+        ],
+        "combinations": 10
+      },
+      {
+        "user_id": "marvel_foodie_654",
+        "personas": [
+          "Marvel Universe Expert",
+          "Culinary Comedy Expert"
+        ],
+        "combinations": 10
+      },
+      {
+        "user_id": "dynamic_duo_987",
+        "personas": [
+          "Tech Bro Philosopher (Dynamic)",
+          "Suburban Chaos Coordinator (Dynamic)"
+        ],
+        "combinations": 10
+      }
+    ],
+    "average_humor_score": 6.7,
+    "persona_diversity": "High - Mix of traditional and dynamic personas",
+    "generation_date": "2025-08-25 00:51:20"
+  }
+}

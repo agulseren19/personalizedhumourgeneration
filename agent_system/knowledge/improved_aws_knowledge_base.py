@@ -315,6 +315,27 @@ class PostgreSQLKnowledgeBase:
                 db.commit()
                 print(f"  ✅ Database save successful for {user_id} -> {persona_name}")
                 
+                # ENHANCED: Update user embeddings for personalization (SHEEP-Medium approach)
+                try:
+                    from agent_system.knowledge.user_embedding_manager import UserEmbeddingManager
+                    embedding_manager = UserEmbeddingManager()
+                    
+                    # Prepare feedback data for embedding update
+                    feedback_data = [{
+                        'feedback_score': feedback_score,
+                        'persona_name': persona_name,
+                        'context': context,
+                        'topic': topic
+                    }]
+                    
+                    # Update user embedding
+                    embedding_manager.update_user_embedding(user_id, feedback_data, db)
+                    print(f"  🧠 User embedding updated for personalization")
+                    
+                except Exception as embedding_error:
+                    print(f"  ⚠️ User embedding update failed: {embedding_error}")
+                    # Don't fail the whole operation if embeddings fail
+                
                 return True
                 
             except Exception as db_error:

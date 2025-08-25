@@ -20,7 +20,7 @@ def start_api_server():
     print("🚀 Starting FastAPI server...")
     subprocess.run([
         sys.executable, "-m", "uvicorn", 
-        "agent_system.api.main:app", 
+        "api.main:app", 
         "--host", "0.0.0.0", 
         "--port", "8000", 
         "--reload"
@@ -31,7 +31,7 @@ def start_streamlit_ui():
     print("🎨 Starting Streamlit UI...")
     subprocess.run([
         sys.executable, "-m", "streamlit", "run", 
-        "agent_system/ui/streamlit_app.py",
+        "ui/streamlit_app.py",
         "--server.port", "8501",
         "--server.address", "0.0.0.0"
     ])

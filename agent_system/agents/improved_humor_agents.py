@@ -340,11 +340,21 @@ class ContentFilter:
         return sanitized
 
 class ImprovedHumorAgent:
-    """Improved humor generation agent with proper persona handling"""
+    """Improved humor generation agent with proper persona handling and user embeddings"""
     
     def __init__(self):
         self.content_filter = ContentFilter()
         self.surprise_calculator = SurpriseCalculator()
+        
+        # Initialize user embedding manager for personalization (SHEEP-Medium approach)
+        try:
+            from knowledge.user_embedding_manager import UserEmbeddingManager
+            self.embedding_manager = UserEmbeddingManager(embedding_dimension=128)
+            print("✅ User embedding manager initialized for personalization")
+        except ImportError as e:
+            print(f"⚠️ User embedding manager not available: {e}")
+            self.embedding_manager = None
+        
         # Initialize statistical evaluator for literature-based metrics
         try:
             import sys
@@ -698,12 +708,29 @@ Response:"""
             return None
     
     def _filter_personas_by_preferences(self, personas: List[str], user_prefs: Optional[UserPreference]) -> List[str]:
-        """Filter personas based on user likes/dislikes"""
+        """Filter personas based on user likes/dislikes and embeddings (SHEEP-Medium approach)"""
         if not user_prefs:
             return personas
         
         # Remove disliked personas
         filtered = [p for p in personas if p not in user_prefs.disliked_personas]
+        
+        # ENHANCED: Use user embeddings for better personalization if available
+        if self.embedding_manager and user_prefs.user_id:
+            try:
+                # Score personas using embeddings
+                persona_scores = []
+                for persona in filtered:
+                    score = self._calculate_persona_embedding_score(persona, user_prefs.user_id)
+                    persona_scores.append((persona, score))
+                
+                # Sort by embedding score
+                persona_scores.sort(key=lambda x: x[1], reverse=True)
+                filtered = [p[0] for p in persona_scores]
+                
+                print(f"  🧠 Personas ranked by embeddings: {filtered[:3]}")
+            except Exception as e:
+                print(f"  ⚠️ Embedding personalization failed: {e}")
         
         # Prioritize liked personas
         liked_in_list = [p for p in filtered if p in user_prefs.liked_personas]
@@ -713,6 +740,34 @@ Response:"""
         final_list = liked_in_list + not_liked_in_list
         
         return final_list if final_list else personas  # Fallback to original if all filtered out
+    
+    def _calculate_persona_embedding_score(self, persona_name: str, user_id: str) -> float:
+        """Calculate persona score using user embeddings (SHEEP-Medium approach)"""
+        try:
+            # Create simple text embedding for persona
+            text_embedding = self._create_simple_text_embedding(persona_name)
+            
+            # Get personalized prediction
+            score = self.embedding_manager.get_personalized_prediction(
+                user_id, text_embedding, persona_name, "persona_selection", "general"
+            )
+            
+            return score
+        except Exception as e:
+            print(f"    ⚠️ Error calculating embedding score for {persona_name}: {e}")
+            return 5.0  # Default neutral score
+    
+    def _create_simple_text_embedding(self, text: str) -> List[float]:
+        """Create simple text embedding (hash-based for now)"""
+        # Simple hash-based embedding - replace with proper model in production
+        text_hash = hash(text) % 10000
+        
+        embedding = []
+        for i in range(128):  # Match embedding dimension
+            feature = float((text_hash + i * 7) % 1000) / 1000.0
+            embedding.append(feature)
+        
+        return embedding
     
     async def _generate_with_custom_persona_old(self, request: HumorRequest, custom_persona, model: str) -> Optional[GenerationResult]:
         """Generate humor with a custom persona template"""

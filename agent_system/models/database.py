@@ -228,6 +228,26 @@ class PersonaPreference(Base):
     # Relationships
     persona = relationship("Persona", back_populates="preferences")
 
+class UserEmbedding(Base):
+    __tablename__ = "user_embeddings"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, index=True, nullable=False)
+    
+    # Learned user embedding vector (stored as JSON for flexibility)
+    embedding_vector = Column(JSONB, nullable=False)  # List of floats
+    
+    # Embedding metadata
+    embedding_dimension = Column(Integer, default=128)  # Dimension of the embedding
+    training_samples = Column(Integer, default=0)  # Number of samples used for training
+    last_trained = Column(DateTime, default=func.now())
+    
+    # Model version that generated this embedding
+    model_version = Column(String, default="v1.0")
+    
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
 # Database initialization
 def create_database(database_url: str):
     """Create database tables"""
