@@ -133,7 +133,7 @@ function CAHPageContent() {
               🔄 Refresh Page
             </button>
             <button 
-              onClick={() => console.log('🔍 Current State:', { user, userId, effectiveId: user?.id || userId })}
+              onClick={() => {/* console.log('🔍 Current State:', { user, userId, effectiveId: user?.id || userId }) */}}
               className="bg-green-500 hover:bg-green-600 px-2 py-1 rounded text-xs ml-1"
             >
               <BarChart3 className="inline mr-2" size={16} />

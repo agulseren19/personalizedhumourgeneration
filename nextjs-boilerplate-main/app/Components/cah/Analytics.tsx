@@ -19,11 +19,11 @@ export default function Analytics({ userId }: AnalyticsProps) {
     const effectiveUserId = user?.id || userId;
     
     // Debug logging
-    console.log('🔍 Analytics Debug:', {
-      authenticatedUserId: user?.id,
-      fallbackUserId: userId,
-      effectiveUserId
-    });
+    // console.log('🔍 Analytics Debug:', {
+    //   authenticatedUserId: user?.id,
+    //   fallbackUserId: userId,
+    //   effectiveUserId
+    // });
     
     if (effectiveUserId) {
       loadAnalytics(effectiveUserId);

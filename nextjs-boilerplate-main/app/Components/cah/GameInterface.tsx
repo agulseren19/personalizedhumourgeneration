@@ -83,7 +83,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
             // Extract favorite personas (liked personas)
             const favorites = result.analytics.liked_personas || [];
             setFavoritePersonas(favorites);
-            console.log('🎭 Loaded favorite personas:', favorites);
+            // console.log('🎭 Loaded favorite personas:', favorites);
           }
         }
       } catch (error) {

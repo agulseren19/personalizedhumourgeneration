@@ -46,7 +46,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     
     // Listen for auth success events (from Google OAuth)
     const handleAuthSuccess = () => {
-      console.log('🔍 Auth success event received, refreshing auth status...');
+      // console.log('🔍 Auth success event received, refreshing auth status...');
       checkAuthStatus();
     };
     
@@ -59,12 +59,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const checkAuthStatus = async () => {
     try {
-      console.log('🔍 Checking auth status...');
+      // console.log('🔍 Checking auth status...');
       const token = localStorage.getItem('cah_token');
-      console.log('🔍 Token found:', !!token);
-      console.log('🔍 Token preview:', token ? `${token.substring(0, 20)}...` : 'None');
-      console.log('🔍 Token length:', token ? token.length : 0);
-      console.log('🔍 Token value:', token);
+      // console.log('🔍 Token found:', !!token);
+      // console.log('🔍 Token preview:', token ? `${token.substring(0, 20)}...` : 'None');
+      // console.log('🔍 Token length:', token ? token.length : 0);
+      // console.log('🔍 Token value:', token);
       
       if (token && token.trim() !== '') {
         try {
@@ -74,10 +74,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
           
           if (response.ok) {
             const userData = await response.json();
-            console.log('🔍 User data from API:', userData);
+            // console.log('🔍 User data from API:', userData);
             setUser(userData.user);
           } else {
-            console.log('🔍 Token invalid, removing...');
+            // console.log('🔍 Token invalid, removing...');
             localStorage.removeItem('cah_token');
             localStorage.removeItem('user_info');
             setUser(null);
@@ -88,17 +88,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
           setUser(null);
         }
       } else {
-        console.log('🔍 No valid token found, checking user_info...');
+        // console.log('🔍 No valid token found, checking user_info...');
         // Check if we have user_info from Google OAuth
         const userInfo = localStorage.getItem('user_info');
-        console.log('🔍 User info found:', !!userInfo);
+        // console.log('🔍 User info found:', !!userInfo);
         if (userInfo) {
           try {
             const user = JSON.parse(userInfo);
-            console.log('🔍 User from user_info:', user);
+            // console.log('🔍 User from user_info:', user);
             setUser(user);
           } catch (e) {
-            console.log('🔍 Failed to parse user_info:', e);
+            // console.log('🔍 Failed to parse user_info:', e);
             localStorage.removeItem('user_info');
             setUser(null);
           }
@@ -125,18 +125,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
 
       if (data.success) {
-        console.log('🔍 Login successful, storing token:', {
-          success: data.success,
-          hasAccessToken: !!data.access_token,
-          accessTokenPreview: data.access_token ? `${data.access_token.substring(0, 20)}...` : 'None',
-          user: data.user,
-          fullResponse: data
-        });
+        // console.log('🔍 Login successful, storing token:', {
+        //   success: data.success,
+        //   hasAccessToken: !!data.access_token,
+        //   accessTokenPreview: data.access_token ? `${data.access_token.substring(0, 20)}...` : 'None',
+        //   user: data.user,
+        //   fullResponse: data
+        // });
         
         // Check if access_token exists and is not empty
         if (!data.access_token || data.access_token.trim() === '') {
-          console.error('🔍 ERROR: access_token is missing or empty!');
-          console.error('🔍 Full response data:', data);
+          // console.error('🔍 ERROR: access_token is missing or empty!');
+          // console.error('🔍 Full response data:', data);
           return false;
         }
         
@@ -145,9 +145,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
         
         // Verify token is stored correctly
         const storedToken = localStorage.getItem('cah_token');
-        console.log('🔍 Token stored successfully:', !!storedToken);
-        console.log('🔍 Stored token preview:', storedToken ? `${storedToken.substring(0, 20)}...` : 'None');
-        console.log('🔍 Stored token length:', storedToken ? storedToken.length : 0);
+        // console.log('🔍 Token stored successfully:', !!storedToken);
+        // console.log('🔍 Stored token preview:', storedToken ? `${storedToken.substring(0, 20)}...` : 'None');
+        // console.log('🔍 Stored token length:', storedToken ? storedToken.length : 0);
         
         return true;
       } else {

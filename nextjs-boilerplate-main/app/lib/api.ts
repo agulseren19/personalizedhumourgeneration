@@ -15,31 +15,31 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('cah_token');
-    console.log('🔍 API Request Interceptor:', {
-      url: config.url,
-      method: config.method,
-      hasToken: !!token,
-      tokenPreview: token ? `${token.substring(0, 20)}...` : 'None',
-      tokenLength: token ? token.length : 0,
-      tokenValue: token,
-      tokenTrimmed: token ? token.trim() : 'N/A',
-      headers: config.headers
-    });
+    // console.log('🔍 API Request Interceptor:', {
+    //   url: config.url,
+    //   method: config.method,
+    //   hasToken: !!token,
+    //   tokenPreview: token ? `${token.substring(0, 20)}...` : 'None',
+    //   tokenLength: token ? token.length : 0,
+    //   tokenValue: token,
+    //   tokenTrimmed: token ? token.trim() : 'N/A',
+    //   headers: config.headers
+    // });
     
     if (token && token.trim() !== '') {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('🔍 Added Authorization header:', `Bearer ${token.substring(0, 20)}...`);
-      console.log('🔍 Full Authorization header:', config.headers.Authorization);
-      console.log('🔍 Final headers:', config.headers);
+      // console.log('🔍 Added Authorization header:', `Bearer ${token.substring(0, 20)}...`);
+      // console.log('🔍 Full Authorization header:', config.headers.Authorization);
+      // console.log('🔍 Final headers:', config.headers);
     } else {
-      console.log('🔍 No valid token found, request will be unauthenticated');
-      console.log('🔍 Token details:', {
-        exists: !!token,
-        length: token ? token.length : 0,
-        value: token,
-        trimmed: token ? token.trim() : 'N/A',
-        isEmpty: token ? token.trim() === '' : true
-      });
+      // console.log('🔍 No valid token found, request will be unauthenticated');
+      // console.log('🔍 Token details:', {
+      //   exists: !!token,
+      //   length: token ? token.length : 0,
+      //   value: token,
+      //   trimmed: token ? token.trim() : 'N/A',
+      //   isEmpty: token ? token.trim() === '' : true
+      // });
     }
     return config;
   },
