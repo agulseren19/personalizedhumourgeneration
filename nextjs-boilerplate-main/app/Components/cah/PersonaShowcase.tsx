@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { cahApi, Persona } from '../../lib/api';
-import { Users, Sparkles, Brain, Zap } from 'lucide-react';
+import { Users, Sparkles, Brain, Zap, Home, Briefcase, Gamepad2, TrendingUp } from 'lucide-react';
 
 export default function PersonaShowcase() {
   const [personas, setPersonas] = useState<Persona[]>([]);
@@ -28,20 +28,20 @@ export default function PersonaShowcase() {
     }
   };
 
-  const getPersonaEmoji = (personaId: string) => {
-    const emojiMap: Record<string, string> = {
-      'dad_humor_enthusiast': '👨‍👧‍👦',
-      'millennial_memer': '😂',
-      'office_worker': '💼',
-      'gaming_guru': '🎮',
-      'dark_humor_specialist': '🌚',
-      'suburban_parent': '🏠',
-      'gen_z_chaos': '🔥',
-      'wordplay_master': '🎭',
-      'corporate_ladder_climber': '📈',
-      'absurdist_artist': '🎨'
+  const getPersonaIcon = (personaId: string) => {
+    const iconMap: Record<string, JSX.Element> = {
+      'dad_humor_enthusiast': <Home size={24} className="text-accent-blue" />,
+      'millennial_memer': <Users size={24} className="text-accent-orange" />,
+      'office_worker': <Briefcase size={24} className="text-accent-yellow" />,
+      'gaming_guru': <Gamepad2 size={24} className="text-accent-blue" />,
+      'dark_humor_specialist': <Users size={24} className="text-custom-brown1" />,
+      'suburban_parent': <Home size={24} className="text-accent-orange" />,
+      'gen_z_chaos': <Zap size={24} className="text-accent-yellow" />,
+      'wordplay_master': <Users size={24} className="text-accent-blue" />,
+      'corporate_ladder_climber': <TrendingUp size={24} className="text-custom-brown2" />,
+      'absurdist_artist': <Sparkles size={24} className="text-accent-orange" />
     };
-    return emojiMap[personaId] || '🎭';
+    return iconMap[personaId] || <Users size={24} className="text-accent-blue" />;
   };
 
   const getPersonaGradient = (index: number) => {
@@ -61,7 +61,7 @@ export default function PersonaShowcase() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-green"></div>
         <span className="ml-3 text-white">Loading AI comedians...</span>
       </div>
     );
@@ -93,13 +93,13 @@ export default function PersonaShowcase() {
               {/* Persona Header */}
               <div className="flex items-center mb-4">
                 <div className={`text-4xl mr-4 p-3 rounded-full bg-gradient-to-r ${getPersonaGradient(index)} bg-opacity-20`}>
-                  {getPersonaEmoji(persona.id)}
+                  {getPersonaIcon(persona.id)}
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">
+                                     <h3 className="text-lg font-bold text-white group-hover:text-accent-green transition-colors">
                     {persona.name}
                   </h3>
-                  <div className="text-sm text-purple-300 font-medium">
+                  <div className="text-sm text-accent-green font-medium">
                     {persona.humor_style}
                   </div>
                 </div>
@@ -115,7 +115,7 @@ export default function PersonaShowcase() {
                 {persona.expertise.slice(0, 3).map((expertise, idx) => (
                   <span
                     key={idx}
-                    className="px-2 py-1 bg-purple-600/30 text-purple-200 rounded-full text-xs font-medium"
+                                         className="px-2 py-1 bg-accent-green/30 text-accent-green rounded-full text-xs font-medium"
                   >
                     {expertise}
                   </span>
@@ -129,7 +129,7 @@ export default function PersonaShowcase() {
 
               {/* Click to view more */}
               <div className="text-center pt-2 border-t border-white/10">
-                <span className="text-xs text-gray-400 group-hover:text-purple-300 transition-colors">
+                                 <span className="text-xs text-gray-400 group-hover:text-accent-green transition-colors">
                   Click to learn more
                 </span>
               </div>
@@ -139,15 +139,16 @@ export default function PersonaShowcase() {
       </div>
 
       {/* System Features */}
-      <div className="bg-gradient-to-r from-purple-600/20 to-indigo-600/20 rounded-xl p-8 border border-purple-400/30">
+             <div className="bg-gradient-to-r from-accent-green/20 to-accent-darkGreen/20 rounded-xl p-8 border border-accent-green/30">
         <h3 className="text-2xl font-bold text-white mb-6 text-center">
-          🧠 How the AI Comedy System Works
+          <Brain className="inline mr-2" size={24} />
+          How the AI Comedy System Works
         </h3>
         
         <div className="grid md:grid-cols-3 gap-6">
           <div className="text-center">
-            <div className="bg-purple-600/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <Brain className="w-8 h-8 text-purple-400" />
+                         <div className="bg-accent-green/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+               <Brain className="w-8 h-8 text-accent-green" />
             </div>
             <h4 className="font-semibold text-white mb-2">Smart Learning</h4>
             <p className="text-sm text-gray-300">
@@ -156,8 +157,8 @@ export default function PersonaShowcase() {
           </div>
           
           <div className="text-center">
-            <div className="bg-indigo-600/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-8 h-8 text-indigo-400" />
+                         <div className="bg-accent-blue/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+               <Sparkles className="w-8 h-8 text-accent-blue" />
             </div>
             <h4 className="font-semibold text-white mb-2">Personalized Recommendations</h4>
             <p className="text-sm text-gray-300">
@@ -184,13 +185,13 @@ export default function PersonaShowcase() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
                 <div className="text-5xl mr-4">
-                  {getPersonaEmoji(selectedPersona.id)}
+                  {getPersonaIcon(selectedPersona.id)}
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-white">
                     {selectedPersona.name}
                   </h2>
-                  <div className="text-purple-300 font-medium">
+                                     <div className="text-accent-green font-medium">
                     {selectedPersona.humor_style}
                   </div>
                 </div>
@@ -217,7 +218,7 @@ export default function PersonaShowcase() {
                   {selectedPersona.expertise.map((expertise, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 bg-purple-600/30 text-purple-200 rounded-full text-sm font-medium"
+                                             className="px-3 py-1 bg-accent-green/30 text-accent-green rounded-full text-sm font-medium"
                     >
                       {expertise}
                     </span>
@@ -225,7 +226,7 @@ export default function PersonaShowcase() {
                 </div>
               </div>
 
-              <div className="bg-purple-600/20 rounded-lg p-4">
+                             <div className="bg-accent-green/20 rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-white mb-2">How to Interact</h3>
                 <ul className="text-sm text-gray-300 space-y-1">
                   <li>• This persona will be recommended based on context and your preferences</li>

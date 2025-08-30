@@ -331,6 +331,9 @@ IMPORTANT: Each score should be different and reflect the actual quality of the 
         """SMART STRATEGY: 2 favorites + 1 dynamic/random for exploration"""
         user_id_str = str(user_id)
         
+        # Store user_id for use in _add_random_persona method
+        self._current_user_id = user_id
+        
         # Get user's persona preferences from database
         from agent_system.models.database import PersonaPreference
         
@@ -490,8 +493,15 @@ IMPORTANT: Each score should be different and reflect the actual quality of the 
             recommended = self.get_recommended_personas(context, "adults", "humor", count * 2)
             
             selected_names = {p.name for p in selected_personas}
+            
+            # Get disliked personas for filtering
+            user_id = getattr(self, '_current_user_id', None)
+            disliked_personas = self._get_disliked_persona_names(user_id)
+            
             for persona in recommended:
-                if persona.name not in selected_names and len(selected_personas) < count:
+                if (persona.name not in selected_names and 
+                    persona.name not in disliked_personas and 
+                    len(selected_personas) < count):
                     selected_personas.append(persona)
                     print(f"DEBUG: Added recommended persona: {persona.name}")
         
@@ -500,28 +510,55 @@ IMPORTANT: Each score should be different and reflect the actual quality of the 
             all_personas = self.db.query(Persona).filter(Persona.is_active == True).all()
             selected_names = {p.name for p in selected_personas}
             
+            # Get disliked personas for filtering
+            user_id = getattr(self, '_current_user_id', None)
+            disliked_personas = self._get_disliked_persona_names(user_id)
+            
             for persona in all_personas:
-                if persona.name not in selected_names and len(selected_personas) < count:
+                if (persona.name not in selected_names and 
+                    persona.name not in disliked_personas and 
+                    len(selected_personas) < count):
                     selected_personas.append(persona)
                     print(f"DEBUG: Added fallback persona: {persona.name}")
         
         print(f"DEBUG: Final selected personas: {[p.name for p in selected_personas]}")
         return selected_personas[:count]
     
+    def _get_disliked_persona_names(self, user_id: str) -> set:
+        """Get set of disliked persona names for a user (minimal DB query)"""
+        if not user_id:
+            return set()
+        
+        # Single efficient query using JOIN
+        from agent_system.models.database import PersonaPreference
+        result = self.db.query(Persona.name).join(PersonaPreference).filter(
+            PersonaPreference.user_id == str(user_id),
+            PersonaPreference.preference_score <= 3.0,
+            Persona.is_active == True
+        ).all()
+        
+        return {name[0] for name in result}
+    
     def _add_random_persona(self, selected_personas: List[Persona], count: int):
         """Add a random persona for exploration"""
-        # Get all available personas
-        all_personas = self.db.query(Persona).filter(Persona.is_active == True).all()
+        # Get disliked personas for current user
+        user_id = getattr(self, '_current_user_id', None)
+        disliked_personas = self._get_disliked_persona_names(user_id)
         selected_names = {p.name for p in selected_personas}
         
-        # Filter out already selected personas
-        available_personas = [p for p in all_personas if p.name not in selected_names]
+        # Get available personas excluding selected and disliked ones
+        all_personas = self.db.query(Persona).filter(Persona.is_active == True).all()
+        available_personas = [
+            p for p in all_personas 
+            if p.name not in selected_names and p.name not in disliked_personas
+        ]
         
         if available_personas:
-            # Select a random persona for exploration
             random_persona = random.choice(available_personas)
             selected_personas.append(random_persona)
             print(f"DEBUG: Added RANDOM persona for exploration: {random_persona.name}")
+        else:
+            print(f"DEBUG: No available personas for random selection")
     
     def _create_persona_from_dynamic_template(self, dynamic_template: PersonaTemplate) -> Optional[Persona]:
         """Create a database persona from a dynamic persona template"""
@@ -643,6 +680,7 @@ White Card Response:"""
         
         preference.preference_score = max(0.0, min(1.0, new_score))  # Clamp between 0 and 1
         preference.interaction_count += 1
+        from sqlalchemy import func
         preference.last_interaction = func.now()
         
         # Update context preferences

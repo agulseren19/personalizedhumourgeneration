@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../contexts/UserContext';
 import AuthModal from './auth/AuthModal';
+import { Gamepad2 } from 'lucide-react';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -53,37 +54,38 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      className="fixed top-0 w-full z-50 sm:p-6 p-3 bg-gray-900/20 backdrop-blur-sm"
+      className="fixed top-0 w-full z-50 sm:p-6 p-3 bg-text-primary/20 backdrop-blur-sm"
       initial="hidden"
       animate="visible"
       variants={navbarVariants}
     >
       <motion.div
-        className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 bg-gray-900/95 backdrop-blur-md shadow-lg py-4 rounded-xl border border-white/10"
+        className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 bg-background-cream/95 backdrop-blur-md shadow-lg py-4 rounded-xl border border-text-secondary/30"
         variants={navbarVariants}
       >
         <div className="flex items-center justify-between h-12">
           <div className="flex items-center flex-shrink-0">
             <Link href="/" className="cursor-pointer">
-              <div className="text-white font-bold text-lg flex items-center space-x-1 whitespace-nowrap">
-                <span>🃏 AI Cards Against Humanity</span>
+              <div className="text-text-primary font-bold text-lg flex items-center space-x-1 whitespace-nowrap">
+                <Gamepad2 className="inline mr-2" size={20} />
+                <span>AI Cards Against Humanity</span>
               </div>
             </Link>
           </div>
           <div className="hidden md:flex justify-center flex-1 mx-8">
             <ul className="flex items-center space-x-8">
               <motion.li variants={linkVariants}>
-                <Link href="/" className="text-gray-200 hover:text-teal-400 cursor-pointer transition-colors">
+                <Link href="/" className="text-text-secondary hover:text-accent-pink cursor-pointer transition-colors">
                   Home
                 </Link>
               </motion.li>
               <motion.li variants={linkVariants}>
-                <Link href="/cah" className="text-gray-200 hover:text-teal-400 cursor-pointer transition-colors">
+                <Link href="/cah" className="text-text-secondary hover:text-accent-pink cursor-pointer transition-colors">
                   Game
                 </Link>
               </motion.li>
               <motion.li variants={linkVariants}>
-                <Link href="/cah?tab=analytics" className="text-gray-200 hover:text-teal-400 cursor-pointer transition-colors">
+                <Link href="/cah?tab=analytics" className="text-text-secondary hover:text-accent-pink cursor-pointer transition-colors">
                   Analytics
                 </Link>
               </motion.li>
@@ -92,14 +94,14 @@ const Navbar = () => {
           <motion.div className="hidden md:block" variants={linkVariants}>
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-gray-300 text-sm">Welcome, {user.email}</span>
+                <span className="text-text-secondary text-sm">Welcome, {user.email}</span>
                 <button
                   onClick={logout}
-                  className="text-gray-300 hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                  className="text-text-secondary hover:text-accent-pink transition-colors px-3 py-2 rounded-lg hover:bg-text-primary/20"
                 >
                   Logout
                 </button>
-                <Link href="/cah" className="bg-teal-400 text-white px-6 py-3 rounded-xl hover:bg-teal-500 transition-all duration-200 font-medium shadow-md hover:shadow-lg">
+                <Link href="/cah" className="bg-accent-turquoise text-text-primary px-6 py-3 rounded-xl hover:bg-accent-turquoise/80 transition-all duration-200 font-medium shadow-md hover:shadow-lg">
                   Play Game
                 </Link>
               </div>
@@ -107,13 +109,13 @@ const Navbar = () => {
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="text-gray-300 hover:text-teal-400 transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                  className="text-text-secondary hover:text-accent-pink transition-colors px-3 py-2 rounded-lg hover:bg-text-primary/20"
                 >
                   Sign In
                 </button>
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="bg-teal-400 text-white px-6 py-3 rounded-xl hover:bg-teal-500 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                  className="bg-accent-turquoise text-text-primary px-6 py-3 rounded-xl hover:bg-accent-turquoise/80 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
                 >
                   Get Started
                 </button>
@@ -121,7 +123,7 @@ const Navbar = () => {
             )}
           </motion.div>
           <div className="md:hidden flex items-center">
-            <button onClick={handleMobileMenuToggle} className="text-white">
+            <button onClick={handleMobileMenuToggle} className="text-text-primary">
               {isMobileMenuOpen ? (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -145,17 +147,17 @@ const Navbar = () => {
             >
               <ul className="space-y-4">
                 <motion.li variants={menuItemVariants}>
-                  <Link href="/" className="text-gray-200 hover:text-teal-400 cursor-pointer transition-colors">
+                  <Link href="/" className="text-text-secondary hover:text-accent-pink cursor-pointer transition-colors">
                     Home
                   </Link>
                 </motion.li>
                 <motion.li variants={menuItemVariants}>
-                  <Link href="/cah" className="text-gray-200 hover:text-teal-400 cursor-pointer transition-colors">
+                  <Link href="/cah" className="text-text-secondary hover:text-accent-pink cursor-pointer transition-colors">
                     Game
                   </Link>
                 </motion.li>
                 <motion.li variants={menuItemVariants}>
-                  <Link href="/cah?tab=analytics" className="text-gray-200 hover:text-teal-400 cursor-pointer transition-colors">
+                  <Link href="/cah?tab=analytics" className="text-text-secondary hover:text-accent-pink cursor-pointer transition-colors">
                     Analytics
                   </Link>
                 </motion.li>

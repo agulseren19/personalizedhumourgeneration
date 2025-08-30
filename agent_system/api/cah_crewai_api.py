@@ -300,7 +300,7 @@ async def initialize_humor_system():
         default_personas = ["Comedy Expert", "Edgy Comedian", "Witty Critic"]  # fallback
         try:
             # Get available personas from persona manager
-            available_personas = persona_manager.get_available_personas()
+            available_personas = [p.name for p in persona_manager.get_generation_personas()]
             if available_personas and len(available_personas) >= 3:
                 default_personas = available_personas[:3]  # Use first 3 available personas
                 print(f"🎭 Using personas from persona manager: {default_personas}")

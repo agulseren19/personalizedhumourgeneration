@@ -71,28 +71,29 @@ const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, b
               height: `${dotSize}px`,
               left: `${dot.x}px`,
               top: `${dot.y}px`,
-              background: 'linear-gradient(145deg, #1e293b, #0f172a)',
-              borderColor: '#33313d',
+              background: 'rgba(46, 46, 46, 0.1)',
+              borderColor: 'rgba(74, 74, 74, 0.2)',
             }}
           />
           {/* Render line to the right neighbor */}
           {dot.x + gridSpacing < containerWidth ? (
             <div
-              className="absolute bg-slate-800"
+              className="absolute"
               style={{
                 width: `${gridSpacing - dotSize - 2 * linePadding}px`,
                 height: `${lineWidth}px`,
                 left: `${dot.x + dotSize + linePadding}px`,
                 top: `${dot.y + dotSize / 2 - lineWidth / 2}px`,
                 overflow: 'hidden',
+                background: 'rgba(74, 74, 74, 0.1)',
               }}
             >
               <motion.div
                 className="absolute top-0 left-0 h-full"
                 style={{
                   width: `${beamWidth}px`,
-                  background: 'linear-gradient(90deg, transparent, teal, transparent)',
-                  opacity: 0.75,
+                  background: 'linear-gradient(90deg, transparent, rgba(78, 205, 196, 0.3), transparent)',
+                  opacity: 0.4,
                 }}
                 initial={{ x: '-200px' }}
                 animate={{ x: `calc(${gridSpacing - dotSize - 2 * linePadding}px + ${beamWidth}px)` }}
@@ -107,7 +108,7 @@ const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, b
             </div>
           ) : (
             <div
-              className="absolute bg-slate-800"
+              className="absolute bg-text-secondary"
               style={{
                 width: `${containerWidth - dot.x - dotSize - linePadding}px`,
                 height: `${lineWidth}px`,
@@ -120,7 +121,7 @@ const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, b
                 className="absolute top-0 left-0 h-full"
                 style={{
                   width: `${beamWidth}px`,
-                  background: 'linear-gradient(90deg, transparent, teal, transparent)',
+                  background: 'linear-gradient(90deg, transparent, #4ECDC4, transparent)',
                   opacity: 0.75,
                 }}
                 initial={{ x: '-200px' }}
@@ -138,21 +139,22 @@ const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, b
           {/* Render line to the bottom neighbor */}
           {dot.y + gridSpacing < containerHeight ? (
             <div
-              className="absolute bg-slate-800"
+              className="absolute"
               style={{
                 width: `${lineWidth}px`,
                 height: `${gridSpacing - dotSize - 2 * linePadding}px`,
                 left: `${dot.x + dotSize / 2 - lineWidth / 2}px`,
                 top: `${dot.y + dotSize + linePadding}px`,
                 overflow: 'hidden',
+                background: 'rgba(74, 74, 74, 0.1)',
               }}
             >
               <motion.div
                 className="absolute top-0 left-0 w-full"
                 style={{
                   height: `${beamWidth}px`,
-                  background: 'linear-gradient(180deg, transparent, teal, transparent)',
-                  opacity: 0.75,
+                  background: 'linear-gradient(180deg, transparent, rgba(78, 205, 196, 0.3), transparent)',
+                  opacity: 0.4,
                 }}
                 initial={{ y: '-200px' }}
                 animate={{ y: `calc(${gridSpacing - dotSize - 2 * linePadding}px + ${beamWidth}px)` }}
@@ -167,7 +169,7 @@ const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, b
             </div>
           ) : (
             <div
-              className="absolute bg-slate-800"
+              className="absolute bg-text-secondary"
               style={{
                 width: `${lineWidth}px`,
                 height: `${containerHeight - dot.y - dotSize - linePadding}px`,
@@ -180,7 +182,7 @@ const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, b
                 className="absolute top-0 left-0 w-full"
                 style={{
                   height: `${beamWidth}px`,
-                  background: 'linear-gradient(180deg, transparent, teal, transparent)',
+                  background: 'linear-gradient(180deg, transparent, #4ECDC4, transparent)',
                   opacity: 0.75,
                 }}
                 initial={{ y: '-200px' }}
@@ -197,21 +199,22 @@ const DotGridBackground = ({ containerHeight, containerWidth, lineWidth = 1.5, b
           )}
           {/* Render line to the top neighbor */}
           <div
-            className="absolute bg-slate-800"
+            className="absolute"
             style={{
               width: `${lineWidth}px`,
               height: `${gridSpacing - dotSize - 2 * linePadding}px`,
               left: `${dot.x + dotSize / 2 - lineWidth / 2}px`,
               top: `${dot.y - gridSpacing + dotSize + linePadding}px`,
               overflow: 'hidden',
+              background: 'rgba(46, 46, 46, 0.1)',
             }}
           >
             <motion.div
               className="absolute bottom-0 left-0 w-full"
               style={{
                 height: `${beamWidth}px`,
-                background: 'linear-gradient(0deg, transparent, teal, transparent)',
-                opacity: 0.75,
+                background: 'linear-gradient(0deg, transparent, rgba(78, 205, 196, 0.3), transparent)',
+                opacity: 0.4,
               }}
               initial={{ y: '200px' }}
               animate={{ y: `calc(-${gridSpacing - dotSize - 2 * linePadding}px - ${beamWidth}px)` }}
@@ -254,7 +257,7 @@ const BackgroundWrapper = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <div className="relative w-full h-full min-h-screen bg-slate-900" ref={containerRef}>
+    <div className="relative w-full h-full min-h-screen bg-background-cream" ref={containerRef}>
       <DotGridBackground containerHeight={dimensions.height} containerWidth={dimensions.width} />
       <div className="relative z-10">{children}</div>
     </div>

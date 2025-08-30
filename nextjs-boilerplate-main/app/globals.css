@@ -3,27 +3,224 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 46, 46, 46;
+  --background-start-rgb: 255, 250, 227;
+  --background-end-rgb: 255, 249, 214;
+  --text-primary: 46, 46, 46;
+  --text-secondary: 74, 74, 74;
+  --accent-pink: 255, 107, 107;
+  --accent-turquoise: 78, 205, 196;
+  --background-cream: 255, 250, 227;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --foreground-rgb: 46, 46, 46;
+    --background-start-rgb: 255, 250, 227;
+    --background-end-rgb: 255, 249, 214;
   }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
+  /* Default background - can be overridden by Tailwind classes */
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+/* Allow Tailwind background classes to override body background */
+.bg-background-seaGreen {
+  background: #082e19 !important;
+}
+
+.bg-background-cream {
+  background: #FFFAE3 !important;
+}
+
+/* Fix text readability on dark green background */
+.bg-background-seaGreen .text-gray-300 {
+  color: #f3f4f6 !important; /* Very light gray for better contrast */
+}
+
+.bg-background-seaGreen .text-gray-400 {
+  color: #e5e7eb !important; /* Light gray */
+}
+
+.bg-background-seaGreen .text-gray-500 {
+  color: #d1d5db !important; /* Lighter medium gray */
+}
+
+.bg-background-seaGreen .text-green-400 {
+  color: #4ade80 !important; /* Brighter green */
+}
+
+.bg-background-seaGreen .text-green-500 {
+  color: #22c55e !important; /* Bright green */
+}
+
+.bg-background-seaGreen .text-accent-green {
+  color: #10b981 !important; /* Bright emerald */
+}
+
+.bg-background-seaGreen .text-white {
+  color: #ffffff !important; /* Ensure pure white */
+}
+
+.bg-background-seaGreen .text-text-primary {
+  color: #ffffff !important; /* White for primary text */
+}
+
+.bg-background-seaGreen .text-text-secondary {
+  color: #f3f4f6 !important; /* Very light gray for secondary text */
+}
+
+/* Additional readability fixes */
+.bg-background-seaGreen .placeholder-gray-300::placeholder {
+  color: #d1d5db !important;
+}
+
+.bg-background-seaGreen .border-gray-400 {
+  border-color: #9ca3af !important;
+}
+
+/* Fix placeholder and input text colors */
+.bg-background-seaGreen input::placeholder {
+  color: #d1d5db !important; /* Light gray for all placeholders */
+}
+
+.bg-background-seaGreen textarea::placeholder {
+  color: #d1d5db !important; /* Light gray for textarea placeholders */
+}
+
+.bg-background-seaGreen .placeholder-gray-300::placeholder,
+.bg-background-seaGreen .placeholder-text-secondary::placeholder {
+  color: #d1d5db !important; /* Override all placeholder classes */
+}
+
+/* Fix label and instruction text */
+.bg-background-seaGreen .text-text-primary {
+  color: #ffffff !important; /* White for labels */
+}
+
+.bg-background-seaGreen .text-gray-600 {
+  color: #f3f4f6 !important; /* Very light gray instead of dark gray */
+}
+
+.bg-background-seaGreen .text-gray-700 {
+  color: #e5e7eb !important; /* Light gray instead of dark gray */
+}
+
+.bg-background-seaGreen .text-accent-turquoise {
+  color: #06b6d4 !important; /* Bright cyan */
+}
+
+.bg-background-seaGreen .text-accent-blue {
+  color: #3b82f6 !important; /* Bright blue */
+}
+
+.bg-background-seaGreen .text-accent-orange {
+  color: #f97316 !important; /* Bright orange */
+}
+
+.bg-background-seaGreen .text-accent-yellow {
+  color: #eab308 !important; /* Bright yellow */
+}
+
+/* Make audience/topic option boxes more visible on dark green background */
+.bg-background-seaGreen .bg-text-primary\/20 {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.bg-background-seaGreen .hover\:bg-text-primary\/30:hover {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Make borders more visible on dark green background */
+.bg-background-seaGreen .border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.3) !important; /* More visible white border */
+}
+
+.bg-background-seaGreen .border-white\/20 {
+  border-color: rgba(255, 255, 255, 0.4) !important; /* More visible white border */
+}
+
+.bg-background-seaGreen .border-text-secondary\/20 {
+  border-color: rgba(255, 255, 255, 0.4) !important; /* Enhanced main container border */
+}
+
+.bg-background-seaGreen .border-gray-200 {
+  border-color: #e5e7eb !important; /* Light gray border */
+}
+
+.bg-background-seaGreen .border-blue-500\/50 {
+  border-color: rgba(59, 130, 246, 0.7) !important; /* More visible blue border */
+}
+
+.bg-background-seaGreen .border-green-500\/50 {
+  border-color: rgba(34, 197, 94, 0.7) !important; /* More visible green border */
+}
+
+.bg-background-seaGreen .border {
+  border-color: rgba(255, 255, 255, 0.3) !important; /* Default border enhancement */
+}
+
+/* Fix text readability on white cards/backgrounds */
+.bg-white .text-gray-300,
+.bg-white .text-gray-400,
+.bg-white .text-gray-500 {
+  color: #374151 !important; /* Dark gray for white backgrounds */
+}
+
+.bg-white\/95 .text-gray-300,
+.bg-white\/95 .text-gray-400,
+.bg-white\/95 .text-gray-500 {
+  color: #374151 !important; /* Dark gray for white backgrounds */
+}
+
+.bg-background-cream .text-gray-300,
+.bg-background-cream .text-gray-400,
+.bg-background-cream .text-gray-500 {
+  color: #374151 !important; /* Dark gray for cream backgrounds */
+}
+
+/* Ensure card text is readable */
+.bg-white .text-text-secondary,
+.bg-white\/95 .text-text-secondary,
+.bg-background-cream .text-text-secondary {
+  color: #6b7280 !important; /* Medium gray for secondary text on light backgrounds */
+}
+
+/* Make sure all text on white cards is dark enough */
+.bg-white .text-gray-600,
+.bg-white .text-gray-700,
+.bg-white\/95 .text-gray-600,
+.bg-white\/95 .text-gray-700 {
+  color: #374151 !important; /* Dark gray */
+}
+
+/* Specific card text styling */
+.bg-white.text-black .text-gray-300,
+.bg-white.text-black .text-gray-400,
+.bg-white.text-black .text-gray-500 {
+  color: #374151 !important; /* Dark gray for card labels */
+}
+
+/* Card metadata text (like "Humor:", "Overall:", etc.) */
+.bg-white .text-xs,
+.bg-white .text-sm {
+  color: #6b7280 !important; /* Medium gray for small text */
+}
+
+/* Ensure persona names and other labels are dark */
+.bg-white .font-medium,
+.bg-white .font-semibold {
+  color: #1f2937 !important; /* Very dark gray */
 }
 
 @layer utilities {
@@ -38,7 +235,7 @@ body {
   height: 16px;
   width: 16px;
   border-radius: 50%;
-  background: #8b5cf6;
+  background: #FF6B6B;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -47,7 +244,7 @@ body {
   height: 16px;
   width: 16px;
   border-radius: 50%;
-  background: #8b5cf6;
+  background: #FF6B6B;
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);

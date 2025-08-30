@@ -68,7 +68,7 @@ function GoogleCallbackContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background-seaGreen flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full text-center">
         <div className="mb-6">
           <div className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -98,7 +98,7 @@ function GoogleCallbackContent() {
 export default function GoogleCallback() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background-seaGreen flex items-center justify-center p-4">
         <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full text-center">
           <div className="mb-6">
             <div className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
