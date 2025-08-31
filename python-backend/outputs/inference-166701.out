@@ -1,0 +1,90 @@
+Fri May  9 12:40:32 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.120                Driver Version: 550.120        CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A30                     Off |   00000000:02:00.0 Off |                    0 |
+| N/A   34C    P0             30W /  165W |       1MiB /  24576MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+ 12:40:32 up 15 days,  1:08,  0 user,  load average: 1.04, 1.07, 1.05
+=== Running minimal model inference comparison ===
+This script uses absolute minimal resources for inference
+=== Running T5 inference ===
+INFO:__main__:GPU: NVIDIA A30
+INFO:__main__:Total GPU memory: 25.22 GB
+INFO:__main__:Initial GPU memory usage: 0.00 GB
+INFO:__main__:Running inference with t5-small
+INFO:__main__:GPU memory cleared. Current usage: 0.00 GB
+INFO:__main__:GPU memory: allocated=0.00 GB, reserved=0.00 GB
+INFO:__main__:Loading tokenizer...
+INFO:__main__:Loading model...
+INFO:__main__:Using GPU for inference
+INFO:accelerate.utils.modeling:We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+INFO:__main__:GPU memory: allocated=0.15 GB, reserved=0.29 GB
+INFO:__main__:Running generation for: Complete this sentence: Cards Against Humanity is
+/vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages/transformers/generation/configuration_utils.py:679: UserWarning: `num_beams` is set to 1. However, `early_stopping` is set to `True` -- this flag is only used in beam-based generation modes. You should set `num_beams>1` or unset `early_stopping`.
+  warnings.warn(
+INFO:__main__:Input: Complete this sentence: Cards Against Humanity is
+INFO:__main__:Output: True
+INFO:__main__:Running generation for: Give a humorous response to: My idea of a perfect date is
+INFO:__main__:Input: Give a humorous response to: My idea of a perfect date is
+INFO:__main__:Output: :
+INFO:__main__:Running generation for: Write a funny answer for: The secret to a happy life is
+INFO:__main__:Input: Write a funny answer for: The secret to a happy life is
+INFO:__main__:Output: : The secret to a happy life is to be happy.
+INFO:__main__:Results saved to inference_results/t5-small_results.json
+INFO:__main__:GPU memory cleared. Current usage: 0.01 GB
+INFO:__main__:Successful inference with t5-small:
+INFO:__main__:Input: Complete this sentence: Cards Against Humanity is
+INFO:__main__:Output: True
+INFO:__main__:Input: Give a humorous response to: My idea of a perfect date is
+INFO:__main__:Output: :
+INFO:__main__:Input: Write a funny answer for: The secret to a happy life is
+INFO:__main__:Output: : The secret to a happy life is to be happy.
+INFO:__main__:Full results saved to inference_results/t5-small_results.json
+=== Running BART inference ===
+INFO:__main__:GPU: NVIDIA A30
+INFO:__main__:Total GPU memory: 25.22 GB
+INFO:__main__:Initial GPU memory usage: 0.00 GB
+INFO:__main__:Running inference with facebook/bart-base
+INFO:__main__:GPU memory cleared. Current usage: 0.00 GB
+INFO:__main__:GPU memory: allocated=0.00 GB, reserved=0.00 GB
+INFO:__main__:Loading tokenizer...
+INFO:__main__:Loading model...
+INFO:__main__:Using GPU for inference
+INFO:accelerate.utils.modeling:We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+INFO:__main__:GPU memory: allocated=0.28 GB, reserved=0.46 GB
+INFO:__main__:Running generation for: Complete this sentence: Cards Against Humanity is
+/vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages/transformers/generation/configuration_utils.py:679: UserWarning: `num_beams` is set to 1. However, `early_stopping` is set to `True` -- this flag is only used in beam-based generation modes. You should set `num_beams>1` or unset `early_stopping`.
+  warnings.warn(
+INFO:__main__:Input: Complete this sentence: Cards Against Humanity is
+INFO:__main__:Output: Complete this sentence: Cards Against Humanity is
+INFO:__main__:Running generation for: Give a humorous response to: My idea of a perfect date is
+INFO:__main__:Input: Give a humorous response to: My idea of a perfect date is
+INFO:__main__:Output: Give a humorous response to: My idea of a perfect date is
+INFO:__main__:Running generation for: Write a funny answer for: The secret to a happy life is
+INFO:__main__:Input: Write a funny answer for: The secret to a happy life is
+INFO:__main__:Output: Write a funny answer for: The secret to a happy life is
+INFO:__main__:Results saved to inference_results/facebook_bart-base_results.json
+INFO:__main__:GPU memory cleared. Current usage: 0.01 GB
+INFO:__main__:Successful inference with facebook/bart-base:
+INFO:__main__:Input: Complete this sentence: Cards Against Humanity is
+INFO:__main__:Output: Complete this sentence: Cards Against Humanity is
+INFO:__main__:Input: Give a humorous response to: My idea of a perfect date is
+INFO:__main__:Output: Give a humorous response to: My idea of a perfect date is
+INFO:__main__:Input: Write a funny answer for: The secret to a happy life is
+INFO:__main__:Output: Write a funny answer for: The secret to a happy life is
+INFO:__main__:Full results saved to inference_results/facebook_bart-base_results.json
+=== Inference comparison complete ===

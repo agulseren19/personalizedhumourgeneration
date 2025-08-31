@@ -1,0 +1,514 @@
+{
+  "model_path": "finetuned_models/t5-base-cah-finetuned",
+  "timestamp": "2025-05-14 18:27:17",
+  "device": "cuda",
+  "samples": [
+    {
+      "black_card": "In hindsight having _ at a child's birthday party was a bad idea.",
+      "formatted_input": "Complete this card: In hindsight having _ at a child's birthday party was a bad idea.",
+      "reference_white_cards": [
+        "Stabbing a man in winter to see the steam rise from his wounds.",
+        "Swordplay.",
+        "Vertical Smile"
+      ],
+      "generated_texts": [
+        "Smoking a baby.",
+        "Smoking a bottle of beer",
+        "Smoking a bottle of water with your partner"
+      ],
+      "generation_time_seconds": 1.079571,
+      "rouge_scores": {
+        "rouge1": 0.125,
+        "rouge2": 0.0,
+        "rougeL": 0.125
+      },
+      "humor_scores": [
+        0.9874923229217529,
+        0.41606244444847107,
+        0.9227326512336731
+      ]
+    },
+    {
+      "black_card": "For 50% of the people involved, _ is hilarious.",
+      "formatted_input": "Complete this card: For 50% of the people involved, _ is hilarious.",
+      "reference_white_cards": [
+        "Kim Jong-un",
+        "Using Ice Cubes",
+        "Expecting a burp and vomiting on the floor."
+      ],
+      "generated_texts": [
+        "Getting kicked out of a movie.",
+        "Getting kicked out of a car seat",
+        "Getting kicked out of a party"
+      ],
+      "generation_time_seconds": 0.169617,
+      "rouge_scores": {
+        "rouge1": 0.14285714285714288,
+        "rouge2": 0.0,
+        "rougeL": 0.14285714285714288
+      },
+      "humor_scores": [
+        0.7542955875396729,
+        0.009946626611053944,
+        0.012585323303937912
+      ]
+    },
+    {
+      "black_card": "When the going gets tough, the tough get _.",
+      "formatted_input": "Complete this card: When the going gets tough, the tough get _.",
+      "reference_white_cards": [
+        "#YOLO.",
+        "A panty raid.",
+        "Limiting all sensory experiences to chocolate and YouTube."
+      ],
+      "generated_texts": [
+        "Pretending you're going to get a broken hand.",
+        "Pretending you're going to get a broken hand",
+        "Pretending you're going to get ripped by the Devil."
+      ],
+      "generation_time_seconds": 0.244802,
+      "rouge_scores": {
+        "rouge1": 0.16666666666666666,
+        "rouge2": 0.0,
+        "rougeL": 0.16666666666666666
+      },
+      "humor_scores": [
+        0.7588658928871155,
+        0.9627723097801208,
+        0.7869986295700073
+      ]
+    },
+    {
+      "black_card": "*RANDOM*\nHand this card to another player and have them: TELL A JOKE",
+      "formatted_input": "Complete this card: *RANDOM*\nHand this card to another player and have them: TELL A JOKE",
+      "reference_white_cards": [
+        "lording it as a country schoolmaster",
+        "A blinged out consecration bracelet.",
+        "Kissing nan on the forehead and turning off her life support."
+      ],
+      "generated_texts": [
+        "Reacting like a hummingbird.",
+        "Reacting like a hummingbird",
+        "Reacting like a kid."
+      ],
+      "generation_time_seconds": 0.188669,
+      "rouge_scores": {
+        "rouge1": 0.22222222222222224,
+        "rouge2": 0.0,
+        "rougeL": 0.22222222222222224
+      },
+      "humor_scores": [
+        0.9893425703048706,
+        0.34964898228645325,
+        0.9882810711860657
+      ]
+    },
+    {
+      "black_card": "_ would be woefully incomplete without _.",
+      "formatted_input": "Complete this card: _ would be woefully incomplete without _.",
+      "reference_white_cards": [
+        "The ability to get drunk at altitude after one drink but not stopping.",
+        "Realizing \"cribs\" is not just a TV show.",
+        "Chris Christie's hostage face."
+      ],
+      "generated_texts": [
+        "Pretending to be pregnant.",
+        "Pretending you're going to have a baby",
+        "Pregnancy."
+      ],
+      "generation_time_seconds": 0.201287,
+      "rouge_scores": {
+        "rouge1": 0.125,
+        "rouge2": 0.0,
+        "rougeL": 0.125
+      },
+      "humor_scores": [
+        0.9638195037841797,
+        0.9408165216445923,
+        0.6073856949806213
+      ]
+    },
+    {
+      "black_card": "I knew he/she was creepy when _.",
+      "formatted_input": "Complete this card: I knew he/she was creepy when _.",
+      "reference_white_cards": [
+        "Rainy birthdays",
+        "Vampire bunnies.",
+        "Osama Bin Laden."
+      ],
+      "generated_texts": [
+        "Getting kicked out of school with a clumsy cockroach",
+        "Getting kicked out of school with a clumsy cigarette.",
+        "Getting kicked out of school by a friend."
+      ],
+      "generation_time_seconds": 0.29302,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.992918074131012,
+        0.992078959941864,
+        0.9890252947807312
+      ]
+    },
+    {
+      "black_card": "What keeps me warm during those long, bitterly cold, winter nights?",
+      "formatted_input": "Complete this card: What keeps me warm during those long, bitterly cold, winter nights?",
+      "reference_white_cards": [
+        "an inbred hillbilly",
+        "Fromunda cheese",
+        "Paying the iron price."
+      ],
+      "generated_texts": [
+        "Removing limbs from the body.",
+        "Removing limbs from your body.",
+        "Removing limbs from your body"
+      ],
+      "generation_time_seconds": 0.173551,
+      "rouge_scores": {
+        "rouge1": 0.22222222222222224,
+        "rouge2": 0.0,
+        "rougeL": 0.22222222222222224
+      },
+      "humor_scores": [
+        0.992084801197052,
+        0.9932417273521423,
+        0.5183670520782471
+      ]
+    },
+    {
+      "black_card": "Brought to you by XXXX Gold, the Official Beer of _.",
+      "formatted_input": "Complete this card: Brought to you by XXXX Gold, the Official Beer of _.",
+      "reference_white_cards": [
+        "Whiskey on the gums.",
+        "Sook-Yin Lee",
+        "Swag."
+      ],
+      "generated_texts": [
+        "Having a babysitter.",
+        "Having a baby baby.",
+        "Having a baby who has sex."
+      ],
+      "generation_time_seconds": 0.186755,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.020410019904375076,
+        0.01869921199977398,
+        0.01787310652434826
+      ]
+    },
+    {
+      "black_card": "Every wedding toast should include at least one mention of _.",
+      "formatted_input": "Complete this card: Every wedding toast should include at least one mention of _.",
+      "reference_white_cards": [
+        "Yes, Sir!",
+        "Getting groped by a department store Santa Claus.",
+        "Liberal propaganda."
+      ],
+      "generated_texts": [
+        "A cockroach made with a scream.",
+        "A cockroach who's going to pick up a baby.",
+        "A cockroach who's going to pick up a needle."
+      ],
+      "generation_time_seconds": 0.247208,
+      "rouge_scores": {
+        "rouge1": 0.14285714285714288,
+        "rouge2": 0.0,
+        "rougeL": 0.14285714285714288
+      },
+      "humor_scores": [
+        0.05312580615282059,
+        0.19712010025978088,
+        0.2356652021408081
+      ]
+    },
+    {
+      "black_card": "Sure, _ was an unlikely source of income during college, but $20 is $20, right?!",
+      "formatted_input": "Complete this card: Sure, _ was an unlikely source of income during college, but $20 is $20, right?!",
+      "reference_white_cards": [
+        "Jokes about 9/11.",
+        "White-glove water-boarding.",
+        "Greggs Vegan Sausage rolls"
+      ],
+      "generated_texts": [
+        "Having a baby.",
+        "Pregnancy screams",
+        "Pregnancy"
+      ],
+      "generation_time_seconds": 0.128605,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.9742636680603027,
+        0.10868295282125473,
+        0.10991823673248291
+      ]
+    },
+    {
+      "black_card": "In ancient Sparta, boys became men only after killing and eating _.",
+      "formatted_input": "Complete this card: In ancient Sparta, boys became men only after killing and eating _.",
+      "reference_white_cards": [
+        "Sacrificing Uncle Tim.",
+        "Marine Wife: The \"hardest\" job in the Corps!",
+        "An elderly home's hot tub"
+      ],
+      "generated_texts": [
+        "Becoming President of the World Cup Committee.",
+        "Becoming President of the World Cup Organization.",
+        "Becoming President of the World Cup."
+      ],
+      "generation_time_seconds": 0.165459,
+      "rouge_scores": {
+        "rouge1": 0.14285714285714288,
+        "rouge2": 0.0,
+        "rougeL": 0.14285714285714288
+      },
+      "humor_scores": [
+        0.006046751514077187,
+        0.005472224205732346,
+        0.005693530198186636
+      ]
+    },
+    {
+      "black_card": "For \"Insert Name's\" next magic trick, he/she will pull a _ out of a hat.",
+      "formatted_input": "Complete this card: For \"Insert Name's\" next magic trick, he/she will pull a _ out of a hat.",
+      "reference_white_cards": [
+        "The total collapse of the global financial system.",
+        "Hurry up and wait!",
+        "Getting suicidal thoughts after going on the Jeremy Kyle show."
+      ],
+      "generated_texts": [
+        "Getting a scream in my throat.",
+        "Getting a screamin' head.",
+        "Getting a scream in my throat"
+      ],
+      "generation_time_seconds": 0.189421,
+      "rouge_scores": {
+        "rouge1": 0.14285714285714288,
+        "rouge2": 0.0,
+        "rougeL": 0.14285714285714288
+      },
+      "humor_scores": [
+        0.9902819395065308,
+        0.9634908437728882,
+        0.8623563051223755
+      ]
+    },
+    {
+      "black_card": "How the Grinch stole _.",
+      "formatted_input": "Complete this card: How the Grinch stole _.",
+      "reference_white_cards": [
+        "Fire",
+        "Anchor babies.",
+        "Crushing birth control pills into her breakfast every morning"
+      ],
+      "generated_texts": [
+        "Getting kicked out of a car seat.",
+        "Getting kicked out of a car seat",
+        "Getting kicked out of a party"
+      ],
+      "generation_time_seconds": 0.216678,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.6692973971366882,
+        0.46683022379875183,
+        0.40771910548210144
+      ]
+    },
+    {
+      "black_card": "Joey, look out behind you! It's _!",
+      "formatted_input": "Complete this card: Joey, look out behind you! It's _!",
+      "reference_white_cards": [
+        "can you keep a secret?",
+        "Barfing into a popcorn bucket.",
+        "a group of old white women eating Cobb salad"
+      ],
+      "generated_texts": [
+        "Getting a slapstick XP shirt.",
+        "Getting a slapstick stuffed potato.",
+        "Getting a slapstick XP shirt"
+      ],
+      "generation_time_seconds": 0.232676,
+      "rouge_scores": {
+        "rouge1": 0.20000000000000004,
+        "rouge2": 0.0,
+        "rougeL": 0.20000000000000004
+      },
+      "humor_scores": [
+        0.8906384110450745,
+        0.9542557001113892,
+        0.621208906173706
+      ]
+    },
+    {
+      "black_card": "Hallelujah, it's raining _.",
+      "formatted_input": "Complete this card: Hallelujah, it's raining _.",
+      "reference_white_cards": [
+        "Switching to the metric system.",
+        "Bombing in the name of freedom",
+        "Sometimes it's amazing but usually it's meh."
+      ],
+      "generated_texts": [
+        "Getting kicked out of the car seat.",
+        "Getting kicked by a cockroach",
+        "Getting kicked out of school"
+      ],
+      "generation_time_seconds": 0.173273,
+      "rouge_scores": {
+        "rouge1": 0.30769230769230765,
+        "rouge2": 0.0,
+        "rougeL": 0.1818181818181818
+      },
+      "humor_scores": [
+        0.7488700151443481,
+        0.8376490473747253,
+        0.3106946051120758
+      ]
+    },
+    {
+      "black_card": "I've always dreamt of _.",
+      "formatted_input": "Complete this card: I've always dreamt of _.",
+      "reference_white_cards": [
+        "A snart (sneezing and farting at the same time)",
+        "Cropdusting a group of quadriplegics.",
+        "A Fleshlight."
+      ],
+      "generated_texts": [
+        "Having a baby.",
+        "Having a baby snoring.",
+        "Having a baby snort."
+      ],
+      "generation_time_seconds": 0.188293,
+      "rouge_scores": {
+        "rouge1": 0.4,
+        "rouge2": 0.0,
+        "rougeL": 0.4
+      },
+      "humor_scores": [
+        0.8498872518539429,
+        0.9675325751304626,
+        0.9388651251792908
+      ]
+    },
+    {
+      "black_card": "What have you done to deserve a promotion?",
+      "formatted_input": "Complete this card: What have you done to deserve a promotion?",
+      "reference_white_cards": [
+        "Over the shoulder boulder holders.",
+        "Our new Buffalo Chicken Dippers\u00ae!",
+        "a double tongue; there's two tongues"
+      ],
+      "generated_texts": [
+        "Shooting a baby in the face.",
+        "Shooting a baby.",
+        "Shooting a baby in the belly."
+      ],
+      "generation_time_seconds": 0.158602,
+      "rouge_scores": {
+        "rouge1": 0.2,
+        "rouge2": 0.0,
+        "rougeL": 0.2
+      },
+      "humor_scores": [
+        0.9934064149856567,
+        0.9934722185134888,
+        0.9939256310462952
+      ]
+    },
+    {
+      "black_card": "The four shifts at Desert Bus: Dawn Guard, Alpha Flight, Night Watch and _.",
+      "formatted_input": "Complete this card: The four shifts at Desert Bus: Dawn Guard, Alpha Flight, Night Watch and _.",
+      "reference_white_cards": [
+        "Being the only person at the office-mandated sexual harassment training.",
+        "David Cameron.",
+        "Sardines."
+      ],
+      "generated_texts": [
+        "Shooting a hammer.",
+        "Shooting a dummy in the face.",
+        "Shooting a dummy in the face"
+      ],
+      "generation_time_seconds": 0.188436,
+      "rouge_scores": {
+        "rouge1": 0.11764705882352942,
+        "rouge2": 0.0,
+        "rougeL": 0.11764705882352942
+      },
+      "humor_scores": [
+        0.00679974677041173,
+        0.008297530002892017,
+        0.005583429243415594
+      ]
+    },
+    {
+      "black_card": "A wise man once said, \"What doesn't kill you makes you _.\" I stand before you today as living proof that this is true.",
+      "formatted_input": "Complete this card: A wise man once said, \"What doesn't kill you makes you _.\" I stand before you today as living proof that this is true.",
+      "reference_white_cards": [
+        "Several decades of festering resentment.",
+        "Hand stuff.",
+        "I like to do this every night before bed"
+      ],
+      "generated_texts": [
+        "Getting ripped off by a woman who screams \"I don't know what I do.\"",
+        "Getting ripped off by a woman who screams \"I don't know what I do\".",
+        "Getting ripped off by a woman who screams \"I don't know.\""
+      ],
+      "generation_time_seconds": 0.380105,
+      "rouge_scores": {
+        "rouge1": 0.16666666666666669,
+        "rouge2": 0.0,
+        "rougeL": 0.16666666666666669
+      },
+      "humor_scores": [
+        0.9853025674819946,
+        0.9912632703781128,
+        0.9882761836051941
+      ]
+    },
+    {
+      "black_card": "I wished for _ on my birthday last year",
+      "formatted_input": "Complete this card: I wished for _ on my birthday last year",
+      "reference_white_cards": [
+        "The LGBT community.",
+        "Eating bacon.",
+        "Farting, moving away, and acting casual."
+      ],
+      "generated_texts": [
+        "Getting ripped off for having a baby.",
+        "Getting ripped off for having a baby!",
+        "Getting ripped off for having a baby"
+      ],
+      "generation_time_seconds": 0.187439,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.5601485967636108,
+        0.18823696672916412,
+        0.657990574836731
+      ]
+    }
+  ],
+  "metrics": {
+    "avg_generation_time": 0.24967335,
+    "avg_rouge1": 0.14122728578610932,
+    "avg_rouge2": 0.0,
+    "avg_rougeL": 0.13493357949240303,
+    "avg_humor_score": 0.7475380701478571
+  }
+}

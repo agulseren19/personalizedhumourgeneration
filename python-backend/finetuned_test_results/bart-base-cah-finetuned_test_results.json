@@ -1,0 +1,514 @@
+{
+  "model_path": "finetuned_models/bart-base-cah-finetuned",
+  "timestamp": "2025-05-14 17:10:22",
+  "device": "cuda",
+  "samples": [
+    {
+      "black_card": "In hindsight having _ at a child's birthday party was a bad idea.",
+      "formatted_input": "Complete this card: In hindsight having _ at a child's birthday party was a bad idea.",
+      "reference_white_cards": [
+        "ARchbishop Emeritus Desmond Tutu.",
+        "Feather dusters.",
+        "Cockhenge."
+      ],
+      "generated_texts": [
+        "A slightly shittier parallel universe.",
+        "A very intimate Scoutmaster.",
+        "Being the prettiest girl at Mass."
+      ],
+      "generation_time_seconds": 8.750208,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.9916201829910278,
+        0.9852729439735413,
+        0.9871635437011719
+      ]
+    },
+    {
+      "black_card": "For 50% of the people involved, _ is hilarious.",
+      "formatted_input": "Complete this card: For 50% of the people involved, _ is hilarious.",
+      "reference_white_cards": [
+        "Karma.",
+        "The MWR tour you're no longer allowed to join.",
+        "A painful hand job"
+      ],
+      "generated_texts": [
+        "A whole lot of donuts.",
+        "A hot Brazilian nanny.",
+        "A hot Brazilian nanny"
+      ],
+      "generation_time_seconds": 0.075105,
+      "rouge_scores": {
+        "rouge1": 0.25,
+        "rouge2": 0.0,
+        "rougeL": 0.25
+      },
+      "humor_scores": [
+        0.40722155570983887,
+        0.040440358221530914,
+        0.006494798697531223
+      ]
+    },
+    {
+      "black_card": "When the going gets tough, the tough get _.",
+      "formatted_input": "Complete this card: When the going gets tough, the tough get _.",
+      "reference_white_cards": [
+        "Getting divorced over a game of Monopoly.",
+        "Hoverboards.",
+        "Using the last baby wipe when you desparately need another one."
+      ],
+      "generated_texts": [
+        "Pretending to agree then quietly walking away.",
+        "Praying to the saints.",
+        "The entire state of Texas."
+      ],
+      "generation_time_seconds": 0.104505,
+      "rouge_scores": {
+        "rouge1": 0.16666666666666666,
+        "rouge2": 0.0,
+        "rougeL": 0.16666666666666666
+      },
+      "humor_scores": [
+        0.4355524480342865,
+        0.1088632345199585,
+        0.04721248522400856
+      ]
+    },
+    {
+      "black_card": "*RANDOM*\nHand this card to another player and have them: TELL A JOKE",
+      "formatted_input": "Complete this card: *RANDOM*\nHand this card to another player and have them: TELL A JOKE",
+      "reference_white_cards": [
+        "Not wearing trousers.",
+        "Only believing in science.",
+        "Bringing democracy to faraway lands."
+      ],
+      "generated_texts": [
+        "A giant cocoon made entirely out of human skin.",
+        "Wondering who the father is",
+        "A giant cocoon made entirely out of Malaria."
+      ],
+      "generation_time_seconds": 0.110508,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.9879298210144043,
+        0.40497636795043945,
+        0.9885517358779907
+      ]
+    },
+    {
+      "black_card": "_ would be woefully incomplete without _.",
+      "formatted_input": "Complete this card: _ would be woefully incomplete without _.",
+      "reference_white_cards": [
+        "Germans on holiday.",
+        "Your kid brother",
+        "A stiff upper lip"
+      ],
+      "generated_texts": [
+        "A very awkward voicemail.",
+        "An entire game of Monopoly",
+        "A peckerwood."
+      ],
+      "generation_time_seconds": 0.070448,
+      "rouge_scores": {
+        "rouge1": 0.3333333333333333,
+        "rouge2": 0.0,
+        "rougeL": 0.3333333333333333
+      },
+      "humor_scores": [
+        0.9883346557617188,
+        0.018905509263277054,
+        0.9356836676597595
+      ]
+    },
+    {
+      "black_card": "I knew he/she was creepy when _.",
+      "formatted_input": "Complete this card: I knew he/she was creepy when _.",
+      "reference_white_cards": [
+        "Irregular bowel movements brought to you by Cape May's galley.",
+        "Gogurt burps",
+        "The well endowed."
+      ],
+      "generated_texts": [
+        "Getting naked and watching Wielie-Walie",
+        "A slightly shittier parallel universe.",
+        "Getting naked and watching Planet Earth."
+      ],
+      "generation_time_seconds": 0.101824,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.9916138648986816,
+        0.9913045167922974,
+        0.9880451560020447
+      ]
+    },
+    {
+      "black_card": "What keeps me warm during those long, bitterly cold, winter nights?",
+      "formatted_input": "Complete this card: What keeps me warm during those long, bitterly cold, winter nights?",
+      "reference_white_cards": [
+        "Eating all the skin off a rotisserie chicken.",
+        "Swords.",
+        "Finding Waldo."
+      ],
+      "generated_texts": [
+        "Getting laughing gas at the dentist's office.",
+        "A giant meteor to collide with Earth.",
+        "The benefits of global warming."
+      ],
+      "generation_time_seconds": 0.096012,
+      "rouge_scores": {
+        "rouge1": 0.15384615384615385,
+        "rouge2": 0.0,
+        "rougeL": 0.15384615384615385
+      },
+      "humor_scores": [
+        0.9950149655342102,
+        0.9946005344390869,
+        0.9801473617553711
+      ]
+    },
+    {
+      "black_card": "Brought to you by XXXX Gold, the Official Beer of _.",
+      "formatted_input": "Complete this card: Brought to you by XXXX Gold, the Official Beer of _.",
+      "reference_white_cards": [
+        "At least three ducks.",
+        "Bisexual robots.",
+        "Low hugs."
+      ],
+      "generated_texts": [
+        "A dead puppy, marinated with monkey-gland sauce.",
+        "A turd that has been surgically removed from your body.",
+        "A hot Brazilian nanny."
+      ],
+      "generation_time_seconds": 0.1275,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.04135145619511604,
+        0.017801715061068535,
+        0.016487864777445793
+      ]
+    },
+    {
+      "black_card": "Every wedding toast should include at least one mention of _.",
+      "formatted_input": "Complete this card: Every wedding toast should include at least one mention of _.",
+      "reference_white_cards": [
+        "Finding a polite way to ask if your date was born the gender they are now.",
+        "Mixing up pajama day with picture day",
+        "Sarah Palin in a helicopter shooting seals with an AK-47."
+      ],
+      "generated_texts": [
+        "A hot Brazilian nanny",
+        "The liberal bubble.",
+        "The liberal media."
+      ],
+      "generation_time_seconds": 0.06529,
+      "rouge_scores": {
+        "rouge1": 0.13333333333333333,
+        "rouge2": 0.0,
+        "rougeL": 0.13333333333333333
+      },
+      "humor_scores": [
+        0.006846065632998943,
+        0.01701373979449272,
+        0.011960805393755436
+      ]
+    },
+    {
+      "black_card": "Sure, _ was an unlikely source of income during college, but $20 is $20, right?!",
+      "formatted_input": "Complete this card: Sure, _ was an unlikely source of income during college, but $20 is $20, right?!",
+      "reference_white_cards": [
+        "The milk that comes out of a person.",
+        "WhiteBabyBlackMarket.com",
+        "The tiny, calloused hands of the Chinese children that made this card."
+      ],
+      "generated_texts": [
+        "A giant meteor to collide with Earth.",
+        "A giant meteor to collide with Earth's rotation.",
+        "A giant cup of coffee."
+      ],
+      "generation_time_seconds": 0.103157,
+      "rouge_scores": {
+        "rouge1": 0.3076923076923077,
+        "rouge2": 0.0,
+        "rougeL": 0.15384615384615385
+      },
+      "humor_scores": [
+        0.9567080140113831,
+        0.9457830786705017,
+        0.9796593189239502
+      ]
+    },
+    {
+      "black_card": "In ancient Sparta, boys became men only after killing and eating _.",
+      "formatted_input": "Complete this card: In ancient Sparta, boys became men only after killing and eating _.",
+      "reference_white_cards": [
+        "The John D. and Catherine T. MacArthur Foundation.",
+        "White privilege.",
+        "A butterface."
+      ],
+      "generated_texts": [
+        "Pretending to have done the reading.",
+        "Pretending to be black.",
+        "Pretending to agree then quietly seeing myself out"
+      ],
+      "generation_time_seconds": 0.10939,
+      "rouge_scores": {
+        "rouge1": 0.14285714285714288,
+        "rouge2": 0.0,
+        "rougeL": 0.14285714285714288
+      },
+      "humor_scores": [
+        0.013714791275560856,
+        0.014480534940958023,
+        0.009321079589426517
+      ]
+    },
+    {
+      "black_card": "For \"Insert Name's\" next magic trick, he/she will pull a _ out of a hat.",
+      "formatted_input": "Complete this card: For \"Insert Name's\" next magic trick, he/she will pull a _ out of a hat.",
+      "reference_white_cards": [
+        "Playing whack-a-mole with the ban hammer.",
+        "sorry, I'm a little rusty",
+        "Private Handler."
+      ],
+      "generated_texts": [
+        "A whole lot of donuts.",
+        "Pretending to agree then quietly walking away.",
+        "Pretending to be a wizard."
+      ],
+      "generation_time_seconds": 0.102891,
+      "rouge_scores": {
+        "rouge1": 0.1818181818181818,
+        "rouge2": 0.0,
+        "rougeL": 0.1818181818181818
+      },
+      "humor_scores": [
+        0.9621977210044861,
+        0.5886214375495911,
+        0.21059180796146393
+      ]
+    },
+    {
+      "black_card": "How the Grinch stole _.",
+      "formatted_input": "Complete this card: How the Grinch stole _.",
+      "reference_white_cards": [
+        "Drake and Young Jeezy sharing a milkshake",
+        "Falsely portraying that life is amazing on social media",
+        "Discovering that he's hung like a lightswitch."
+      ],
+      "generated_texts": [
+        "Coffee so black that it starts picking cotton.",
+        "The liberal bubble.",
+        "Coffee."
+      ],
+      "generation_time_seconds": 0.11365,
+      "rouge_scores": {
+        "rouge1": 0.125,
+        "rouge2": 0.0,
+        "rougeL": 0.125
+      },
+      "humor_scores": [
+        0.969070553779602,
+        0.10916590690612793,
+        0.7496687769889832
+      ]
+    },
+    {
+      "black_card": "Joey, look out behind you! It's _!",
+      "formatted_input": "Complete this card: Joey, look out behind you! It's _!",
+      "reference_white_cards": [
+        "Roadkill.",
+        "making legs",
+        "The Combat Action Ribbon."
+      ],
+      "generated_texts": [
+        "Getting really worried about global warming for a few seconds",
+        "A hot Brazilian nanny.",
+        "Getting really worried about global warming."
+      ],
+      "generation_time_seconds": 0.104166,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.7914237380027771,
+        0.9251503348350525,
+        0.4611039161682129
+      ]
+    },
+    {
+      "black_card": "Hallelujah, it's raining _.",
+      "formatted_input": "Complete this card: Hallelujah, it's raining _.",
+      "reference_white_cards": [
+        "A racist-themed costume party.",
+        "Illegal immigrants.",
+        "Police 10 7"
+      ],
+      "generated_texts": [
+        "Pretending to agree then quietly walking away.",
+        "Pooping in the soup.",
+        "Pretending to be black."
+      ],
+      "generation_time_seconds": 0.116142,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "humor_scores": [
+        0.12497211992740631,
+        0.27401262521743774,
+        0.09382851421833038
+      ]
+    },
+    {
+      "black_card": "I've always dreamt of _.",
+      "formatted_input": "Complete this card: I've always dreamt of _.",
+      "reference_white_cards": [
+        "The Warriors",
+        "Bathrooms with danceable music.",
+        "Lice."
+      ],
+      "generated_texts": [
+        "A giant meteor to collide with Earth.",
+        "A happy dancer with a spectacular ballsack.",
+        "A happy dancer with an impressive scrotum"
+      ],
+      "generation_time_seconds": 0.096142,
+      "rouge_scores": {
+        "rouge1": 0.18181818181818182,
+        "rouge2": 0.0,
+        "rougeL": 0.18181818181818182
+      },
+      "humor_scores": [
+        0.8602845668792725,
+        0.9545828700065613,
+        0.9788079261779785
+      ]
+    },
+    {
+      "black_card": "What have you done to deserve a promotion?",
+      "formatted_input": "Complete this card: What have you done to deserve a promotion?",
+      "reference_white_cards": [
+        "an extradition hearing",
+        "Make America Great Again sombreros.",
+        "The magical gold-weaving spider that creates Donald Trump's hair every night."
+      ],
+      "generated_texts": [
+        "The Second Vatican Council.",
+        "A three-day hangover",
+        "A three-day gender reveal"
+      ],
+      "generation_time_seconds": 0.073391,
+      "rouge_scores": {
+        "rouge1": 0.11764705882352941,
+        "rouge2": 0.0,
+        "rougeL": 0.11764705882352941
+      },
+      "humor_scores": [
+        0.6033565998077393,
+        0.31040480732917786,
+        0.01921345852315426
+      ]
+    },
+    {
+      "black_card": "The four shifts at Desert Bus: Dawn Guard, Alpha Flight, Night Watch and _.",
+      "formatted_input": "Complete this card: The four shifts at Desert Bus: Dawn Guard, Alpha Flight, Night Watch and _.",
+      "reference_white_cards": [
+        "Ripping into a man's chest and pulling out his still-beating heart.",
+        "Not having silly talk.",
+        "Asians"
+      ],
+      "generated_texts": [
+        "Sitting in the back of the Church.",
+        "Sitting in the back of the school bus",
+        "Sitting on a cake."
+      ],
+      "generation_time_seconds": 0.100158,
+      "rouge_scores": {
+        "rouge1": 0.11764705882352941,
+        "rouge2": 0.0,
+        "rougeL": 0.11764705882352941
+      },
+      "humor_scores": [
+        0.010860735550522804,
+        0.007547515910118818,
+        0.013386462815105915
+      ]
+    },
+    {
+      "black_card": "A wise man once said, \"What doesn't kill you makes you _.\" I stand before you today as living proof that this is true.",
+      "formatted_input": "Complete this card: A wise man once said, \"What doesn't kill you makes you _.\" I stand before you today as living proof that this is true.",
+      "reference_white_cards": [
+        "Fanny packs.",
+        "Stopping an actual gravy train",
+        "Disco fever."
+      ],
+      "generated_texts": [
+        "A hot Brazilian nanny.",
+        "A hot Brazilian nanny",
+        "An overly sexualized cartoon character"
+      ],
+      "generation_time_seconds": 0.079149,
+      "rouge_scores": {
+        "rouge1": 0.20000000000000004,
+        "rouge2": 0.0,
+        "rougeL": 0.20000000000000004
+      },
+      "humor_scores": [
+        0.9822068214416504,
+        0.9611872434616089,
+        0.9786720275878906
+      ]
+    },
+    {
+      "black_card": "I wished for _ on my birthday last year",
+      "formatted_input": "Complete this card: I wished for _ on my birthday last year",
+      "reference_white_cards": [
+        "Domestic intelligence gathering",
+        "A new pair of togs",
+        "have you ever had Five Guys?"
+      ],
+      "generated_texts": [
+        "A happy dancer with an impressive scrotum.",
+        "Getting really worried about global warming for a few seconds",
+        "Getting really worried about global warming."
+      ],
+      "generation_time_seconds": 0.105829,
+      "rouge_scores": {
+        "rouge1": 0.16666666666666666,
+        "rouge2": 0.0,
+        "rougeL": 0.16666666666666666
+      },
+      "humor_scores": [
+        0.33921822905540466,
+        0.6966487765312195,
+        0.12119218707084656
+      ]
+    }
+  ],
+  "metrics": {
+    "avg_generation_time": 0.53027325,
+    "avg_rouge1": 0.12891630428395134,
+    "avg_rouge2": 0.0,
+    "avg_rougeL": 0.12122399659164365,
+    "avg_humor_score": 0.5233909308832759
+  }
+}

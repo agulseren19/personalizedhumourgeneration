@@ -1,0 +1,506 @@
+{
+  "model_name": "facebook/bart-base",
+  "model_size": "base",
+  "timestamp": "2025-05-13 14:10:04",
+  "device": "cuda",
+  "memory_stats": {
+    "before_load": {
+      "allocated_gb": 0.743852032,
+      "reserved_gb": 0.799014912
+    },
+    "after_load": {
+      "allocated_gb": 1.022793728,
+      "reserved_gb": 1.260388352
+    }
+  },
+  "samples": [
+    {
+      "black_card": "In hindsight having _ at a child's birthday party was a bad idea.",
+      "formatted_input": "Complete this card: In hindsight having _ at a child's birthday party was a bad idea.",
+      "reference_white_cards": [
+        "Dancing ballroom before ballroom was cool.",
+        "Stalkers",
+        "Casting 600 stitches onto the wrong size needle."
+      ],
+      "generated_texts": [
+        "Complete this card: In hindsight having _ at a child's birthday party was a bad idea.",
+        "Complete this card: In hindsight having a party at a child's birthday party was a bad idea.",
+        "Complete this card: In hindsight having a cake at a child's birthday party was a bad idea."
+      ],
+      "generation_time_seconds": 0.36007237434387207,
+      "rouge_scores": {
+        "rouge1": 0.09090909090909091,
+        "rouge2": 0.0,
+        "rougeL": 0.09090909090909091
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9277745485305786,
+        "humor_score": 0.3968394756317139
+      }
+    },
+    {
+      "black_card": "For 50% of the people involved, _ is hilarious.",
+      "formatted_input": "Complete this card: For 50% of the people involved, _ is hilarious.",
+      "reference_white_cards": [
+        "Adulting classes.",
+        "Lending my parents money to pay for meds.",
+        "The 94 million eligible voters who didn't vote."
+      ],
+      "generated_texts": [
+        "Complete this card: For 50% of the people involved, _ is hilarious.",
+        "Complete this card: For 50% of the people involved, this is hilarious.",
+        "Complete this card: For 50% of the people involved, it is hilarious."
+      ],
+      "generation_time_seconds": 0.1298975944519043,
+      "rouge_scores": {
+        "rouge1": 0.10526315789473685,
+        "rouge2": 0.0,
+        "rougeL": 0.10526315789473685
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.928420901298523,
+        "humor_score": 0.47131646951039635
+      }
+    },
+    {
+      "black_card": "When the going gets tough, the tough get _.",
+      "formatted_input": "Complete this card: When the going gets tough, the tough get _.",
+      "reference_white_cards": [
+        "A swallow",
+        "Mother Nature",
+        "Cancer."
+      ],
+      "generated_texts": [
+        "Complete this card: When the going gets tough, the tough get _.",
+        "Complete this card: When the going gets tough, the tough get better.",
+        "Complete this card: When the going gets tough, the tough get tough."
+      ],
+      "generation_time_seconds": 0.11338329315185547,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.7646310329437256,
+        "humor_score": 0.3599194606145223
+      }
+    },
+    {
+      "black_card": "*RANDOM*\nHand this card to another player and have them: TELL A JOKE",
+      "formatted_input": "Complete this card: *RANDOM*\nHand this card to another player and have them: TELL A JOKE",
+      "reference_white_cards": [
+        "Rationalizing the terrible things you have seen and done in combat.",
+        "Zentos- King of the barbarian horde.",
+        "Frisking all immigrants who are at least an 8."
+      ],
+      "generated_texts": [
+        "Complete this card: *RANDOM*Hand this Card to another player and have them: TELL A JOKE",
+        "Complete this card: *RANDOM*Hand this Card to another player and have them: TELL A JOKE!",
+        "Complete this card: *RANDOM*Hand this Card to another player and have them: TELL A JOKE*"
+      ],
+      "generation_time_seconds": 0.18044447898864746,
+      "rouge_scores": {
+        "rouge1": 0.14814814814814814,
+        "rouge2": 0.0,
+        "rougeL": 0.07407407407407407
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9124581813812256,
+        "humor_score": 0.48231251080830895
+      }
+    },
+    {
+      "black_card": "_ would be woefully incomplete without _.",
+      "formatted_input": "Complete this card: _ would be woefully incomplete without _.",
+      "reference_white_cards": [
+        "A single mum with a 1.5L Nitro",
+        "Lines of Koch.",
+        "focus on the bits at the top"
+      ],
+      "generated_texts": [
+        "Complete this card: _ would be woefully incomplete without _.",
+        "Finish this card: _ would be woefully incomplete without _.",
+        "Complete this card: _ Would be woefully incomplete without _."
+      ],
+      "generation_time_seconds": 0.10163569450378418,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.908488929271698,
+        "humor_score": 0.5008868344624837
+      }
+    },
+    {
+      "black_card": "I knew he/she was creepy when _.",
+      "formatted_input": "Complete this card: I knew he/she was creepy when _.",
+      "reference_white_cards": [
+        "ALL the drugs!",
+        "Stepping on a plastic building brick",
+        "Suppressing the gag reflex."
+      ],
+      "generated_texts": [
+        "Complete this card: I knew he/she was creepy when _.",
+        "Complete this card: I knew he/she was creepy when I saw it.",
+        "Complete this card: I knew he/she was creepy when I saw him."
+      ],
+      "generation_time_seconds": 0.1200413703918457,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9181890487670898,
+        "humor_score": 0.47492845376332604
+      }
+    },
+    {
+      "black_card": "What keeps me warm during those long, bitterly cold, winter nights?",
+      "formatted_input": "Complete this card: What keeps me warm during those long, bitterly cold, winter nights?",
+      "reference_white_cards": [
+        "Crack Houses",
+        "Referring to stolen valor as being \"trans-veteran.\"",
+        "Billy Crystal."
+      ],
+      "generated_texts": [
+        "Complete this card: What keeps me warm during those long, bitterly cold, winter nights?",
+        "Finish this card: What keeps me warm during those long, bitterly cold, winter nights?",
+        "Read this card: What keeps me warm during those long, bitterly cold, winter nights?"
+      ],
+      "generation_time_seconds": 0.13180136680603027,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9079918265342712,
+        "humor_score": 0.4002851883570353
+      }
+    },
+    {
+      "black_card": "Brought to you by XXXX Gold, the Official Beer of _.",
+      "formatted_input": "Complete this card: Brought to you by XXXX Gold, the Official Beer of _.",
+      "reference_white_cards": [
+        "That girl from the Hunger Games.",
+        "a creamy pool",
+        "Steve Irwin dying the way he lived his life ... with animals in his heart."
+      ],
+      "generated_texts": [
+        "Complete this card: Brought to you by XXXX Gold, the Official Beer of _.",
+        "Complete this card: Brought to you by XXXX Gold, the Official Beer of the World.",
+        "Complete this card: Brought to you by XXXX Gold, the Official Beer of The World."
+      ],
+      "generation_time_seconds": 0.14281296730041504,
+      "rouge_scores": {
+        "rouge1": 0.10526315789473684,
+        "rouge2": 0.0,
+        "rougeL": 0.10526315789473684
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.8786873817443848,
+        "humor_score": 0.4633894769350688
+      }
+    },
+    {
+      "black_card": "Every wedding toast should include at least one mention of _.",
+      "formatted_input": "Complete this card: Every wedding toast should include at least one mention of _.",
+      "reference_white_cards": [
+        "The last days of school.",
+        "the ungraspable phantom of life",
+        "ID-10-t Error."
+      ],
+      "generated_texts": [
+        "Complete this card: Every wedding toast should include at least one mention of _.",
+        "Complete this card: Every wedding toast should include at least one mention of the bride.",
+        "Complete this card: Every wedding toast should include at least one mention of the wedding."
+      ],
+      "generation_time_seconds": 0.12807536125183105,
+      "rouge_scores": {
+        "rouge1": 0.2,
+        "rouge2": 0.0,
+        "rougeL": 0.1111111111111111
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.936578094959259,
+        "humor_score": 0.3986145853996277
+      }
+    },
+    {
+      "black_card": "Sure, _ was an unlikely source of income during college, but $20 is $20, right?!",
+      "formatted_input": "Complete this card: Sure, _ was an unlikely source of income during college, but $20 is $20, right?!",
+      "reference_white_cards": [
+        "A bunch of dead squirrels on a trampoline.",
+        "Leg amputation.",
+        "A hand job from a monkey"
+      ],
+      "generated_texts": [
+        "Complete this card: Sure, _ was an unlikely source of income during college, but $20 is $80, right?!",
+        "Complete this card: Sure, _ was an unlikely source of income during college, but $20 is $200, right?!",
+        "Complete this card: Sure, _ was an unlikely source of income during college, but $20 is still $200, right?!"
+      ],
+      "generation_time_seconds": 0.18198108673095703,
+      "rouge_scores": {
+        "rouge1": 0.07999999999999999,
+        "rouge2": 0.0,
+        "rougeL": 0.07999999999999999
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9205410480499268,
+        "humor_score": 0.3940650383631389
+      }
+    },
+    {
+      "black_card": "In ancient Sparta, boys became men only after killing and eating _.",
+      "formatted_input": "Complete this card: In ancient Sparta, boys became men only after killing and eating _.",
+      "reference_white_cards": [
+        "Drinkig a whole bottle of ranch.",
+        "A little camel toe",
+        "Cougars"
+      ],
+      "generated_texts": [
+        "Complete this card: In ancient Sparta, boys became men only after killing and eating men.",
+        "Complete this card: In ancient Sparta, boys became men only after killing and eating _.",
+        "Complete this card: In ancient Sparta, boys became men only after killing and eating their wives."
+      ],
+      "generation_time_seconds": 0.1499319076538086,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9205942153930664,
+        "humor_score": 0.4151301105817159
+      }
+    },
+    {
+      "black_card": "For \"Insert Name's\" next magic trick, he/she will pull a _ out of a hat.",
+      "formatted_input": "Complete this card: For \"Insert Name's\" next magic trick, he/she will pull a _ out of a hat.",
+      "reference_white_cards": [
+        "Giving your bud a brojob to cheer him up after his goldfish died",
+        "Placenta polenta.",
+        "Watermelon!"
+      ],
+      "generated_texts": [
+        "Complete this card: For \"Insert Name's\" next magic trick, he/she will pull a _ out of a hat.",
+        "Complete this card: For \"Insert Name's\" next magic trick, he/she will pull a name out of a hat.",
+        "Complete this card: For \"Insert Name's\" next magic trick, he/she will pull a new hat out of a hat."
+      ],
+      "generation_time_seconds": 0.18880867958068848,
+      "rouge_scores": {
+        "rouge1": 0.0625,
+        "rouge2": 0.0,
+        "rougeL": 0.0625
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9453215599060059,
+        "humor_score": 0.4239519079526266
+      }
+    },
+    {
+      "black_card": "How the Grinch stole _.",
+      "formatted_input": "Complete this card: How the Grinch stole _.",
+      "reference_white_cards": [
+        "Getting the call-up for the world cup final, while standing knee deep in whitebait nets",
+        "a confessional",
+        "Impregnating women in 3rd world countries."
+      ],
+      "generated_texts": [
+        "Complete this card: How the Grinch stole _.",
+        "Complete this card: How the Grinch stole the card.",
+        "Complete this card: How the Grinch stole _"
+      ],
+      "generation_time_seconds": 0.09586334228515625,
+      "rouge_scores": {
+        "rouge1": 0.16,
+        "rouge2": 0.0,
+        "rougeL": 0.16
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9151556491851807,
+        "humor_score": 0.5875022665659587
+      }
+    },
+    {
+      "black_card": "Joey, look out behind you! It's _!",
+      "formatted_input": "Complete this card: Joey, look out behind you! It's _!",
+      "reference_white_cards": [
+        "Getting much fatter after Fat Tuesday.",
+        "Tellig personal Jesus stories.",
+        "Living in Community."
+      ],
+      "generated_texts": [
+        "Complete this card: Joey, look out behind you! It's _!",
+        "Complete this card: Joey, look out behind you! It's your turn!",
+        "Complete this card: Joey, look out behind you! It's the moon!"
+      ],
+      "generation_time_seconds": 0.11901068687438965,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9315189719200134,
+        "humor_score": 0.47465490420659384
+      }
+    },
+    {
+      "black_card": "Hallelujah, it's raining _.",
+      "formatted_input": "Complete this card: Hallelujah, it's raining _.",
+      "reference_white_cards": [
+        "Pingers.",
+        "a botched Botox injection",
+        "Systems and policies designed to preserve centuries-old power structures."
+      ],
+      "generated_texts": [
+        "Complete this card: Hallelujah, it's raining _.",
+        "Complete this card: Hallelujah, it's raining.",
+        "Complete this card: Hallelujah, it's raining outside."
+      ],
+      "generation_time_seconds": 0.10767555236816406,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.904964804649353,
+        "humor_score": 0.5573297802607219
+      }
+    },
+    {
+      "black_card": "I've always dreamt of _.",
+      "formatted_input": "Complete this card: I've always dreamt of _.",
+      "reference_white_cards": [
+        "Mine-clearance dolphins.",
+        "A plant-devouring space-worm named \"Rachel.\"",
+        "My hillbilly family."
+      ],
+      "generated_texts": [
+        "Complete this card: I've always dreamt of _.",
+        "Complete this card: I've always dreamt of _ _.",
+        "Complete this card: I've always dreamt of _"
+      ],
+      "generation_time_seconds": 0.10092544555664062,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9215965270996094,
+        "humor_score": 0.4947906597455343
+      }
+    },
+    {
+      "black_card": "What have you done to deserve a promotion?",
+      "formatted_input": "Complete this card: What have you done to deserve a promotion?",
+      "reference_white_cards": [
+        "A water pistol loaded with LSD.",
+        "A Coffee Break For Sisyphus.",
+        "it's your turn on the slip-and-slide"
+      ],
+      "generated_texts": [
+        "Complete this card: What have you done to deserve a promotion?",
+        "Complete this article: What have you done to deserve a promotion?",
+        "Complete this report: What have you done to deserve a promotion?"
+      ],
+      "generation_time_seconds": 0.1014251708984375,
+      "rouge_scores": {
+        "rouge1": 0.12500000000000003,
+        "rouge2": 0.0,
+        "rougeL": 0.12500000000000003
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9247597455978394,
+        "humor_score": 0.48166349093119304
+      }
+    },
+    {
+      "black_card": "The four shifts at Desert Bus: Dawn Guard, Alpha Flight, Night Watch and _.",
+      "formatted_input": "Complete this card: The four shifts at Desert Bus: Dawn Guard, Alpha Flight, Night Watch and _.",
+      "reference_white_cards": [
+        "Running away with the circus.",
+        "Not having extra cash for the second collection.",
+        "The Jonas Brothers."
+      ],
+      "generated_texts": [
+        "Complete this card: The four shifts at Desert Bus: Dawn Guard, Alpha Flight, Night Watch and _.",
+        "Complete this card: The four shifts at Desert Bus: Dawn Guard, Alpha Flight, Night Watch and Night Guard.",
+        "Complete this card: The four shifts at Desert Bus: Dawn Guard, Alpha Flight, Night Watch and the Night Guard."
+      ],
+      "generation_time_seconds": 0.17121505737304688,
+      "rouge_scores": {
+        "rouge1": 0.10526315789473684,
+        "rouge2": 0.0,
+        "rougeL": 0.10526315789473684
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9374010562896729,
+        "humor_score": 0.39273753960927327
+      }
+    },
+    {
+      "black_card": "A wise man once said, \"What doesn't kill you makes you _.\" I stand before you today as living proof that this is true.",
+      "formatted_input": "Complete this card: A wise man once said, \"What doesn't kill you makes you _.\" I stand before you today as living proof that this is true.",
+      "reference_white_cards": [
+        "Expired Dog Food",
+        "Tsotsis wielding non-traditional weapons.",
+        "Dedicating your Medal of Honor speech to Harambe the fallen gorilla."
+      ],
+      "generated_texts": [
+        "Complete this card: A wise man once said, \"What doesn't kill you makes you _.\" I stand before you today as living proof that this is true.",
+        "Complete this card: A wise man once said, \"What doesn't kill you makes you stronger.\" I stand before you today as living proof that this is true.",
+        "Complete this card: A wise man once said, \"What doesn't kill you makes you _.\" I stand before you today as living proof that this is true. I"
+      ],
+      "generation_time_seconds": 0.23270750045776367,
+      "rouge_scores": {
+        "rouge1": 0.0,
+        "rouge2": 0.0,
+        "rougeL": 0.0
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9193509817123413,
+        "humor_score": 0.40811374187469485
+      }
+    },
+    {
+      "black_card": "I wished for _ on my birthday last year",
+      "formatted_input": "Complete this card: I wished for _ on my birthday last year",
+      "reference_white_cards": [
+        "Nodding and shouting \"Yeah!\" at my parent's advice while knowing I'll ignore it.",
+        "Talking smack about everything I see.",
+        "The White Savior Complex"
+      ],
+      "generated_texts": [
+        "Complete this card: I wished for _ on my birthday last year",
+        "Complete this card: I wished for this on my birthday last year",
+        "Complete this card: I wished for _ On my birthday last year"
+      ],
+      "generation_time_seconds": 0.10881352424621582,
+      "rouge_scores": {
+        "rouge1": 0.15384615384615383,
+        "rouge2": 0.0,
+        "rougeL": 0.11764705882352942
+      },
+      "deberta_scores": {
+        "semantic_similarity": 0.9262646436691284,
+        "humor_score": 0.5024859873453776
+      }
+    }
+  ],
+  "metrics": {
+    "avg_generation_time": 0.1483261227607727,
+    "avg_rouge1": 0.06680964332938018,
+    "avg_rouge2": 0.0,
+    "avg_rougeL": 0.05685154043010081,
+    "avg_semantic_similarity": 0.915590450167656,
+    "avg_humor_score": 0.45404589414596563
+  }
+}

@@ -1,0 +1,136 @@
+Wed May 14 17:07:10 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.120                Driver Version: 550.120        CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A16                     Off |   00000000:03:00.0 Off |                    0 |
+|  0%   21C    P8             15W /   62W |       1MiB /  15356MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+ 17:07:10 up 15 days, 42 min,  0 user,  load average: 1.40, 1.29, 1.45
+Requirement already satisfied: transformers in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (4.51.3)
+Requirement already satisfied: datasets in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (3.6.0)
+Requirement already satisfied: pandas in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (2.2.3)
+Requirement already satisfied: torch in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (2.7.0+cu118)
+Requirement already satisfied: rouge_score in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (0.1.2)
+Requirement already satisfied: filelock in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (3.13.1)
+Requirement already satisfied: huggingface-hub<1.0,>=0.30.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (0.31.1)
+Requirement already satisfied: numpy>=1.17 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (2.1.2)
+Requirement already satisfied: packaging>=20.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (25.0)
+Requirement already satisfied: pyyaml>=5.1 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (6.0.2)
+Requirement already satisfied: regex!=2019.12.17 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (2024.11.6)
+Requirement already satisfied: requests in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (2.32.3)
+Requirement already satisfied: tokenizers<0.22,>=0.21 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (0.21.1)
+Requirement already satisfied: safetensors>=0.4.3 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (0.5.3)
+Requirement already satisfied: tqdm>=4.27 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from transformers) (4.67.1)
+Requirement already satisfied: pyarrow>=15.0.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from datasets) (20.0.0)
+Requirement already satisfied: dill<0.3.9,>=0.3.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from datasets) (0.3.8)
+Requirement already satisfied: xxhash in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from datasets) (3.5.0)
+Requirement already satisfied: multiprocess<0.70.17 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from datasets) (0.70.16)
+Requirement already satisfied: fsspec<=2025.3.0,>=2023.1.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from fsspec[http]<=2025.3.0,>=2023.1.0->datasets) (2024.6.1)
+Requirement already satisfied: python-dateutil>=2.8.2 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from pandas) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from pandas) (2025.2)
+Requirement already satisfied: tzdata>=2022.7 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from pandas) (2025.2)
+Requirement already satisfied: typing-extensions>=4.10.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (4.13.2)
+Requirement already satisfied: setuptools in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (80.3.1)
+Requirement already satisfied: sympy>=1.13.3 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (1.13.3)
+Requirement already satisfied: networkx in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (3.3)
+Requirement already satisfied: jinja2 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (3.1.6)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu11==11.8.89 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (11.8.89)
+Requirement already satisfied: nvidia-cuda-runtime-cu11==11.8.89 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (11.8.89)
+Requirement already satisfied: nvidia-cuda-cupti-cu11==11.8.87 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (11.8.87)
+Requirement already satisfied: nvidia-cudnn-cu11==9.1.0.70 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (9.1.0.70)
+Requirement already satisfied: nvidia-cublas-cu11==11.11.3.6 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (11.11.3.6)
+Requirement already satisfied: nvidia-cufft-cu11==10.9.0.58 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (10.9.0.58)
+Requirement already satisfied: nvidia-curand-cu11==10.3.0.86 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (10.3.0.86)
+Requirement already satisfied: nvidia-cusolver-cu11==11.4.1.48 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (11.4.1.48)
+Requirement already satisfied: nvidia-cusparse-cu11==11.7.5.86 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (11.7.5.86)
+Requirement already satisfied: nvidia-nccl-cu11==2.21.5 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (2.21.5)
+Requirement already satisfied: nvidia-nvtx-cu11==11.8.86 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (11.8.86)
+Requirement already satisfied: triton==3.3.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from torch) (3.3.0)
+Requirement already satisfied: absl-py in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from rouge_score) (2.2.2)
+Requirement already satisfied: nltk in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from rouge_score) (3.9.1)
+Requirement already satisfied: six>=1.14.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from rouge_score) (1.17.0)
+Requirement already satisfied: aiohttp!=4.0.0a0,!=4.0.0a1 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from fsspec[http]<=2025.3.0,>=2023.1.0->datasets) (3.11.18)
+Requirement already satisfied: hf-xet<2.0.0,>=1.1.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from huggingface-hub<1.0,>=0.30.0->transformers) (1.1.0)
+Requirement already satisfied: charset-normalizer<4,>=2 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from requests->transformers) (3.4.2)
+Requirement already satisfied: idna<4,>=2.5 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from requests->transformers) (3.10)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from requests->transformers) (2.4.0)
+Requirement already satisfied: certifi>=2017.4.17 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from requests->transformers) (2025.4.26)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from sympy>=1.13.3->torch) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from jinja2->torch) (3.0.2)
+Requirement already satisfied: click in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from nltk->rouge_score) (8.1.8)
+Requirement already satisfied: joblib in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from nltk->rouge_score) (1.5.0)
+Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets) (2.6.1)
+Requirement already satisfied: aiosignal>=1.1.2 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets) (1.3.2)
+Requirement already satisfied: attrs>=17.3.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets) (25.3.0)
+Requirement already satisfied: frozenlist>=1.1.1 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets) (1.6.0)
+Requirement already satisfied: multidict<7.0,>=4.5 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets) (6.4.3)
+Requirement already satisfied: propcache>=0.2.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets) (0.3.1)
+Requirement already satisfied: yarl<2.0,>=1.17.0 in /vol/bitbucket/ag724/cahvenv/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.3.0,>=2023.1.0->datasets) (1.20.0)
+=== Testing fine-tuned model on CAH dataset ===
+INFO:__main__:Loading test data from ../cah-app/data/processed/cah_train_safe.parquet
+INFO:__main__:Loaded 5102 black cards and 15037 white cards
+INFO:__main__:Created 20 test samples
+INFO:absl:Using default tokenizer.
+INFO:__main__:Loading model from finetuned_models/bart-base-cah-finetuned
+INFO:__main__:Testing model on 20 samples
+
+  0%|          | 0/20 [00:00<?, ?it/s]
+  5%|▌         | 1/20 [00:25<07:57, 25.11s/it]
+ 10%|█         | 2/20 [00:25<03:12, 10.70s/it]
+ 15%|█▌        | 3/20 [00:26<01:43,  6.10s/it]
+ 20%|██        | 4/20 [00:26<01:02,  3.94s/it]
+ 25%|██▌       | 5/20 [00:27<00:40,  2.73s/it]
+ 30%|███       | 6/20 [00:28<00:28,  2.01s/it]
+ 35%|███▌      | 7/20 [00:28<00:20,  1.55s/it]
+ 40%|████      | 8/20 [00:29<00:15,  1.28s/it]
+ 45%|████▌     | 9/20 [00:30<00:11,  1.06s/it]
+ 50%|█████     | 10/20 [00:30<00:09,  1.08it/s]
+ 55%|█████▌    | 11/20 [00:31<00:07,  1.19it/s]
+ 60%|██████    | 12/20 [00:31<00:06,  1.28it/s]
+ 65%|██████▌   | 13/20 [00:32<00:05,  1.36it/s]
+ 70%|███████   | 14/20 [00:33<00:04,  1.42it/s]
+ 75%|███████▌  | 15/20 [00:34<00:03,  1.33it/s]
+ 80%|████████  | 16/20 [00:34<00:02,  1.41it/s]
+ 85%|████████▌ | 17/20 [00:35<00:02,  1.48it/s]
+ 90%|█████████ | 18/20 [00:35<00:01,  1.51it/s]
+ 95%|█████████▌| 19/20 [00:36<00:00,  1.51it/s]
+100%|██████████| 20/20 [00:37<00:00,  1.50it/s]
+100%|██████████| 20/20 [00:37<00:00,  1.86s/it]
+INFO:__main__:Average generation time: 0.530s
+INFO:__main__:Average ROUGE-1: 0.1289
+INFO:__main__:Average ROUGE-2: 0.0000
+INFO:__main__:Average ROUGE-L: 0.1212
+INFO:__main__:Average humor score: 0.5234
+INFO:__main__:Results saved to test_results/bart-base-cah-finetuned_test_results.json
+INFO:__main__:
+Example generations:
+INFO:__main__:
+Black card: In hindsight having _ at a child's birthday party was a bad idea.
+INFO:__main__:Generated: A slightly shittier parallel universe.
+INFO:__main__:Humor score: 0.9916
+INFO:__main__:Reference: ARchbishop Emeritus Desmond Tutu.
+INFO:__main__:
+Black card: For 50% of the people involved, _ is hilarious.
+INFO:__main__:Generated: A whole lot of donuts.
+INFO:__main__:Humor score: 0.4072
+INFO:__main__:Reference: Karma.
+INFO:__main__:
+Black card: When the going gets tough, the tough get _.
+INFO:__main__:Generated: Pretending to agree then quietly walking away.
+INFO:__main__:Humor score: 0.4356
+INFO:__main__:Reference: Getting divorced over a game of Monopoly.
+=== Testing complete ===
+=== Test results saved to test_results/ ===

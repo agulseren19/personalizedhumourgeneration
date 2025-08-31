@@ -1,0 +1,34 @@
+{
+  "timestamp": "2025-05-13 14:10:39",
+  "models_compared": [
+    "t5-small",
+    "t5-base",
+    "bart-base"
+  ],
+  "metrics": {
+    "t5-small": {
+      "avg_generation_time": 0.8257505774497986,
+      "avg_rouge1": 0.07552343872660455,
+      "avg_rouge2": 0.0,
+      "avg_rougeL": 0.069803977028882,
+      "avg_semantic_similarity": 0.9014045596122742,
+      "avg_humor_score": 0.46587565414110826
+    },
+    "t5-base": {
+      "avg_generation_time": 0.38271082639694215,
+      "avg_rouge1": 0.060687455819034765,
+      "avg_rouge2": 0.0,
+      "avg_rougeL": 0.057088883181724684,
+      "avg_semantic_similarity": 0.9051158219575882,
+      "avg_humor_score": 0.499232538620631
+    },
+    "bart-base": {
+      "avg_generation_time": 0.1483261227607727,
+      "avg_rouge1": 0.06680964332938018,
+      "avg_rouge2": 0.0,
+      "avg_rougeL": 0.05685154043010081,
+      "avg_semantic_similarity": 0.915590450167656,
+      "avg_humor_score": 0.45404589414596563
+    }
+  }
+}

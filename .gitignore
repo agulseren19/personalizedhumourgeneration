@@ -55,12 +55,12 @@ architecture/
 documents/
 
 # Large model files and dependencies
-python-backend/finetuned_models/
-python-backend/models/
-python-backend/data/
-python-backend/outputs/
-python-backend/finetuned_test_results/
-python-backend/inference_model_comparison_results/
+# python-backend/finetuned_models/
+# python-backend/models/
+# python-backend/data/
+# python-backend/outputs/
+# python-backend/finetuned_test_results/
+# python-backend/inference_model_comparison_results/
 
 # Database files
 *.db
@@ -183,4 +183,18 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-python-backend/
+# python-backend/
+
+python-backend/finetuned_models/*/checkpoint-*/
+python-backend/finetuned_models/*/model.safetensors
+python-backend/finetuned_models/*/optimizer.pt
+python-backend/finetuned_models/*/rng_state.pth
+python-backend/finetuned_models/*/scaler.pt
+python-backend/finetuned_models/*/scheduler.pt
+python-backend/models/*/checkpoint-*/
+python-backend/models/*/model.safetensors
+python-backend/models/*/optimizer.pt
+python-backend/models/*/rng_state.pth
+python-backend/models/*/scaler.pt
+python-backend/models/*/scheduler.pt
+python-backend/models/trained/*.pkl
