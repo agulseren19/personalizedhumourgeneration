@@ -9,7 +9,7 @@ import re
 from typing import Dict, List, Optional
 from datetime import datetime
 
-# from detoxify import Detoxify  # REMOVED - causes memory issues on Render
+# from detoxify import Detoxify  # causes memory issues on Render in prod
 
 def simple_content_filter(text: str) -> Dict[str, float]:
     """Simple regex-based content filter (replaces detoxify)"""

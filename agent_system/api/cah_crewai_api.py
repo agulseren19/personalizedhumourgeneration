@@ -130,6 +130,8 @@ except ImportError as e:
 # Helper function to convert numpy types to Python native types
 def convert_numpy_types(obj):
     """Convert numpy types to Python native types for JSON serialization"""
+    import dataclasses
+    
     if isinstance(obj, np.integer):
         return int(obj)
     elif isinstance(obj, np.floating):
@@ -140,6 +142,9 @@ def convert_numpy_types(obj):
         return {key: convert_numpy_types(value) for key, value in obj.items()}
     elif isinstance(obj, list):
         return [convert_numpy_types(item) for item in obj]
+    elif dataclasses.is_dataclass(obj):
+        # Convert dataclass to dictionary and recursively convert fields
+        return convert_numpy_types(dataclasses.asdict(obj))
     else:
         return obj
 
@@ -797,7 +802,8 @@ async def generate_humor(request: HumorRequest):
                     "generation_time": result.get("generation_time", 0.0),
                     "fallback_used": result.get("fallback_used", False),
                     "best_result": result.get("best_result"),
-                    "recommended_personas": result.get("recommended_personas", [])
+                    "recommended_personas": result.get("recommended_personas", []),
+                    "batch_distinct_1": result.get("batch_distinct_1")  # Include batch distinct-1 score
                 }
 
                 # If zero generations, return 500 so frontend shows an error instead of silent 0 cards
@@ -825,6 +831,7 @@ async def generate_humor(request: HumorRequest):
 
                 # Convert numpy types to Python types
                 standardized_result = convert_numpy_types(standardized_result)
+                
                 return standardized_result
             else:
                 # Fallback if result is not a dict

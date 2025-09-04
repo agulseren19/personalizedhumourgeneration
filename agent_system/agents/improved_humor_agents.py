@@ -138,6 +138,10 @@ class GenerationResult:
     confidence_score: float
     surprise_index: float = 5.0  # Add surprise index with default value
     evaluation: Optional[Any] = None  # Add evaluation field for complete sentence metrics
+    # Add direct access to key evaluation metrics for frontend
+    distinct_1: Optional[float] = None
+    semantic_coherence: Optional[float] = None
+    pacs_score: Optional[float] = None
     
     def __post_init__(self):
         # Ensure all float values are Python floats, not numpy types
@@ -608,7 +612,11 @@ Response:"""
                                 confidence_score=0.8,
                                 surprise_index=evaluation_result.surprisal_score,
                                 # Add evaluation data
-                                evaluation=evaluation_result
+                                evaluation=evaluation_result,
+                                # Add direct access to key metrics for frontend
+                                distinct_1=evaluation_result.distinct_1,
+                                semantic_coherence=evaluation_result.semantic_coherence,
+                                pacs_score=evaluation_result.pacs_score
                             )
                         else:
                             # Fallback to basic evaluation
@@ -1149,7 +1157,11 @@ Black Card:""",
                     safety_score=safety_score,
                     is_safe=is_safe,
                     confidence_score=0.9,
-                    surprise_index=surprise_index
+                    surprise_index=surprise_index,
+                    # Add placeholder values - will be updated by hybrid evaluation
+                    distinct_1=None,
+                    semantic_coherence=None,
+                    pacs_score=None
                 )
                 
                 print(f"    ✅ CrewAI generated: {result.strip()[:50]}...")
@@ -1566,6 +1578,7 @@ class ImprovedHumorEvaluator:
         try:
             # Step 1: Get statistical metrics (objective measures)
             statistical_result = await self._evaluate_with_literature_metrics(humor_text, request)
+            print(f"🔧 DEBUG: Hybrid evaluation - statistical distinct_1={statistical_result.distinct_1:.3f}, pacs_score={statistical_result.pacs_score:.3f}")
             
             # Step 2: Get ONLY humor score from LLM (subjective humor assessment)
             llm_humor_score = await self._get_llm_humor_score(humor_text, request)
@@ -1995,6 +2008,15 @@ class ImprovedHumorOrchestrator:
         for generation in generations:
             evaluation = await evaluator.evaluate_humor(generation.text, request)
             
+            # Update generation with evaluation metrics for frontend access
+            generation.distinct_1 = evaluation.distinct_1
+            generation.semantic_coherence = evaluation.semantic_coherence
+            generation.pacs_score = evaluation.pacs_score
+            generation.evaluation = evaluation
+            
+            # DEBUG: Log the values being set
+            print(f"🔧 DEBUG: Setting generation metrics - distinct_1={evaluation.distinct_1:.3f}, semantic_coherence={evaluation.semantic_coherence:.1f}, pacs_score={evaluation.pacs_score:.3f}")
+            
             evaluated_results.append({
                 'generation': generation,
                 'evaluation': evaluation,
@@ -2003,6 +2025,9 @@ class ImprovedHumorOrchestrator:
         
         # Sort by combined score
         evaluated_results.sort(key=lambda x: x['combined_score'], reverse=True)
+        
+        # Calculate batch distinct-1 across all generated cards
+        batch_distinct_1 = self._calculate_batch_distinct_1([result['generation'].text for result in evaluated_results])
         
         # Convert numpy types to Python types for JSON serialization
         def convert_numpy_types(obj):
@@ -2026,8 +2051,30 @@ class ImprovedHumorOrchestrator:
             'top_results': convert_numpy_types(evaluated_results[:3]) if evaluated_results else [],
             'num_results': len(evaluated_results) if evaluated_results else 0,
             'generation_time': total_generation_time,
-            'fallback_used': False
+            'fallback_used': False,
+            'batch_distinct_1': batch_distinct_1  # Add batch distinct-1 score
         }
+    
+    def _calculate_batch_distinct_1(self, texts: List[str]) -> float:
+        """Calculate distinct-1 across all generated cards in a batch"""
+        if not texts:
+            return 0.0
+        
+        # Combine all texts and calculate distinct-1 across the entire batch
+        all_words = []
+        for text in texts:
+            words = text.lower().split()
+            all_words.extend(words)
+        
+        if not all_words:
+            return 0.0
+        
+        unique_words = len(set(all_words))
+        total_words = len(all_words)
+        batch_distinct_1 = unique_words / total_words
+        
+        print(f"🎯 Batch Distinct-1: {batch_distinct_1:.3f} (unique: {unique_words}, total: {total_words}) across {len(texts)} cards")
+        return batch_distinct_1
     
     async def _generate_fallback_humor(self, request: HumorRequest, personas: List[str]) -> List[GenerationResult]:
         """Generate fallback humor when standard generation fails"""

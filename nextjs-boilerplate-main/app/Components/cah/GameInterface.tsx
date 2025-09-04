@@ -17,6 +17,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
   const [topic, setTopic] = useState('general');
   const [cardType, setCardType] = useState<'white' | 'black' | 'multiplayer'>('multiplayer');
   const [generations, setGenerations] = useState<Generation[]>([]);
+  const [generationData, setGenerationData] = useState<any>(null); // Store full generation response
   const [loading, setLoading] = useState(false);
   const [generationTime, setGenerationTime] = useState(0);
   const [recommendations, setRecommendations] = useState<string[]>([]);
@@ -192,6 +193,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
 
     setLoading(true);
     setGenerations([]);
+    setGenerationData(null);
 
     try {
       // Check if the context is already a black card (contains fill-in-the-blank)
@@ -226,6 +228,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
       
       if (result.success) {
         setGenerations(result.results || []);  // Backend'den gelen 'results' field'ı
+        setGenerationData(result); // Store full result data including batch_distinct_1
         setRecommendations(result.recommended_personas || []);
         setGenerationTime(result.generation_time || 0);
         setRound(r => r + 1); // increment round
@@ -1520,7 +1523,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
           </div>
 
           {generations && generations.length > 0 && (
-            <div className="flex items-center justify-center mb-2">
+            <div className="flex flex-col items-center justify-center mb-4 space-y-2">
               <span className="text-lg font-bold text-text-primary">Round {round}</span>
             </div>
           )}
@@ -1557,7 +1560,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                       )}
                     </span>
                     <span className="px-1.5 py-0.5 bg-blue-600/20 text-blue-300 rounded text-xs font-medium">
-                      {whiteCardRatings[generation.id || 'unknown'] || 5}/10
+                      {whiteCardRatings[generation.id || generation.generation?.text || 'unknown'] || '5'}/10
                     </span>
                   </div>
                   {/* Literature-Based Evaluation Metrics */}
@@ -1592,12 +1595,6 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                         {(generation.semantic_coherence ?? generation.evaluation?.semantic_coherence)?.toFixed(1) || 'N/A'}/10
                       </span>
                     </div>
-                    <div title="Lexical diversity and word variety (Li et al. 2016)">
-                      <span className="text-gray-400">Distinct-1:</span>
-                      <span className={cardType === 'black' ? 'text-text-primary ml-1' : 'text-black ml-1'}>
-                        {((generation.distinct_1 ?? generation.evaluation?.distinct_1 ?? 0) * 10).toFixed(1)}/10
-                      </span>
-                    </div>
 
                     <div title="Personalization score based on user preferences (Deep-SHEEP 2022)">
                       <span className="text-gray-400">Personal:</span>
@@ -1609,7 +1606,7 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
                     <div title="Content safety score from Detoxify (higher = safer)">
                       <span className="text-gray-400">Safety:</span>
                       <span className={cardType === 'black' ? 'text-text-primary ml-1' : 'text-black ml-1'}>
-                        {(generation.safety_score ?? 0.9).toFixed(1)}/1
+                        {(((generation as any).generation?.safety_score ?? (generation as any).safety_score ?? 0.9) * 10).toFixed(1)}/10
                       </span>
                     </div>
                   </div>
@@ -1638,6 +1635,18 @@ export default function GameInterface({ userId }: GameInterfaceProps) {
               </div>
             ))}
           </div>
+          
+          {/* Batch Distinct-1 Score - Below the cards (only for white cards) */}
+          {generationData?.batch_distinct_1 !== undefined && (
+            <div className="flex justify-center mt-6">
+              <div className="flex items-center space-x-2 px-4 py-2 bg-blue-600/10 rounded-lg border border-blue-600/20">
+                <span className="text-sm text-gray-400">Distinct-1:</span>
+                <span className="text-sm font-medium text-blue-300" title="Lexical diversity across all generated cards (Li et al. 2016)">
+                  {(generationData.batch_distinct_1 * 10).toFixed(1)}/10
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

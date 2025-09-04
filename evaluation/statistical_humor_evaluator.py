@@ -47,8 +47,13 @@ try:
     from evaluation.creativity_diversity_metrics import CreativityDiversityEvaluator
     CREATIVITY_METRICS_AVAILABLE = True
 except ImportError:
-    print("WARNING: Creativity/Diversity metrics not available")
-    CREATIVITY_METRICS_AVAILABLE = False
+    try:
+        # Try different import path
+        from creativity_diversity_metrics import CreativityDiversityEvaluator
+        CREATIVITY_METRICS_AVAILABLE = True
+    except ImportError:
+        print("WARNING: Creativity/Diversity metrics not available")
+        CREATIVITY_METRICS_AVAILABLE = False
 
 
 @dataclass
@@ -907,10 +912,26 @@ class StatisticalHumorEvaluator:
         # 3. Calculate creativity/diversity metrics (single text)
         creativity_scores = None
         if self.creativity_evaluator:
-            creativity_scores = self.creativity_evaluator.evaluate_creativity_diversity([text])
+            try:
+                creativity_scores = self.creativity_evaluator.evaluate_creativity_diversity([text])
+            except Exception as e:
+                print(f"⚠️ Creativity evaluator failed: {e}")
+                creativity_scores = None
         
-        # Extract creativity metrics
-        distinct_1 = creativity_scores.distinct_1 if creativity_scores else 0.0
+        # Extract creativity metrics with proper fallback calculation
+        if creativity_scores and hasattr(creativity_scores, 'distinct_1'):
+            distinct_1 = creativity_scores.distinct_1
+            print(f"🎨 Using creativity evaluator distinct_1: {distinct_1:.3f}")
+        else:
+            # Calculate simple distinct-1 fallback for single text
+            words = text.lower().split()
+            if len(words) > 0:
+                unique_words = len(set(words))
+                distinct_1 = unique_words / len(words)  # Simple distinct-1 calculation
+                print(f"🎨 Calculated fallback distinct_1: {distinct_1:.3f} (unique: {unique_words}, total: {len(words)}) for text: '{text[:50]}...'")
+            else:
+                distinct_1 = 0.0
+                print(f"🎨 Empty text, distinct_1: {distinct_1:.3f}")
         distinct_2 = creativity_scores.distinct_2 if creativity_scores else 0.0
         self_bleu = creativity_scores.self_bleu_1 if creativity_scores else 0.0
         mauve_score = creativity_scores.mauve_score if creativity_scores else 0.0
@@ -933,6 +954,9 @@ class StatisticalHumorEvaluator:
         
         # 6. Calculate F1 score (precision + recall balance)
         f1_score = self.calculate_f1_score(text, context)
+        
+        # Debug output for distinct_1
+        print(f"🎯 StatisticalHumorEvaluator returning distinct_1: {distinct_1:.3f}")
         
         return StatisticalHumorScores(
             surprisal_score=surprisal_score,

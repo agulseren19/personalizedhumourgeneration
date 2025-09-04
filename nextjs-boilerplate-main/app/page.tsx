@@ -13,7 +13,7 @@ export default function Home() {
               <Gamepad2 size={88} className="mx-auto text-accent-turquoise" />
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-text-primary mb-10 leading-tight">
-              AI Cards Against Humanity
+              Cards Against Humanity
             </h1>
             <p className="text-lg md:text-xl text-text-secondary mb-16 max-w-2xl mx-auto leading-relaxed">
               Experience the future of comedy with AI-powered humor generation. 
@@ -113,6 +113,10 @@ export default function Home() {
                   
                   <p>
                     You can browse all available humour styles under the <strong className="text-text-primary">AI Comedians</strong> section, and track your card picks, ratings, and evolving preferences in the <strong className="text-text-primary">Your Learning</strong> tab.
+                  </p>
+
+                  <p>
+                  This game includes safety filters to reduce offensive or inappropriate content. However, due to the satirical nature of Cards Against Humanity, some users may find it inappropriate. Please proceed accordingly.
                   </p>
                 </div>
               </div>
