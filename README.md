@@ -70,7 +70,7 @@ python agent_system/fixed_complete_demo.py > fixed_demo_output.txt
 ### Advanced Generation Methods
 
 #### PPLM and RAG Evaluation
-**Implementation:** `agent_system/run_full_comprehensive_evaluation.py`
+**Implementation:** `agent_system/run_full_comprehensive_evaluation1.py`
 
 Evaluation of advanced text generation techniques:
 - **PPLM (Plug and Play Language Models)**: Real iterative gradient ascent during generation
