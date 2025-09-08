@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Complete System Demonstration
-Shows all components working together exactly as described by the user
+Shows all components working together exactly
 """
 
 import asyncio

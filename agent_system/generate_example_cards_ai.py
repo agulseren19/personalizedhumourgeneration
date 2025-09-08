@@ -22,11 +22,15 @@ from models.database import create_database, get_session_local, User, Persona, P
 from config.settings import settings
 from personas.persona_manager import PersonaManager
 from agents.improved_humor_agents import ImprovedHumorOrchestrator, HumorRequest
+from evaluation.statistical_humor_evaluator import StatisticalHumorEvaluator
 
 class MultiUserAIExampleCardGenerator:
     """Generates example CAH cards for multiple users with different personas"""
     
     def __init__(self):
+        # Initialize statistical humor evaluator
+        self.humor_evaluator = StatisticalHumorEvaluator()
+        
         # Define 5 different users with different favorite personas
         self.users = {
             "office_gamer_456": {
@@ -676,25 +680,56 @@ class MultiUserAIExampleCardGenerator:
             
             for combo in complete_sentences:
                 # Generate mock scores (in real scenario, these would come from evaluation)
-                mock_scores = {
-                    "surprisal_score": round(random.uniform(3.5, 5.5), 1),
-                    "ambiguity_score": round(random.uniform(6.5, 8.5), 1),
-                    "distinctiveness_ratio": round(random.uniform(2.5, 4.5), 1),
-                    "entropy_score": round(random.uniform(5.0, 6.5), 1),
-                    "perplexity_score": round(random.uniform(7.0, 10.0), 1),
-                    "semantic_coherence": round(random.uniform(6.0, 8.0), 1),
-                    "distinct_1": round(random.uniform(0.85, 0.97), 2),
-                    "distinct_2": 1.0,
-                    "self_bleu": 0.0,
-                    "mauve_score": 0.0,
-                    "vocabulary_richness": round(random.uniform(0.45, 0.65), 2),
-                    "overall_semantic_diversity": 0.0,
-                    "intra_cluster_diversity": 0.0,
-                    "inter_cluster_diversity": 0.0,
-                    "semantic_spread": 0.0,
-                    "cluster_coherence": 0.0,
-                    "overall_humor_score": round(random.uniform(6.0, 7.5), 1)
-                }
+                # Use real statistical humor evaluator
+                try:
+                    statistical_scores = self.humor_evaluator.evaluate_humor_statistically(
+                        text=combo['complete_sentence'],
+                        context=combo['black_card'],
+                        user_profile=[]  # Empty profile for now
+                    )
+                    
+                    # Convert to dictionary format
+                    mock_scores = {
+                        "surprisal_score": round(statistical_scores.surprisal_score, 1),
+                        "ambiguity_score": round(statistical_scores.ambiguity_score, 1),
+                        "distinctiveness_ratio": round(statistical_scores.distinctiveness_ratio, 1),
+                        "entropy_score": round(statistical_scores.entropy_score, 1),
+                        "perplexity_score": round(statistical_scores.perplexity_score, 1),
+                        "semantic_coherence": round(statistical_scores.semantic_coherence, 1),
+                        "distinct_1": round(statistical_scores.distinct_1, 2),
+                        "distinct_2": round(statistical_scores.distinct_2, 2),
+                        "self_bleu": round(statistical_scores.self_bleu, 2),
+                        "mauve_score": round(statistical_scores.mauve_score, 2),
+                        "vocabulary_richness": round(statistical_scores.vocabulary_richness, 2),
+                        "overall_semantic_diversity": round(statistical_scores.overall_semantic_diversity, 2),
+                        "intra_cluster_diversity": round(statistical_scores.intra_cluster_diversity, 2),
+                        "inter_cluster_diversity": round(statistical_scores.inter_cluster_diversity, 2),
+                        "semantic_spread": round(statistical_scores.semantic_spread, 2),
+                        "cluster_coherence": round(statistical_scores.cluster_coherence, 2),
+                        "overall_humor_score": round(statistical_scores.overall_humor_score, 1)
+                    }
+                except Exception as e:
+                    print(f"⚠️ Statistical evaluator failed, using fallback: {e}")
+                    # Fallback to basic scores if evaluator fails
+                    mock_scores = {
+                        "surprisal_score": 4.0,
+                        "ambiguity_score": 7.0,
+                        "distinctiveness_ratio": 3.0,
+                        "entropy_score": 5.5,
+                        "perplexity_score": 8.0,
+                        "semantic_coherence": 7.0,
+                        "distinct_1": 0.90,
+                        "distinct_2": 1.0,
+                        "self_bleu": 0.0,
+                        "mauve_score": 0.0,
+                        "vocabulary_richness": 0.50,
+                        "overall_semantic_diversity": 0.0,
+                        "intra_cluster_diversity": 0.0,
+                        "inter_cluster_diversity": 0.0,
+                        "semantic_spread": 0.0,
+                        "cluster_coherence": 0.0,
+                        "overall_humor_score": 6.5
+                    }
                 
                 result = {
                     "combination_id": combination_id,

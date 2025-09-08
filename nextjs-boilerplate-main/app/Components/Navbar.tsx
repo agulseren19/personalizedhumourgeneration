@@ -68,7 +68,7 @@ const Navbar = () => {
             <Link href="/" className="cursor-pointer">
               <div className="text-text-primary font-bold text-lg flex items-center space-x-1 whitespace-nowrap">
                 <Gamepad2 className="inline mr-2" size={20} />
-                <span>AI Cards Against Humanity</span>
+                <span>Cards Against Humanity</span>
               </div>
             </Link>
           </div>

@@ -7,10 +7,10 @@ import { UserProvider } from "./contexts/UserContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AI Cards Against Humanity",
+  title: "Cards Against Humanity",
   description: "AI-powered humor generation with personalized learning and feedback",
   openGraph: {
-    title: "AI Cards Against Humanity",
+    title: "Cards Against Humanity",
     description: "AI-powered humor generation with personalized learning and feedback",
     siteName: "AI CAH",
     images: [
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Cards Against Humanity",
+    title: "Cards Against Humanity",
     description: "AI-powered humor generation with personalized learning and feedback",
     images:
       "https://res.cloudinary.com/dl2adjye7/image/upload/v1716922972/DynaUI_rfzbgc.png",

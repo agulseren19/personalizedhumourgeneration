@@ -37,10 +37,10 @@ This document presents the results of a comprehensive comparison between static 
 
 | Approach | F1 Score | Improvement |
 |----------|----------|-------------|
-| **Static** | 0.825 | Baseline |
-| **Dynamic** | 0.889 | **+7.6%** |
+| **Static** | 0.62 | Baseline |
+| **Dynamic** | 0.65 | **+4.8%** |
 
-**Key Finding**: Dynamic personas achieve **7.6% improvement** in F1 scores, indicating better precision-recall balance in humor quality assessment.
+**Key Finding**: Dynamic personas achieve **4.8% improvement** in F1 scores, indicating better precision-recall balance in humor quality assessment.
 
 **Technical Details**:
 - F1 scores calculated using simulated predictions based on humor quality scores
@@ -214,7 +214,7 @@ This comprehensive analysis demonstrates that **dynamic personalization approach
 *This analysis provides comprehensive, evidence-based support for the superiority of dynamic personalization approaches in AI-generated humor systems.*
 
 Metric	Static	Dynamic	Improvement
-F1 Score	0.825	0.889	+7.6%
+F1 Score	0.62	0.65	+4.8%
 MSE	0.169	0.109	-35.5%
 Adaptability	0.93/10	1.01/10	+8.6%
 Diversity	6.45/10	7.12/10	+10.4%
