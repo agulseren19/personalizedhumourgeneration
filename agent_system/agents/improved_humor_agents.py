@@ -1097,16 +1097,15 @@ White Card:"""
         
         try:
             from crewai import Task, Crew
-            
+            print(f"COMEDIAN NAME: {comedian_name}")
             # Create simple task for black card generation
             comedian_style = f"\nGenerate in the style of {comedian_name}." if comedian_name else ""
             task = Task(
                 description=f"""Generate ONE funny black card for Cards Against Humanity.
-
+HUMOR STYLE: {comedian_name}
 Context: {request.context}
 Audience: {request.audience}
 Topic: {request.topic}{comedian_style}
-
 Requirements:
 - Generate exactly ONE black card with a blank (_____)
 - Keep it under 100 characters
