@@ -623,6 +623,22 @@ class AuthenticatedMultiplayerCAHGame:
                 try:
                     logger.info(f"🎯 Making generation call {i+1}/{num_calls} for {player.username}")
                     
+                    # Get player's top 2 favorite personas
+                    favorite_personas = self._get_player_favorites(player.user_id) or []
+                    
+                    # Add 1 random/exploration persona to ensure 2 favorites + 1 exploration
+                    final_personas = favorite_personas[:2]  # Take top 2 favorites
+                    
+                    # Add 1 exploration persona (different from favorites)
+                    exploration_personas = ["Dark Humor Connoisseur", "Techie Tomfoolery", "Corporate Humor Specialist"]
+                    for exploration in exploration_personas:
+                        if exploration not in final_personas:
+                            final_personas.append(exploration)
+                            logger.info(f"🎭 Added exploration persona: {exploration}")
+                            break
+                    
+                    logger.info(f"🎭 Final personas for {player.username}: {final_personas} (2 favorites + 1 exploration)")
+                    
                     # Create humor request with black card context
                     request = HumorRequest(
                         context=f"{context}. Make it edgy and humorous, suitable for adult audiences.",
@@ -630,7 +646,8 @@ class AuthenticatedMultiplayerCAHGame:
                         topic="general",
                         user_id=str(player.user_id),
                         humor_type="edgy",
-                        card_type="white"
+                        card_type="white",
+                        favorite_personas=final_personas  # Pass 2 favorites + 1 exploration
                     )
                     
                     # Generate personalized cards using CrewAI - this returns 3 cards (one per persona)
@@ -770,6 +787,33 @@ class AuthenticatedMultiplayerCAHGame:
                 fallback_cards.append(fallback_card)
             return fallback_cards
     
+    def _get_player_favorites(self, user_id: str) -> Optional[List[str]]:
+        """Get player's top 2 favorite personas"""
+        try:
+            from agent_system.models.database import get_session_local, PersonaPreference, Persona
+            from agent_system.config.settings import settings
+            
+            SessionLocal = get_session_local(settings.database_url)
+            db = SessionLocal()
+            try:
+                preferences = db.query(PersonaPreference).filter(
+                    PersonaPreference.user_id == str(user_id)
+                ).order_by(PersonaPreference.preference_score.desc()).limit(2).all()
+                
+                if preferences:
+                    favorites = []
+                    for pref in preferences:
+                        persona = db.query(Persona).filter(Persona.id == pref.persona_id).first()
+                        if persona:
+                            favorites.append(persona.name)
+                    return favorites if favorites else None
+                return None
+            finally:
+                db.close()
+        except Exception as e:
+            logger.error(f"Error getting favorites for {user_id}: {e}")
+            return None
+
     def _get_best_persona_for_player(self, db: Session, player: AuthenticatedPlayer) -> str:
         """Get the best persona for a player based on their preferences"""
         try:

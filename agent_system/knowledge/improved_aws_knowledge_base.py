@@ -51,6 +51,7 @@ class PostgreSQLKnowledgeBase:
             'gen_z_chaos': 'Gen Z Chaos Agent',
             'gaming_guru': 'Gaming Culture Comedian',
             'absurd_enthusiast': 'Absurdist Humor Artist',
+            'absurdist_artist': 'Absurdist Artist',  # Added missing mapping
             'office_worker': 'Corporate Humor Specialist',
             'dad_humor_enthusiast': 'Dad Humor Enthusiast',
             'suburban_parent': 'Suburban Parent Survivor',
@@ -61,10 +62,27 @@ class PostgreSQLKnowledgeBase:
             'millennial_memer': 'Millennial Memer',
             'marvel_fanatic': 'Marvel Universe Expert',
             
+            # AI Comedian personas (dynamic/generated)
+            'adaptive_humor_expert': 'Adaptive Humor Expert',  # Added missing mapping
+            
+            # Display names that get passed through -> Normalized names (from database)
+            'Gaming Culture Comedian': 'Gaming Culture Comedian',  # Already normalized
+            'Wordplay Enthusiast': 'Wordplay Enthusiast',  # Dynamic persona name
+            'Observational Enthusiast': 'Observational Enthusiast',  # Dynamic persona name
+            'Absurdist Artist': 'Absurdist Artist',  # Already normalized
+            'Adaptive Humor Expert': 'Adaptive Humor Expert',  # Already normalized
+            'Corporate Humor Specialist': 'Corporate Humor Specialist',  # Already normalized
+            'Clever Enthusiast': 'Clever Enthusiast',  # Dynamic persona name
+            'Sarcastic Enthusiast': 'Sarcastic Enthusiast',  # Dynamic persona name
+            'Pop-Culture Enthusiast': 'Pop-Culture Enthusiast',  # Dynamic persona name
+            'clever_enthusiast': 'Clever Enthusiast',  # Template key -> Display name
+            'sarcastic_enthusiast': 'Sarcastic Enthusiast',  # Template key -> Display name
+            
             # Common variations
             'gen z chaos': 'Gen Z Chaos Agent',
             'gaming guru': 'Gaming Culture Comedian',
             'absurd enthusiast': 'Absurdist Humor Artist',
+            'absurd artist': 'Absurdist Artist',
             'office worker': 'Corporate Humor Specialist',
             'dad humor enthusiast': 'Dad Humor Enthusiast',
             'suburban parent': 'Suburban Parent Survivor',
@@ -74,6 +92,10 @@ class PostgreSQLKnowledgeBase:
             'wordplay master': 'Pun and Wordplay Expert',
             'millennial memer': 'Millennial Memer',
             'marvel fanatic': 'Marvel Universe Expert',
+            'adaptive humor': 'Adaptive Humor Expert',
+            'gaming culture': 'Gaming Culture Comedian',
+            'wordplay': 'Wordplay Enthusiast',
+            'observational': 'Observational Enthusiast',
         }
     
     def _normalize_persona_name(self, persona_name: str) -> str:
@@ -95,6 +117,14 @@ class PostgreSQLKnowledgeBase:
         for template_name, db_name in self.persona_name_mapping.items():
             if template_name.lower() in persona_name_lower or persona_name_lower in template_name.lower():
                 return db_name
+        
+        # DYNAMIC PERSONA PATTERN HANDLING: Convert underscore format to title case
+        if '_' in persona_name and persona_name.islower():
+            # Convert dynamic persona pattern: "clever_enthusiast" -> "Clever Enthusiast"
+            parts = persona_name.split('_')
+            title_case_name = ' '.join(word.capitalize() for word in parts)
+            print(f"  🔄 Auto-normalized dynamic persona: '{persona_name}' -> '{title_case_name}'")
+            return title_case_name
         
         # If no match found, return original name
         print(f"  ⚠️  Could not normalize persona name: '{persona_name}'")
