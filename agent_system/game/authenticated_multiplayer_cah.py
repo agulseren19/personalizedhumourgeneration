@@ -624,7 +624,7 @@ class AuthenticatedMultiplayerCAHGame:
                     logger.info(f"🎯 Making generation call {i+1}/{num_calls} for {player.username}")
                     
                     # Get player's top 2 favorite personas
-                    favorite_personas = self._get_player_favorites(player.user_id) or []
+                    favorite_personas = await self._get_player_favorites(player.user_id) or []
                     
                     # Add 1 random/exploration persona to ensure 2 favorites + 1 exploration
                     final_personas = favorite_personas[:2]  # Take top 2 favorites
@@ -787,29 +787,16 @@ class AuthenticatedMultiplayerCAHGame:
                 fallback_cards.append(fallback_card)
             return fallback_cards
     
-    def _get_player_favorites(self, user_id: str) -> Optional[List[str]]:
+    async def _get_player_favorites(self, user_id: str) -> Optional[List[str]]:
         """Get player's top 2 favorite personas"""
         try:
-            from agent_system.models.database import get_session_local, PersonaPreference, Persona
-            from agent_system.config.settings import settings
+            from agent_system.knowledge.improved_aws_knowledge_base import improved_aws_knowledge_base
             
-            SessionLocal = get_session_local(settings.database_url)
-            db = SessionLocal()
-            try:
-                preferences = db.query(PersonaPreference).filter(
-                    PersonaPreference.user_id == str(user_id)
-                ).order_by(PersonaPreference.preference_score.desc()).limit(2).all()
-                
-                if preferences:
-                    favorites = []
-                    for pref in preferences:
-                        persona = db.query(Persona).filter(Persona.id == pref.persona_id).first()
-                        if persona:
-                            favorites.append(persona.name)
-                    return favorites if favorites else None
-                return None
-            finally:
-                db.close()
+            user_preferences = await improved_aws_knowledge_base.get_user_preference(user_id)
+            if user_preferences and user_preferences.liked_personas:
+                # Return top 2 favorite personas
+                return user_preferences.liked_personas[:2]
+            return None
         except Exception as e:
             logger.error(f"Error getting favorites for {user_id}: {e}")
             return None
