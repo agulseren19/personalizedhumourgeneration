@@ -528,6 +528,7 @@ Response:"""
             if response:
                 # Handle both direct strings and LLMResponse objects
                 white_card_text = str(response.content if hasattr(response, 'content') else response).strip()
+                white_card_text = self._clean_response(white_card_text)
                 
                 # For white cards, create complete sentence and evaluate it
                 if request.card_type == "white":
@@ -600,6 +601,11 @@ Response:"""
                             # DEBUG: Log the safety score calculation
                             print(f"      🛡️ Generated safety: is_safe={is_safe}, safety_score={safety_score:.3f}, toxicity_details={toxicity_details}")
                             
+                            # CRITICAL: Reject unsafe content - don't return it to the website
+                            if not is_safe:
+                                print(f"      ❌ Content rejected for safety: {white_card_text[:50]}...")
+                                return None
+                            
                             # Create generation result with evaluation
                             generation_result = GenerationResult(
                                 text=white_card_text,
@@ -624,6 +630,11 @@ Response:"""
                             
                             # Calculate actual safety score using content filter
                             is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(white_card_text)
+                            
+                            # CRITICAL: Reject unsafe content - don't return it to the website
+                            if not is_safe:
+                                print(f"      ❌ Content rejected for safety: {white_card_text[:50]}...")
+                                return None
                             
                             generation_result = GenerationResult(
                                 text=white_card_text,
@@ -717,15 +728,23 @@ Response:"""
             response = await llm_manager.generate_response(llm_request)
             
             if response and response.content:
+                # Clean the response to remove quotes and other formatting
+                cleaned_text = self._clean_response(response.content.strip())
+                
                 # Calculate surprise index
-                surprise_index = await self.surprise_calculator.calculate_surprise_index(response.content.strip(), request.context)
+                surprise_index = await self.surprise_calculator.calculate_surprise_index(cleaned_text, request.context)
                 
                 # Calculate actual safety score using content filter
-                is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(response.content.strip())
+                is_safe, safety_score, toxicity_details = self.content_filter.is_content_safe(cleaned_text)
+                
+                # CRITICAL: Reject unsafe content - don't return it to the website
+                if not is_safe:
+                    print(f"      ❌ Custom persona content rejected for safety: {cleaned_text[:50]}...")
+                    return None
                 
                 # Create generation result
                 generation_result = GenerationResult(
-                    text=response.content.strip(),
+                    text=cleaned_text,
                     persona_name=custom_persona.name,
                     model_used=model,
                     generation_time=1.0,  # Estimated time
@@ -736,7 +755,7 @@ Response:"""
                     surprise_index=surprise_index
                 )
                 
-                print(f"      ✅ Generated with custom persona: {response.content.strip()[:50]}...")
+                print(f"      ✅ Generated with custom persona: {cleaned_text[:50]}...")
                 return generation_result
             else:
                 print(f"      ❌ Empty response from custom persona {custom_persona.name}")
@@ -938,21 +957,25 @@ White Card:"""
             print(f"    Error generating with custom persona {custom_persona.name}: {e}")
             return None
 
-    async def generate_black_cards_with_crewai(self, request: HumorRequest) -> List[GenerationResult]:
+    async def generate_black_cards_with_crewai(self, request: HumorRequest, recommended_personas: List[str] = None) -> List[GenerationResult]:
         """Generate ONE black card using simplified CrewAI - FAST VERSION"""
         print(f"🎭 Generating ONE black card with simplified CrewAI for user {request.user_id}")
         print(f"🎭 DEBUG: Black card generation called with card_type = '{request.card_type}'")
         print(f"🎭 DEBUG: Black card generation called with context = '{request.context}'")
+        print(f"🎭 DEBUG: Recommended personas: {recommended_personas}")
         
         try:
-            # Get user preferences for personalization
-            user_preferences = await self._get_user_preferences(request.user_id)
-            
-            # Get ONE favorite comedian (not multiple)
+            # Use first recommended persona as favorite comedian, with fallback to user preferences
             favorite_comedian = None
-            if user_preferences and user_preferences.liked_personas:
-                favorite_comedian = user_preferences.liked_personas[0]  # Only top 1 favorite
-                print(f"    Using favorite comedian: {favorite_comedian}")
+            if recommended_personas and len(recommended_personas) > 0:
+                favorite_comedian = recommended_personas[0]
+                print(f"    Using first recommended persona as favorite comedian: {favorite_comedian}")
+            else:
+                # Fallback to user preferences for personalization
+                user_preferences = await self._get_user_preferences(request.user_id)
+                if user_preferences and user_preferences.liked_personas:
+                    favorite_comedian = user_preferences.liked_personas[0]  # Only top 1 favorite
+                    print(f"    Fallback to user preference comedian: {favorite_comedian}")
             
             # Create SIMPLIFIED CrewAI crew (only 1 agent)
             crew = await self._create_simple_black_card_crew(request, favorite_comedian)
@@ -1953,7 +1976,7 @@ class ImprovedHumorOrchestrator:
                 agent = self.generator_agents[0] if hasattr(self, 'generator_agents') and self.generator_agents else self.agent
                 # Use asyncio.wait_for to prevent infinite hanging
                 generations = await asyncio.wait_for(
-                    agent.generate_black_cards_with_crewai(request),
+                    agent.generate_black_cards_with_crewai(request, recommended_personas),
                     timeout=30.0  # 30 second timeout for CrewAI
                 )
                 print("✅ CrewAI black card generation completed successfully")
